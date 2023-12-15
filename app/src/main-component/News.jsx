@@ -6,7 +6,7 @@ import AddComment from "../news-comments/AddComment";
 export default function News({ user, login }) {
   const [comments, setComments] = useState([]);
   const [window, setWindow] = useState(false);
- 
+
   useEffect(() => {
     loadComments();
   }, []);
@@ -16,7 +16,8 @@ export default function News({ user, login }) {
     try {
       const result = await fetch("http://localhost/comments");
       const obj = await result.json();
-      setComments(obj);
+      const copy = obj.reverse();
+      setComments(copy);
     } catch (err) {
       throw Error(`Error with comments :${err}`);
     }

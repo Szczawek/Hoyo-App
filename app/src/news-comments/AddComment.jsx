@@ -47,7 +47,7 @@ export default function AddComment({ openWindow, user, login, loadComments }) {
 
       <header className="com_creator">
         <div className="container">
-          <div className="profile_img">
+          <div className="profile_img avatar">
             <img
               className="medium"
               src={user["avatar"]}

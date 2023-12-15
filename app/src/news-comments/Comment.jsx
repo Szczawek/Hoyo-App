@@ -17,10 +17,11 @@ export default function Comment({ comData, current }) {
       throw Error(`The server isn't responding: ${err}`);
     }
   }
+
   return (
     <div className="comment">
       <header>
-        <div className="profile_img ">
+        <div className="avatar">
           <img
             className="small"
             src={comData["avatar"]}

@@ -11,7 +11,7 @@ export default function Header({ user }) {
         </button>
         <nav className={!openMenu ? "navigation hamburger" : "navigation"}>
           <button className="mobile_only" onClick={() => setOpenMenu(false)}>
-            <img src="images/close.svg" />
+            <img src="images/close.svg" className="medium" />
           </button>
 
           <label htmlFor="user_search">
@@ -21,10 +21,10 @@ export default function Header({ user }) {
           <Link to="/">Home</Link>
           <Link to="info">Info</Link>
           <Link to="news">News</Link>
-          <Link className="profile_link" to="user">
+          <Link className="avatar" to="user">
             <img
               className="medium "
-              src={user["Avatar"]}
+              src={user["avatar"]}
               alt="link to user profile"
             />
           </Link>

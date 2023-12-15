@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 // Load comments
 app.get("/comments", function (req, res) {
   const command =
-    "SELECT user.nick, comments.id, comments.userID, user.avatar, comments.content, comments.date from user INNER JOIN comments ON user.id = comments.userID";
+    "SELECT user.nick, comments.id, comments.userID,comments.date, user.avatar, comments.content, comments.date from user INNER JOIN comments ON user.id = comments.userID";
   db.query(command, function (err, data) {
     if (err) throw Error(`Error with database #comment: ${err}`);
     res.send(data);
@@ -111,7 +111,7 @@ app.post("/remove", function (req, res) {
 });
 // Login An Account
 app.post("/login", function (req, res) {
-  const command = "select nick,Password,id,Avatar from user where Login = ?";
+  const command = "select nick,password,id,avatar from user where Login = ?";
   const userLogin = req.body["login"];
 
   db.query(command, [userLogin], function (err, data) {
@@ -124,7 +124,7 @@ app.post("/login", function (req, res) {
       .then((isMatch) => {
         if (isMatch) {
           const copy = { ...data[0] };
-          delete copy.Password;
+          delete copy.password;
           res.cookie("logged", `${JSON.stringify(copy)}`, { httpOnly: true });
           res.sendStatus(200);
           return;
@@ -138,7 +138,7 @@ app.post("/login", function (req, res) {
 
   async function checkPassword(data) {
     const passwordToCheck = req.body["password"];
-    const correctPassword = data[0]["Password"];
+    const correctPassword = data[0]["password"];
     const result = await bcrypt.compare(passwordToCheck, correctPassword);
     return result;
   }

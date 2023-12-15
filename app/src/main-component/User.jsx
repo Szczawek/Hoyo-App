@@ -4,13 +4,18 @@ import Menu from "../profile/Menu";
 export default function User({ user, session }) {
   return (
     <section className="user">
-      <header className="introduce_profile">
-        <img className="avatar" src={user["avatar"]} alt="profile image" />
-        <div className="account_description">
-          <h2>{user["nick"]}</h2>
-        </div>
-      </header>
-      <div className="user_content">
+      <div className="bg-img">
+        <header className="profile">
+          <div className="avatar">
+            <img className="medium" src={user["avatar"]} alt="profile image" />
+          </div>
+          <div className="account_description">
+            <h2>{user["nick"]}</h2>
+          </div>
+        </header>
+        <div className="info"></div>
+      </div>
+      <div className="user_com">
         <p>empty table</p>
       </div>
 
