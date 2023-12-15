@@ -35,11 +35,7 @@ app.get("/comments", function (req, res) {
 });
 
 app.get("add-like", function (req, res) {
-  const command = "UPDATE comments set likes =? where id = ?";
-  const values = [];
-  db.query(command, values, function (err, result) {
-    if (err) throw Error(`Error with database #add-like: ${err}`);
-  });
+
 });
 
 // Add comment to account
