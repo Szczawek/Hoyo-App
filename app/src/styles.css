@@ -200,7 +200,7 @@ body {
   min-height: 10rem;
   grid-template-columns: 4rem 1fr;
   grid-template-rows: max-content 1fr;
-  box-shadow: 0 .4rem .4rem .3rem #0a0a0a;
+  box-shadow: 0 0.4rem 0.4rem 0.3rem #0a0a0a;
 }
 
 .user .avatar img {
@@ -256,6 +256,7 @@ body {
 }
 
 /* ADD COMMENT(WINDOW) */
+
 .com_creator .container {
   display: grid;
   gap: 1rem;
@@ -272,6 +273,14 @@ body {
   border-radius: 0.2rem;
   width: 100%;
 }
+.com_creator button {
+  display: grid;
+  max-width: max-content;
+  padding: .4rem .8rem;
+  align-items: center;
+  margin-inline:auto;
+}
+
 .com_window {
   display: grid;
   place-content: center;
@@ -296,7 +305,14 @@ body {
   padding: 0.4rem 0.6rem;
   transition: filter 300ms;
   font-size: 0.9rem;
+  display: grid;
+  align-items: center;
+  gap: 1rem;
+  grid-template-columns: repeat(2,max-content);
   border-radius: 0.2rem;
+}
+.com_window .container button img {
+  width: 1rem;
 }
 .com_window .add_com {
   background-color: green;
@@ -344,6 +360,19 @@ body {
 }
 .comment .remove_com:hover {
   scale: 1.2;
+}
+.comment .likes {
+  display: grid;
+  align-items: center;
+  gap: 1rem;
+  grid-template-columns: repeat(2, max-content);
+}
+.comment .likes svg {
+  transition: fill 300ms;
+  fill: #302a2a;
+}
+.comment .likes svg:hover {
+  fill: rgb(255, 0, 212);
 }
 @media (max-width: 550px) {
   /* Navigation */

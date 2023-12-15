@@ -27,10 +27,18 @@ app.get("/", (req, res) => {
 // Load comments
 app.get("/comments", function (req, res) {
   const command =
-    "SELECT user.nick, comments.id, comments.userID,comments.date, user.avatar, comments.content, comments.date from user INNER JOIN comments ON user.id = comments.userID";
+    "SELECT user.nick, user.avatar,comments.* from user JOIN comments ON user.id = comments.userID";
   db.query(command, function (err, data) {
     if (err) throw Error(`Error with database #comment: ${err}`);
     res.send(data);
+  });
+});
+
+app.get("add-like", function (req, res) {
+  const command = "UPDATE comments set likes =? where id = ?";
+  const values = [];
+  db.query(command, values, function (err, result) {
+    if (err) throw Error(`Error with database #add-like: ${err}`);
   });
 });
 
@@ -40,10 +48,11 @@ app.post("/add-comment", function (req, res) {
     res.sendStatus(400);
     return;
   }
-  const command = "INSERT INTO comments(userID,content, date) values(?,?,?)";
+  const command =
+    "INSERT INTO comments(userID,content, date,likes) values(?,?,?,?)";
   const userID = JSON.parse(req.cookies["logged"])["id"];
   const content = req.body["content"];
-  const values = [userID, content, new Date()];
+  const values = [userID, content, new Date(), 0];
   db.query(command, values, function (err, data) {
     if (err) throw Error(`Error with database #add-comment${err}`);
     res.sendStatus(200);

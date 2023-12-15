@@ -34,12 +34,12 @@ export default function AddComment({ openWindow, user, login, loadComments }) {
                 addComment();
                 setCommentWindow(false);
               }}>
-              Add Comment
+              Add Comment <img src="images/check.svg" alt="add-comment" />
             </button>
             <button
               className="close_win"
               onClick={() => setCommentWindow(false)}>
-              Cancel
+              Cancel <img src="images/close.svg" alt="cancel comment" />
             </button>
           </div>
         </div>
