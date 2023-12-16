@@ -34,9 +34,12 @@ app.get("/comments", function (req, res) {
   });
 });
 
-app.get("add-like", function (req, res) {
+// TO FIX
+// app.post("/users/:userName", function (req, res) {
+//   console.log(req.params)
+//   res.sendStatus(200)
 
-});
+// });
 
 // Add comment to account
 app.post("/add-comment", function (req, res) {
@@ -162,6 +165,15 @@ app.get("/logged", function (req, res) {
     return;
   }
   res.sendStatus(400);
+});
+
+// Users account
+app.get("/users", function (req, res) {
+  const command = "SELECT nick from user";
+  db.query(command, function (err, result) {
+    if (err) throw Error(`Error with database #users: ${err}`);
+    res.send(result);
+  });
 });
 
 app.listen(PORT, () => {

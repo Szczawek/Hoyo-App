@@ -71,12 +71,26 @@ body {
   scale: 1.2;
 }
 
-.navigation input[type="search"] {
+.navigation .search_user {
+  display: grid;
+  position: relative;
+  grid-template-columns: repeat(2, max-content);
+  padding: 0.2rem 0.6rem;
+  gap: 1rem;
   border: 1px solid red;
-  padding: 0.4rem 1rem;
   border-radius: 0.2rem;
 }
-
+.navigation .user_list {
+  position: absolute;
+  background-color: red;
+  width: 100%;
+  translate: 0 2.4rem;
+  border-radius: .2rem;
+  padding: 0.4rem;
+}
+.navigation .user_list button {
+  width: 100%;
+}
 .hamburger_btn,
 .mobile_only {
   min-width: 1rem;
@@ -276,9 +290,9 @@ body {
 .com_creator button {
   display: grid;
   max-width: max-content;
-  padding: .4rem .8rem;
+  padding: 0.4rem 0.8rem;
   align-items: center;
-  margin-inline:auto;
+  margin-inline: auto;
 }
 
 .com_window {
@@ -308,7 +322,7 @@ body {
   display: grid;
   align-items: center;
   gap: 1rem;
-  grid-template-columns: repeat(2,max-content);
+  grid-template-columns: repeat(2, max-content);
   border-radius: 0.2rem;
 }
 .com_window .container button img {

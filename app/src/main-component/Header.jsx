@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import FindUser from "../header-component/FindUser";
+
 export default function Header({ user }) {
   const [openMenu, setOpenMenu] = useState(false);
 
@@ -13,17 +15,13 @@ export default function Header({ user }) {
           <button className="mobile_only" onClick={() => setOpenMenu(false)}>
             <img src="images/close.svg" className="medium" />
           </button>
-
-          <label htmlFor="user_search">
-            <input type="search" placeholder="Search..." id="user_search" />
-          </label>
-
+          <FindUser />
           <Link to="/">Home</Link>
           <Link to="info">Info</Link>
           <Link to="news">News</Link>
           <Link className="avatar" to="user">
             <img
-              className="medium "
+              className="medium"
               src={user["avatar"]}
               alt="link to user profile"
             />
