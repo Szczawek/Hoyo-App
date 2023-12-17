@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mysql from "mysql";
-import bcrypt from "bcrypt";
+import bcrypt, { compareSync } from "bcrypt";
 import cookieParser from "cookie-parser";
 const app = express();
 app.use(express.json());
@@ -119,7 +119,8 @@ app.post("/remove", function (req, res) {
 });
 // Login An Account
 app.post("/login", function (req, res) {
-  const command = "select nick,password,id,avatar from user where Login = ?";
+  const command =
+    "select nick,password,id,avatar,about from user where Login = ?";
   const userLogin = req.body["login"];
 
   db.query(command, [userLogin], function (err, data) {
@@ -169,10 +170,19 @@ app.get("/logged", function (req, res) {
 
 // Users account
 app.get("/users", function (req, res) {
-  const command = "SELECT nick,about,avatar from user";
+  const command = "SELECT nick, about, avatar, id from user";
   db.query(command, function (err, result) {
     if (err) throw Error(`Error with database #users: ${err}`);
     res.send(result);
+  });
+});
+
+app.post("/user-comments", function (req, res) {
+  const command = "select * from comments where userID = ?";
+  const value = [req.body["id"]];
+  db.query(command, value, function (err, result) {
+    if (err) throw Error(`Error with database #user-comments: ${err}`);
+    res.send(result)
   });
 });
 

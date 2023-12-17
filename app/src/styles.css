@@ -224,15 +224,9 @@ body {
   border-radius: 1.5rem;
   gap: 1rem;
   position: absolute;
-  max-width: 450px;
-  min-height: 10rem;
-  grid-template-columns: 4rem 1fr;
+  min-width: 320px;
   grid-template-rows: max-content 1fr;
   box-shadow: 0 0.4rem 0.4rem 0.3rem #0a0a0a;
-}
-
-.user .avatar img {
-  width: 100%;
 }
 
 .user_com {
@@ -251,6 +245,10 @@ body {
 }
 
 /* PROFILE PICTURE/AVATAR */
+.big {
+  max-width: 5rem;
+}
+
 .medium {
   width: 2.2rem;
 }
@@ -369,7 +367,9 @@ body {
   justify-content: space-between;
   grid-template-columns: repeat(2, max-content);
 }
-.comment .move_to_profile {
+
+.comment .move_to_profile,
+.comment .comment_info {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(2, max-content);
@@ -438,5 +438,10 @@ body {
   .hamburger_btn,
   .mobile_only {
     display: block;
+  }
+  /* USER */
+  .user .profile {
+    left: 0;
+    right: 0;
   }
 }
