@@ -19,38 +19,63 @@ export default function FindUser() {
     }
   }
 
+  function searchUser(nick) {
+    history.pushState(null, "", nick);
+    window.location.reload();
+  }
+  // JEST TO ZEPSUTE
+  // JEST TO ZEPSUTE
+  // JEST TO ZEPSUTE
+  // JEST TO ZEPSUTE
+  // JEST TO ZEPSUTE
+  // JEST TO ZEPSUTE
+  // JEST TO ZEPSUTE
+  // JEST TO ZEPSUTE
   return (
-    <label className="search_user" htmlFor="find_user">
-      <img src="images/search.svg" alt="decoration" />
-      <input
-        type="search"
-        id="find_user"
-        placeholder="Search..."
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onFocus={() => setOpenWindow(true)}
-        onBlur={() => setOpenWindow(false)}
-      />
+    <div onMouseLeave={() => setOpenWindow(false)}>
+      <label
+        className="search_user_case"
+        htmlFor="find_user"
+        onFocus={() => setOpenWindow(true)}>
+        <img src="images/search.svg" alt="decoration" />
+        <input
+          className="search_user"
+          type="search"
+          id="find_user"
+          placeholder="Search..."
+          autoComplete="off"
+          list="users_list"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setOpenWindow(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") searchUser(value);
+          }}
+        />
+      </label>
       {openWinow && (
         <UsersList
+          fn={searchUser}
           empty={value.length > 0}
           users={users.filter((e) =>
             e["nick"].toLowerCase().startsWith(value.toLowerCase())
           )}
         />
       )}
-    </label>
+    </div>
   );
 }
 
-function UsersList({ users, empty }) {
+function UsersList({ users, empty, fn }) {
   return (
     <ul className="user_list">
       {users.length && empty ? (
         users.map((e, index) => {
           return (
             <li key={index}>
-              <button>{e["nick"]}</button>
+              <button onClick={() => fn(e["nick"])}>{e["nick"]}</button>
             </li>
           );
         })

@@ -169,7 +169,7 @@ app.get("/logged", function (req, res) {
 
 // Users account
 app.get("/users", function (req, res) {
-  const command = "SELECT nick from user";
+  const command = "SELECT nick,about,avatar from user";
   db.query(command, function (err, result) {
     if (err) throw Error(`Error with database #users: ${err}`);
     res.send(result);

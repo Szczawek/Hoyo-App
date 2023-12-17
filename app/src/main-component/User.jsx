@@ -1,7 +1,7 @@
 import Login from "../account/Login";
 import Menu from "../profile/Menu";
 
-export default function User({ user, session }) {
+export default function User({ user, session,menu }) {
   return (
     <section className="user">
       <div className="bg-img">
@@ -19,7 +19,7 @@ export default function User({ user, session }) {
         <p>empty table</p>
       </div>
 
-      <Menu />
+      {menu && <Menu />}
       {!session && <Login uncloseable={true}></Login>}
     </section>
   );

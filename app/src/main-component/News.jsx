@@ -5,7 +5,7 @@ import AddComment from "../news-comments/AddComment";
 
 export default function News({ user, login }) {
   const [comments, setComments] = useState([]);
-  const [window, setWindow] = useState(false);
+  const [loginWindow, setLoginloginWindow] = useState(false);
 
   useEffect(() => {
     loadComments();
@@ -23,19 +23,20 @@ export default function News({ user, login }) {
     }
   }
 
-  // Login window
-  function closeWindow() {
-    setWindow(false);
+  // Login loginWindow
+  function closeloginWindow() {
+    setLoginloginWindow(false);
   }
-  function openWindow() {
-    setWindow(true);
+  
+  function openloginWindow() {
+    setLoginloginWindow(true);
   }
 
   return (
     <section className="news">
-      {window && <Login closeFn={closeWindow} />}
+      {loginWindow && <Login closeFn={closeloginWindow} />}
       <AddComment
-        openWindow={openWindow}
+        openloginWindow={openloginWindow}
         user={user}
         login={login}
         loadComments={loadComments}

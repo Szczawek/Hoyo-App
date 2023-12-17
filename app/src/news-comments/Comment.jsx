@@ -18,23 +18,30 @@ export default function Comment({ comData, current }) {
     }
   }
 
-  async function like() {
-    try {
-    } catch (err) {}
+  function searchUser(nick) {
+    history.pushState(null, "", nick);
+    window.location.reload();
   }
+
   return (
     <div className="comment">
       <header>
-        <div className="avatar">
-          <img
-            className="small"
-            src={comData["avatar"]}
-            alt="User profile picture"
-          />
-        </div>
-        <div>
-          <h3 className="nick">{comData["nick"]}</h3>
-          <p className="date">{comData["date"]}</p>
+        <div className="move_to_profile">
+          <button
+            onClick={() => searchUser(comData["nick"])}
+            className="avatar">
+            <img
+              className="small"
+              src={comData["avatar"]}
+              alt="User profile picture"
+            />
+          </button>
+          <div>
+            <button onClick={() => searchUser(comData["nick"])}>
+              <h3 className="nick">{comData["nick"]}</h3>
+            </button>
+            <p className="date">{comData["date"]}</p>
+          </div>
         </div>
         {comData["userID"] == current && (
           <button onClick={() => removeComment()} className="remove_com">

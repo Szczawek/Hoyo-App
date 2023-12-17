@@ -3,4 +3,7 @@
 
 select * from `user`
 
+DELETE FROM `user` WHERE id = 77
+
+SELECT * from `user`
 

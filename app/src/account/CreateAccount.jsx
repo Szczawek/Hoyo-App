@@ -71,6 +71,7 @@ export default function CreateAccount({ nextPage }) {
             onChange={(e) => update("nick", e)}
             maxLength={35}
             minLength={2}
+            pattern="\w*"
             id="create-nick"
             placeholder="Nick"
             required

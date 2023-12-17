@@ -18,6 +18,7 @@ export default function App() {
     verifyLogged();
   }, []);
 
+  
   // Check if the user is logged in
   async function verifyLogged() {
     try {
@@ -29,7 +30,6 @@ export default function App() {
       setSession(true);
       const obj = await response.json();
       const loadUserDate = JSON.parse(obj);
-      console.log(loadUserDate)
       setUserData((prev) => ({
         ...prev,
         ...loadUserDate,
@@ -54,7 +54,7 @@ export default function App() {
             <Route path="info" element={<Info />} />
             <Route
               path="user"
-              element={<User user={userData} session={session} />}
+              element={<User menu={true} user={userData} session={session} />}
             />
             <Route path="*" element={<NotFound />} />
           </Route>
