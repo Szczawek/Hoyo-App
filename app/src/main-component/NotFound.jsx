@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import User from "./User";
 
-export default function NotFound() {
+export default function NotFound({ loggedUserID }) {
   const [exist, setExist] = useState(false);
-  const [userData, setUserData] = useState({});
-  const [userComments, setUserComments] = useState("");
+  const [userData, setUserData] = useState();
   useEffect(() => {
     searchUser();
   }, []);
@@ -20,30 +19,12 @@ export default function NotFound() {
       const ans = !user ? false : true;
       setUserData(user);
       setExist(ans);
-      if (ans) downloadComments(user["id"]);
     } catch (error) {
       throw Error(`Error with download users: ${error}`);
     }
   }
 
-  async function downloadComments(userID) {
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({ id: userID }),
-    };
-
-    try {
-      const response = await fetch("http://localhost/user-comments", options);
-      const obj = await response.json();
-      setUserComments(obj);
-    } catch (error) {
-      throw Error(`Error with comments: ${error}`);
-    }
-  }
   if (!exist) return <p>nothing</p>;
 
-  return <User session={true} user={userData} comments={userComments} />;
+  return <User session={true} user={userData} loggedUserID={loggedUserID} />;
 }

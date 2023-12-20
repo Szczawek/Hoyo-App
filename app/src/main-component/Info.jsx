@@ -1,5 +1,4 @@
 export default function Info() {
-  console.log(Date());
   return (
     <section className="info">
       <header className="introduce">

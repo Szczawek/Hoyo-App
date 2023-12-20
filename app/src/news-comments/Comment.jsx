@@ -1,4 +1,8 @@
-export default function Comment({ comData, current }) {
+import { useNavigate } from "react-router-dom";
+
+export default function Comment({ comData, loggedUserID }) {
+  const navigate = useNavigate();
+
   async function removeComment() {
     const options = {
       method: "POST",
@@ -19,22 +23,17 @@ export default function Comment({ comData, current }) {
   }
 
   function searchUser(nick) {
-    history.pushState(null, "", nick);
-    window.location.reload();
+    navigate(`/${nick}`);
   }
 
   return (
     <div className="comment">
       <header>
-        <div className="move_to_profile">
+        <div className="info">
           <button
             onClick={() => searchUser(comData["nick"])}
-            className="avatar">
-            <img
-              className="small"
-              src={comData["avatar"]}
-              alt="User profile picture"
-            />
+            className="avatar small">
+            <img src={comData["avatar"]} alt="User profile picture" />
           </button>
           <div>
             <button onClick={() => searchUser(comData["nick"])}>
@@ -43,7 +42,7 @@ export default function Comment({ comData, current }) {
             <p className="date">{comData["date"]}</p>
           </div>
         </div>
-        {comData["userID"] == current && (
+        {comData["userID"] == loggedUserID && (
           <button onClick={() => removeComment()} className="remove_com">
             <img src="images/remove.svg" alt="close img button" />
           </button>

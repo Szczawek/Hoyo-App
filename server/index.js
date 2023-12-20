@@ -34,13 +34,6 @@ app.get("/comments", function (req, res) {
   });
 });
 
-// TO FIX
-// app.post("/users/:userName", function (req, res) {
-//   console.log(req.params)
-//   res.sendStatus(200)
-
-// });
-
 // Add comment to account
 app.post("/add-comment", function (req, res) {
   if (!req.cookies["logged"]) {
@@ -177,14 +170,24 @@ app.get("/users", function (req, res) {
   });
 });
 
-app.post("/user-comments", function (req, res) {
-  const command = "select * from comments where userID = ?";
-  const value = [req.body["id"]];
+app.get("/user-comments:id", function (req, res) {
+  const command = "SELECT * from comments where userID = ?";
+  const value = [req.params["id"]];
   db.query(command, value, function (err, result) {
     if (err) throw Error(`Error with database #user-comments: ${err}`);
-    res.send(result)
+    res.send(result);
   });
 });
+
+// app.post("/user-comments:id", function (req, res) {
+//   console.log(req.params)
+//   const command = "select * from comments where userID = ?";
+//   const value = [req.body["id"]];
+//   db.query(command, value, function (err, result) {
+//     if (err) throw Error(`Error with database #user-comments: ${err}`);
+//     res.send(result)
+//   });
+// });
 
 app.listen(PORT, () => {
   console.log(`The server has been activated: http://localhost:${PORT} `);

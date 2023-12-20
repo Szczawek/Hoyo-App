@@ -5,6 +5,7 @@ const Header = lazy(() => import("./main-component/Header"));
 const Info = lazy(() => import("./main-component/Info"));
 const News = lazy(() => import("./main-component/News"));
 const User = lazy(() => import("./main-component/User"));
+const EmptyUser = lazy(() => import("./main-component/EmptyUser"));
 const NotFound = lazy(() => import("./main-component/NotFound"));
 
 export default function App() {
@@ -18,7 +19,6 @@ export default function App() {
     verifyLogged();
   }, []);
 
-  
   // Check if the user is logged in
   async function verifyLogged() {
     try {
@@ -53,10 +53,15 @@ export default function App() {
             />
             <Route path="info" element={<Info />} />
             <Route
-              path="user"
-              element={<User menu={true} user={userData} session={session} />}
+              path="empty-user"
+              element={
+                <EmptyUser session={session} />
+              }
             />
-            <Route path="*" element={<NotFound />} />
+            <Route
+              path="*"
+              element={<NotFound loggedUserID={userData["id"]} />}
+            />
           </Route>
         </Routes>
       </Suspense>

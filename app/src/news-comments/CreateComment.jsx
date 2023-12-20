@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function AddComment({
+export default function CreateComment({
   openLoginWindow,
   user,
   login,
@@ -38,45 +38,37 @@ export default function AddComment({
   return (
     <>
       {window && (
-        <div className="com_window">
-          <div className="container">
+        <div className="window">
+          <div className="sub_window">
             <button
-              className="add_com"
+              className="confirme_comment"
               onClick={() => {
                 addComment();
                 setWindow(false);
               }}>
-              Add Comment <img src="images/check.svg" alt="add-comment" />
+              Add Comment <img src="images/check.svg" alt="create comment" />
             </button>
-            <button className="close_win" onClick={() => setWindow(false)}>
+            <button className="cancel_comment" onClick={() => setWindow(false)}>
               Cancel <img src="images/close.svg" alt="cancel comment" />
             </button>
           </div>
         </div>
       )}
 
-      <header className="com_creator">
-        <div className="container">
-          <div className="profile_img avatar">
-            <img
-              className="medium"
-              src={user["avatar"]}
-              alt="Profile picture"
-            />
-          </div>
-          <h2>{user["nick"]}</h2>
+      <header className="create_comment">
+        <div className="avatar medium">
+          <img src={user["avatar"]} alt="profile img" />
         </div>
         <textarea
+        className="content"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          cols="50"
-          rows="5"
           onKeyDown={(e) => {
             if (e.key === "Enter") confirmComment();
           }}
-          placeholder="Put your comment..."
+          placeholder="What's up..."
           maxLength={1500}></textarea>
-        <button className="add_comment" onClick={() => confirmComment()}>
+        <button className="open_window" onClick={() => confirmComment()}>
           Add comment
         </button>
       </header>

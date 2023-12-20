@@ -1,13 +1,38 @@
 import Login from "../account/Login";
 import Menu from "../profile/Menu";
+import Comment from "../news-comments/Comment";
+import { useEffect, useState } from "react";
 
-export default function User({ user, session, menu, comments }) {
+export default function User({ user, session, menu, loggedUserID }) {
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    if (session) userComments();
+  }, []);
+
+  async function userComments() {
+    try {
+      const response = await fetch(
+        `http://localhost/user-comments${user["id"]}`
+      );
+      const obj = await response.json();
+      const mod = obj.map((e) => ({
+        ...e,
+        nick: user["nick"],
+        avatar: user["avatar"],
+      }));
+      setComments(mod);
+    } catch (error) {
+      throw Error(`Can't download a comments: ${error}`);
+    }
+  }
+
   return (
     <section className="user">
       <div className="bg-img">
         <header className="profile">
-          <div className="avatar">
-            <img className="big" src={user["avatar"]} alt="profile image" />
+          <div className="avatar big">
+            <img src={user["avatar"]} alt="profile image" />
           </div>
           <div className="account_description">
             <h2>{user["nick"]}</h2>
@@ -15,38 +40,19 @@ export default function User({ user, session, menu, comments }) {
           </div>
         </header>
       </div>
-      <div className="only_user_comments">
+      <div className="comments">
         {!comments ? (
           <p>empty table</p>
         ) : (
           comments.map((e) => {
             return (
-              <div key={e["id"]} className="comment">
-                <header>
-                  <div className="comment_info">
-                    <div className="avatar">
-                      <img
-                        className="medium"
-                        src={user["avatar"]}
-                        alt="avatar"
-                      />
-                    </div>
-                    <div>
-                      <h3>{user["nick"]}</h3>
-                      <p className="date">{e["date"]}</p>
-                    </div>
-                  </div>
-                </header>
-                <div className="content">
-                  <p>{e["content"]}</p>
-                </div>
-              </div>
+              <Comment key={e["id"]} comData={e} loggedUserID={loggedUserID} />
             );
           })
         )}
       </div>
-
-      {menu && <Menu />}
+      <Menu />
+      {/* {menu && <Menu />} */}
       {!session && <Login uncloseable={true}></Login>}
     </section>
   );

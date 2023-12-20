@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Login from "../account/Login";
 import Comment from "../news-comments/Comment";
-import AddComment from "../news-comments/AddComment";
+import AddComment from "../news-comments/CreateComment";
 
 export default function News({ user, login }) {
   const [comments, setComments] = useState([]);
@@ -46,7 +46,7 @@ export default function News({ user, login }) {
           <p>"No comments"</p>
         ) : (
           comments.map((e) => {
-            return <Comment key={e["id"]} comData={e} current={user["id"]} />;
+            return <Comment key={e["id"]} comData={e} loggedUserID={user["id"]} />;
           })
         )}
       </div>

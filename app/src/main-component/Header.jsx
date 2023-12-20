@@ -19,9 +19,9 @@ export default function Header({ user }) {
           <Link to="/">Home</Link>
           <Link to="info">Info</Link>
           <Link to="news">News</Link>
-          <Link className="avatar" to="user">
+          <Link className="avatar medium" to="empty-user">
             <img
-              className="medium"
+         
               src={user["avatar"]}
               alt="link to user profile"
             />
