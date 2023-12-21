@@ -30,7 +30,7 @@ export default function CreateComment({
 
   function confirmComment() {
     if (!login) {
-      openLoginWindow(true);
+      openLoginWindow();
       return;
     }
     setWindow(true);

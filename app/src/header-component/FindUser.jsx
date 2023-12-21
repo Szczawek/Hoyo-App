@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function FindUser() {
   const [users, setUsers] = useState([]);
   const [value, setValue] = useState("");
   const [openWinow, setOpenWindow] = useState(false);
+  const navigate = useNavigate()
 
   useEffect(() => {
     downloadUser();
@@ -20,41 +22,38 @@ export default function FindUser() {
   }
 
   function searchUser(nick) {
+    // navigate(`/${nick}`)
     history.pushState(null, "", nick);
     window.location.reload();
   }
-  // JEST TO ZEPSUTE
-  // JEST TO ZEPSUTE
-  // JEST TO ZEPSUTE
-  // JEST TO ZEPSUTE
-  // JEST TO ZEPSUTE
-  // JEST TO ZEPSUTE
-  // JEST TO ZEPSUTE
-  // JEST TO ZEPSUTE
+
   return (
-    <div onMouseLeave={() => setOpenWindow(false)}>
-      <label
-        className="search_user_case"
-        htmlFor="find_user"
-        onFocus={() => setOpenWindow(true)}>
-        <img src="images/search.svg" alt="decoration" />
-        <input
-          className="search_user"
-          type="search"
-          id="find_user"
-          placeholder="Search..."
-          autoComplete="off"
-          list="users_list"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-            setOpenWindow(true);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") searchUser(value);
-          }}
-        />
-      </label>
+    <label
+      className="search_user_case"
+      htmlFor="find_user"
+      onBlur={(e) => {
+        const test = e.relatedTarget;
+        if (test && test.className === "unclosable") return;
+        setOpenWindow(false);
+      }}
+      onFocus={() => setOpenWindow(true)}>
+      <img src="images/search.svg" alt="decoration" />
+      <input
+        className="search_user"
+        type="search"
+        id="find_user"
+        placeholder="Search..."
+        autoComplete="off"
+        list="users_list"
+        value={value}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setOpenWindow(true);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") searchUser(value);
+        }}
+      />
       {openWinow && (
         <UsersList
           fn={searchUser}
@@ -64,7 +63,7 @@ export default function FindUser() {
           )}
         />
       )}
-    </div>
+    </label>
   );
 }
 
@@ -75,7 +74,9 @@ function UsersList({ users, empty, fn }) {
         users.map((e, index) => {
           return (
             <li key={index}>
-              <button onClick={() => fn(e["nick"])}>{e["nick"]}</button>
+              <button className="unclosable" onClick={() => fn(e["nick"])}>
+                {e["nick"]}
+              </button>
             </li>
           );
         })

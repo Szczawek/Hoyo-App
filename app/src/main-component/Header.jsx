@@ -16,16 +16,23 @@ export default function Header({ user }) {
             <img src="images/close.svg" className="medium" />
           </button>
           <FindUser />
-          <Link to="/">Home</Link>
-          <Link to="info">Info</Link>
-          <Link to="news">News</Link>
-          <Link className="avatar medium" to="empty-user">
-            <img
-         
-              src={user["avatar"]}
-              alt="link to user profile"
-            />
-          </Link>
+          <ul className="links">
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="info">Info</Link>
+            </li>
+            <li>
+              {" "}
+              <Link to="news">News</Link>
+            </li>
+            <li className="profil_link">
+              <Link className="avatar medium" to="empty-user">
+                <img src={user["avatar"]} alt="link to user profile" />
+              </Link>
+            </li>
+          </ul>
         </nav>
       </header>
       <Outlet />

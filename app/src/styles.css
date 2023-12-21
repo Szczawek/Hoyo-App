@@ -11,11 +11,13 @@ html {
 }
 
 :root {
+  --contrast: #b3005c;
   --confirm: rgba(18, 131, 18, 0.836);
   --cancel: rgb(233, 25, 25);
-  --component-color: rgba(14, 10, 10, 0.89);
+  --component-color: #0e1010;
   --pr-90: #e7b1cb;
   --pr-30: #4e1832;
+  --dark: #14101075;
 }
 
 button {
@@ -24,7 +26,7 @@ button {
   cursor: pointer;
 }
 a {
-  color: initial;
+  color: inherit;
   text-decoration: none;
 }
 li {
@@ -46,6 +48,7 @@ iframe {
   max-width: 100%;
 }
 body {
+  background-color: var(--dark);
   font-family: "Poppins", sans-serif;
 }
 #root {
@@ -62,41 +65,66 @@ body {
   background-color: var(--component-color);
 }
 .navigation {
-  position: relative;
   display: grid;
-  gap: 1.75rem;
   justify-content: right;
+  position: relative;
+  gap: 2rem;
+  grid-template-columns: repeat(2, max-content);
+}
+.navigation .links {
+  display: grid;
   align-items: center;
-  grid-template-columns: repeat(5, max-content);
+  grid-template-columns: repeat(4, max-content);
+  gap: 1.8rem;
 }
-.navigation a {
-  transition: scale 400ms ease-out;
+.navigation .links li {
+  transition: scale, color, border-color, 400ms ease-out;
 }
-.navigation a:hover {
+.navigation .links li:hover,
+.navigation .links li:focus-within {
   scale: 1.2;
+  color: var(--contrast);
+}
+.navigation .profil_link {
+  border: 2px solid transparent;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
+}
+.navigation .profil_link:hover,
+.navigation .profil_link:focus-within {
+  border-color: var(--contrast);
 }
 .navigation .search_user_case {
   display: grid;
+  position: relative;
   grid-template-columns: repeat(2, max-content);
-  padding: 0.2rem 0.6rem;
   gap: 1rem;
-  border: 1px solid red;
-  border-radius: 0.2rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.4rem;
+  border: 1px solid var(--contrast);
 }
-
 .navigation .user_list {
-  background-color: red;
-  width: 100%;
-  border-radius: 0.2rem;
-  padding: 0.4rem;
+  position: absolute;
+  overflow: hidden;
+  background-color: var(--contrast);
+  top: 2.8rem;
+  border-radius: 0.4rem;
+  right: 0;
+  left: 0;
+}
+.navigation .user_list > * {
+  padding: 0.4rem 0.6rem;
 }
 
+.navigation .user_list li {
+  transition: background-color 300ms;
+}
+.navigation .user_list li:hover {
+background-color: #800042;
+}
 .navigation .user_list button {
   width: 100%;
-}
-
-.navigation .user_list button:hover {
-  background-color: rgb(255, 102, 0);
+  text-align: left;
 }
 
 .hamburger_btn,
@@ -234,10 +262,9 @@ body {
   box-shadow: 0 0.4rem 0.4rem 0.3rem #0a0a0a;
 }
 
-.user_com {
-  display: grid;
-  padding-block: 2rem;
-  place-content: center;
+.user .comments {
+  justify-content: center;
+  grid-template-columns: minmax(300px, 80%);
 }
 /* MENU */
 .menu {
@@ -263,7 +290,6 @@ body {
 
 .avatar {
   display: grid;
-  background-color: rgba(255, 0, 0, 0.452);
   aspect-ratio: 1/1;
   border-radius: 50%;
   overflow: hidden;
@@ -467,15 +493,14 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
     position: fixed;
     grid-template-columns: 1fr;
     justify-items: center;
-    grid-template-rows: repeat(6, max-content);
+    grid-template-rows: repeat(3, max-content);
   }
-  .navigation .user_avatar {
-    width: 2.5rem;
-  }
+
+
   .hamburger_btn,
   .mobile_only {
     display: block;

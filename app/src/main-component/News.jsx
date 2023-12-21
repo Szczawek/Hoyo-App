@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Login from "../account/Login";
 import Comment from "../news-comments/Comment";
-import AddComment from "../news-comments/CreateComment";
+import CreateComment from "../news-comments/CreateComment";
 
 export default function News({ user, login }) {
   const [comments, setComments] = useState([]);
@@ -24,19 +24,19 @@ export default function News({ user, login }) {
   }
 
   // Login loginWindow
-  function closeloginWindow() {
+  function closeLoginWindow() {
     setLoginloginWindow(false);
   }
   
-  function openloginWindow() {
+  function openLoginWindow() {
     setLoginloginWindow(true);
   }
 
   return (
     <section className="news">
-      {loginWindow && <Login closeFn={closeloginWindow} />}
-      <AddComment
-        openloginWindow={openloginWindow}
+      {loginWindow && <Login closeFn={closeLoginWindow} />}
+      <CreateComment
+        openLoginWindow={openLoginWindow}
         user={user}
         login={login}
         loadComments={loadComments}

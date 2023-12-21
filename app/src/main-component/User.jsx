@@ -3,7 +3,7 @@ import Menu from "../profile/Menu";
 import Comment from "../news-comments/Comment";
 import { useEffect, useState } from "react";
 
-export default function User({ user, session, menu, loggedUserID }) {
+export default function User({ user, session, loggedUserID }) {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function User({ user, session, menu, loggedUserID }) {
         nick: user["nick"],
         avatar: user["avatar"],
       }));
-      setComments(mod);
+      setComments(mod.reverse());
     } catch (error) {
       throw Error(`Can't download a comments: ${error}`);
     }
@@ -51,8 +51,7 @@ export default function User({ user, session, menu, loggedUserID }) {
           })
         )}
       </div>
-      <Menu />
-      {/* {menu && <Menu />} */}
+      {user["id"] === loggedUserID && <Menu />}
       {!session && <Login uncloseable={true}></Login>}
     </section>
   );
