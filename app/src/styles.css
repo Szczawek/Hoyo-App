@@ -120,7 +120,7 @@ body {
   transition: background-color 300ms;
 }
 .navigation .user_list li:hover {
-background-color: #800042;
+  background-color: #800042;
 }
 .navigation .user_list button {
   width: 100%;
@@ -144,9 +144,20 @@ background-color: #800042;
 /* HOME SECTION */
 .home .headline {
   display: grid;
-  grid-template-columns: 60%;
+  padding-block: 10rem;
   justify-content: center;
+  grid-template-columns: minmax(300px, 60%);
   text-align: center;
+}
+
+/* INFO */
+.info {
+  grid-template-columns: 70%;
+  display: grid;
+  text-align: center;
+  padding-block: 10rem;
+  justify-content: center;
+  grid-template-rows: repeat(3, max-content);
 }
 
 /* FORM LOGIN/CREATE ACCOUNT */
@@ -437,6 +448,7 @@ background-color: #800042;
 /* COMMENTS */
 .comments {
   display: grid;
+  grid-template-rows: repeat(3, max-content);
   gap: 1.5rem;
 }
 .comment .com_text {
@@ -448,7 +460,7 @@ background-color: #800042;
   justify-content: space-between;
   grid-template-columns: repeat(2, max-content);
 }
-.comment .info {
+.comment .introduction {
   display: grid;
   gap: 1rem;
   align-items: center;
@@ -499,7 +511,6 @@ background-color: #800042;
     justify-items: center;
     grid-template-rows: repeat(3, max-content);
   }
-
 
   .hamburger_btn,
   .mobile_only {

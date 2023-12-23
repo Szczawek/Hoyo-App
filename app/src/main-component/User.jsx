@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 
 export default function User({ user, session, loggedUserID }) {
   const [comments, setComments] = useState([]);
-
   useEffect(() => {
     if (session) userComments();
   }, []);
 
   async function userComments() {
+
     try {
       const response = await fetch(
         `http://localhost/user-comments${user["id"]}`
@@ -46,7 +46,7 @@ export default function User({ user, session, loggedUserID }) {
         ) : (
           comments.map((e) => {
             return (
-              <Comment key={e["id"]} comData={e} loggedUserID={loggedUserID} />
+              <Comment key={e["id"]} comData={e} loggedUserID={loggedUserID} downloadComments={userComments} />
             );
           })
         )}

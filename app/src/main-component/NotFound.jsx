@@ -4,6 +4,7 @@ import User from "./User";
 export default function NotFound({ loggedUserID }) {
   const [exist, setExist] = useState(false);
   const [userData, setUserData] = useState();
+
   useEffect(() => {
     searchUser();
   }, []);

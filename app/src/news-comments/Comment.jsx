@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function Comment({ comData, loggedUserID }) {
+export default function Comment({ comData, loggedUserID, downloadComments }) {
   const navigate = useNavigate();
 
   async function removeComment() {
@@ -26,10 +26,34 @@ export default function Comment({ comData, loggedUserID }) {
     navigate(`/${nick}`);
   }
 
+  async function like() {
+    if (!loggedUserID) {
+      alert("You can't give a like to a comment if you're not logged in!");
+      return;
+    }
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        userID: loggedUserID,
+        commentID: comData["id"],
+      }),
+    };
+    try {
+      await fetch("http://localhost/like", options);
+      downloadComments()
+    } catch (error) {
+      throw Error(`Error wtih likes: ${error}}`);
+    }
+  }
+
   return (
     <div className="comment">
       <header>
-        <div className="info">
+        <div className="introduction">
           <button
             onClick={() => searchUser(comData["nick"])}
             className="avatar small">
@@ -49,7 +73,7 @@ export default function Comment({ comData, loggedUserID }) {
         )}
       </header>
       <p className="com_text">{comData["content"]}</p>
-      <button className="likes">
+      <button className="likes" onClick={() => like()}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"

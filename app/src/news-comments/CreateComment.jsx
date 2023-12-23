@@ -60,7 +60,7 @@ export default function CreateComment({
           <img src={user["avatar"]} alt="profile img" />
         </div>
         <textarea
-        className="content"
+          className="content"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {

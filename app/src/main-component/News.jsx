@@ -23,7 +23,6 @@ export default function News({ user, login }) {
     }
   }
 
-  // Login loginWindow
   function closeLoginWindow() {
     setLoginloginWindow(false);
   }
@@ -46,7 +45,7 @@ export default function News({ user, login }) {
           <p>"No comments"</p>
         ) : (
           comments.map((e) => {
-            return <Comment key={e["id"]} comData={e} loggedUserID={user["id"]} />;
+            return <Comment key={e["id"]} comData={e} loggedUserID={user["id"]} downloadComments={loadComments} />;
           })
         )}
       </div>

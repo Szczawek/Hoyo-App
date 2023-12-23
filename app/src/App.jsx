@@ -4,7 +4,6 @@ const Home = lazy(() => import("./main-component/Home"));
 const Header = lazy(() => import("./main-component/Header"));
 const Info = lazy(() => import("./main-component/Info"));
 const News = lazy(() => import("./main-component/News"));
-const User = lazy(() => import("./main-component/User"));
 const EmptyUser = lazy(() => import("./main-component/EmptyUser"));
 const NotFound = lazy(() => import("./main-component/NotFound"));
 
@@ -55,7 +54,7 @@ export default function App() {
             <Route
               path="empty-user"
               element={
-                <EmptyUser session={session} />
+                <EmptyUser session={session} userNick={userData["nick"]}/>
               }
             />
             <Route

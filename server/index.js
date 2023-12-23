@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 // Load comments
 app.get("/comments", function (req, res) {
   const command =
-    "SELECT user.nick, user.avatar,comments.* from user JOIN comments ON user.id = comments.userID";
+    "SELECT user.nick, user.avatar,comments.*,(SELECT COUNT(commentID) FROM likes WHERE commentID = comments.id) AS likes from user JOIN comments ON user.id = comments.userID";
   db.query(command, function (err, data) {
     if (err) throw Error(`Error with database #comment: ${err}`);
     res.send(data);
@@ -40,11 +40,10 @@ app.post("/add-comment", function (req, res) {
     res.sendStatus(400);
     return;
   }
-  const command =
-    "INSERT INTO comments(userID,content, date,likes) values(?,?,?,?)";
+  const command = "INSERT INTO comments(userID,content, date) values(?,?,?)";
   const userID = JSON.parse(req.cookies["logged"])["id"];
   const content = req.body["content"];
-  const values = [userID, content, new Date(), 0];
+  const values = [userID, content, new Date()];
   db.query(command, values, function (err, data) {
     if (err) throw Error(`Error with database #add-comment${err}`);
     res.sendStatus(200);
@@ -170,8 +169,10 @@ app.get("/users", function (req, res) {
   });
 });
 
+// USERS AND THIS ARE A COMPLET
 app.get("/user-comments:id", function (req, res) {
-  const command = "SELECT * from comments where userID = ?";
+  const command =
+    "SELECT comments.*, (SELECT COUNT(commentID) FROM likes WHERE commentID = comments.id) AS likes FROM comments WHERE comments.userID = ?";
   const value = [req.params["id"]];
   db.query(command, value, function (err, result) {
     if (err) throw Error(`Error with database #user-comments: ${err}`);
@@ -179,15 +180,28 @@ app.get("/user-comments:id", function (req, res) {
   });
 });
 
-// app.post("/user-comments:id", function (req, res) {
-//   console.log(req.params)
-//   const command = "select * from comments where userID = ?";
-//   const value = [req.body["id"]];
-//   db.query(command, value, function (err, result) {
-//     if (err) throw Error(`Error with database #user-comments: ${err}`);
-//     res.send(result)
-//   });
-// });
+//like on unlike comment
+app.post("/like", function (req, res) {
+  const { userID, commentID } = req.body;
+  const command = "SELECT * FROM likes where userID =? and commentID = ?";
+
+  db.query(command, [userID, commentID], function (err, result) {
+    if (err) throw Error(`Error with database #check "like" status: ${err}`);
+    if (!result[0]) {
+      const command = "INSERT INTO likes(userID,commentID) VALUES(?,?)";
+      db.query(command, [userID, commentID], function (err, result) {
+        if (err) throw Error(`Error with database #add-like 2: ${err}}`);
+      });
+    } else {
+      const command = "DELETE FROM likes where id =?";
+      db.query(command, [result[0]["id"]], function (err, result) {
+        if (err) throw Error(`Error with database #remove-like${err}`);
+      });
+    }
+  });
+
+  res.sendStatus(200);
+});
 
 app.listen(PORT, () => {
   console.log(`The server has been activated: http://localhost:${PORT} `);
