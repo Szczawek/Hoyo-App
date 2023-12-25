@@ -45,7 +45,7 @@ export default function News({ user, login }) {
           <p>"No comments"</p>
         ) : (
           comments.map((e) => {
-            return <Comment key={e["id"]} comData={e} loggedUserID={user["id"]} downloadComments={loadComments} />;
+            return <Comment key={e["id"]} comData={e} refreshCom={loadComments} />;
           })
         )}
       </div>

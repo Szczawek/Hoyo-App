@@ -17,7 +17,11 @@ export default function CreateComment({
         "Content-type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ content: value }),
+      body: JSON.stringify({
+        content: value,
+        avatar: user["avatar"],
+        nick: user["nick"],
+      }),
     };
     try {
       const response = await fetch("http://localhost/add-comment", option);

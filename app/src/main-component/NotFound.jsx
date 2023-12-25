@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import User from "./User";
 
-export default function NotFound({ loggedUserID }) {
+export default function NotFound( ) {
   const [exist, setExist] = useState(false);
   const [userData, setUserData] = useState();
 
@@ -11,15 +11,13 @@ export default function NotFound({ loggedUserID }) {
 
   async function searchUser() {
     try {
-      const response = await fetch("http://localhost/users");
-      const obj = await response.json();
-      const user = obj.find(
-        (e) =>
-          e["nick"].toLowerCase() == location.pathname.slice(1).toLowerCase()
+      const response = await fetch(
+        `http://localhost/users${location.pathname.slice(1)}`
       );
-      const ans = !user ? false : true;
-      setUserData(user);
-      setExist(ans);
+      if (!response.ok) return;
+      const obj = await response.json();
+      setExist(true);
+      setUserData(obj);
     } catch (error) {
       throw Error(`Error with download users: ${error}`);
     }
@@ -27,5 +25,5 @@ export default function NotFound({ loggedUserID }) {
 
   if (!exist) return <p>nothing</p>;
 
-  return <User session={true} user={userData} loggedUserID={loggedUserID} />;
+  return <User session={true} user={userData} refreshCom={searchUser} />;
 }

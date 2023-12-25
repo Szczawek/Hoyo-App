@@ -1,31 +1,11 @@
 import Login from "../account/Login";
 import Menu from "../profile/Menu";
 import Comment from "../news-comments/Comment";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { UserContext } from "../App";
 
-export default function User({ user, session, loggedUserID }) {
-  const [comments, setComments] = useState([]);
-  useEffect(() => {
-    if (session) userComments();
-  }, []);
-
-  async function userComments() {
-
-    try {
-      const response = await fetch(
-        `http://localhost/user-comments${user["id"]}`
-      );
-      const obj = await response.json();
-      const mod = obj.map((e) => ({
-        ...e,
-        nick: user["nick"],
-        avatar: user["avatar"],
-      }));
-      setComments(mod.reverse());
-    } catch (error) {
-      throw Error(`Can't download a comments: ${error}`);
-    }
-  }
+export default function User({ session, user, refreshCom }) {
+  const loggedUser = useContext(UserContext);
 
   return (
     <section className="user">
@@ -41,17 +21,15 @@ export default function User({ user, session, loggedUserID }) {
         </header>
       </div>
       <div className="comments">
-        {!comments ? (
+        {!user["comments"] ? (
           <p>empty table</p>
         ) : (
-          comments.map((e) => {
-            return (
-              <Comment key={e["id"]} comData={e} loggedUserID={loggedUserID} downloadComments={userComments} />
-            );
+          user["comments"].map((e) => {
+            return <Comment key={e["id"]} comData={e} refreshCom={refreshCom}/>;
           })
         )}
       </div>
-      {user["id"] === loggedUserID && <Menu />}
+      {user["id"] === loggedUser["id"] && <Menu />}
       {!session && <Login uncloseable={true}></Login>}
     </section>
   );

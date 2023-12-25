@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function FindUser() {
   const [users, setUsers] = useState([]);
   const [value, setValue] = useState("");
   const [openWinow, setOpenWindow] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     downloadUser();
@@ -13,7 +13,7 @@ export default function FindUser() {
 
   async function downloadUser() {
     try {
-      const response = await fetch("http://localhost/users");
+      const response = await fetch("http://localhost/users-list");
       const obj = await response.json();
       setUsers(obj);
     } catch (error) {
@@ -33,7 +33,7 @@ export default function FindUser() {
       htmlFor="find_user"
       onBlur={(e) => {
         const test = e.relatedTarget;
-        if (test && test.className === "unclosable") return;
+        if (test && test.className === "find_user") return;
         setOpenWindow(false);
       }}
       onFocus={() => setOpenWindow(true)}>
@@ -44,14 +44,14 @@ export default function FindUser() {
         id="find_user"
         placeholder="Search..."
         autoComplete="off"
-        list="users_list"
+        pattern="\w*"
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
           setOpenWindow(true);
         }}
         onKeyDown={(e) => {
-          if (e.key === "Enter") searchUser(value);
+          if (e.key === "Enter" && e.target.checkValidity()) searchUser(value);
         }}
       />
       {openWinow && (
@@ -74,7 +74,10 @@ function UsersList({ users, empty, fn }) {
         users.map((e, index) => {
           return (
             <li key={index}>
-              <button className="unclosable" onClick={() => fn(e["nick"])}>
+              <button className="find_user" onClick={() => fn(e["nick"])}>
+                <div className="avatar">
+                  <img  src={e["avatar"]} alt="avatar" />
+                </div>
                 {e["nick"]}
               </button>
             </li>

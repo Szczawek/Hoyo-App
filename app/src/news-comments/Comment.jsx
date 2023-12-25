@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-
-export default function Comment({ comData, loggedUserID, downloadComments }) {
+import { UserContext } from "../App";
+import { useContext } from "react";
+export default function Comment({ comData,refreshCom }) {
+  const loggedUser = useContext(UserContext);
   const navigate = useNavigate();
-
   async function removeComment() {
     const options = {
       method: "POST",
@@ -27,7 +28,7 @@ export default function Comment({ comData, loggedUserID, downloadComments }) {
   }
 
   async function like() {
-    if (!loggedUserID) {
+    if (!loggedUser["id"]) {
       alert("You can't give a like to a comment if you're not logged in!");
       return;
     }
@@ -38,13 +39,13 @@ export default function Comment({ comData, loggedUserID, downloadComments }) {
         "Content-type": "application/json",
       },
       body: JSON.stringify({
-        userID: loggedUserID,
+        userID: loggedUser["id"],
         commentID: comData["id"],
       }),
     };
     try {
       await fetch("http://localhost/like", options);
-      downloadComments()
+      refreshCom()
     } catch (error) {
       throw Error(`Error wtih likes: ${error}}`);
     }
@@ -66,14 +67,18 @@ export default function Comment({ comData, loggedUserID, downloadComments }) {
             <p className="date">{comData["date"]}</p>
           </div>
         </div>
-        {comData["userID"] == loggedUserID && (
+        {comData["userID"] == loggedUser["id"] && (
           <button onClick={() => removeComment()} className="remove_com">
             <img src="images/remove.svg" alt="close img button" />
           </button>
         )}
       </header>
       <p className="com_text">{comData["content"]}</p>
-      <button className="likes" onClick={() => like()}>
+      <button
+        className={`likes ${
+          loggedUser["likes"].includes(comData["id"]) ? "liked" : ""
+        }`}
+        onClick={() => like()}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"

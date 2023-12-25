@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Menu() {
+  const [openMenu, setOpenMenu] = useState(false);
   const navigate = useNavigate();
 
   const options = {
@@ -31,15 +33,21 @@ export default function Menu() {
 
   return (
     <div className="menu">
-      <ul className="menu_list">
-        <li>
-          <button onClick={() => logout()}>Logout</button>
-        </li>
-        <li>Edit profile</li>
-        <li>
-          <button onClick={() => deleteAccount()}>Delete Account</button>
-        </li>
-      </ul>
+      {openMenu ? (
+        <ul className="menu_list">
+          <li>
+            <button onClick={() => logout()}>Logout</button>
+          </li>
+          <li>Edit profile</li>
+          <li>
+            <button onClick={() => deleteAccount()}>Delete Account</button>
+          </li>
+        </ul>
+      ) : (
+        <button onClick={() => setOpenMenu(true)} className="open_menu_btn">
+          <img src="images/settings.svg" alt="" />
+        </button>
+      )}
     </div>
   );
 }

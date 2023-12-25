@@ -24,7 +24,6 @@ export default function Header({ user }) {
               <Link to="info">Info</Link>
             </li>
             <li>
-              {" "}
               <Link to="news">News</Link>
             </li>
             <li className="profil_link">
