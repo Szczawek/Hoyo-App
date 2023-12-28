@@ -25,6 +25,7 @@ export default function Menu() {
   async function deleteAccount() {
     try {
       await fetch("http://localhost/remove", options);
+      navigate("/")
       window.location.reload();
     } catch (error) {
       throw Error(`The server isn't responding: ${error}`);

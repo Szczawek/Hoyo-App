@@ -6,7 +6,12 @@ dodać odpowiedzi pod komentarzami
 zwiększć wydajność strony po przez pobieranie max pięciu komentarzy. Wraz z przesuwaniem strony dodawać nowe #Twitter copy
 
 # Four 
-Do przycisku z usuwaniem konta dodać funckje, która usuwa wszystkie polubienia z konta(oszczędność miejsca)
-
-# Five 
+jest "Naprawione" (może kiedyś będę wiedział jak to zrobić)
 Error z like
+
+# MAIN ISSUE 
+Zapisanie sesji użytwonika z bazie danych rozwiażania:
+ - po zalogowaniu dodać do tabeli session id użytwonika. Dodanie do punkcji useEffect w App funkcje sprawdzania w bazie danych czy istnieje sesja z użytkownikiem. 
+ # WADY 
+ Działa tylko z jedną osobą. useEffect funckja potrzebuje id użytkownika, ale nie ma jak jej tego przekazać wieć trzeba pobrać wszystko z session i zobaczyć id jego, ale działa tylko z jedną osobą.
+  # brak innych pomysłow 

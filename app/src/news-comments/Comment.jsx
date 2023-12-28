@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
-import { useContext } from "react";
-export default function Comment({ comData,refreshCom }) {
+import { useContext, useState } from "react";
+export default function Comment({ comData, refreshCom }) {
   const loggedUser = useContext(UserContext);
+  const [liked, setLiked] = useState(
+    loggedUser["likes"].includes(comData["id"]) ? true : false
+  );
   const navigate = useNavigate();
   async function removeComment() {
     const options = {
@@ -45,12 +48,11 @@ export default function Comment({ comData,refreshCom }) {
     };
     try {
       await fetch("http://localhost/like", options);
-      refreshCom()
+      refreshCom();
     } catch (error) {
       throw Error(`Error wtih likes: ${error}}`);
     }
   }
-
   return (
     <div className="comment">
       <header>
@@ -75,10 +77,12 @@ export default function Comment({ comData,refreshCom }) {
       </header>
       <p className="com_text">{comData["content"]}</p>
       <button
-        className={`likes ${
-          loggedUser["likes"].includes(comData["id"]) ? "liked" : ""
-        }`}
-        onClick={() => like()}>
+        className={`likes ${liked ? "liked" : ""}`}
+        onClick={() => {
+          like();
+          // TO CHANGE
+          setLiked((prev) => !prev);
+        }}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           height="24"

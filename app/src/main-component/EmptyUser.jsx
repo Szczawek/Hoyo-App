@@ -19,7 +19,7 @@ export default function EmptyUser({ session,userNick }) {
         </header>
       </div>
       <p>Empty table...</p>
-      <Login />
+      <Login uncloseable={true}/>
     </section>
   );
 }

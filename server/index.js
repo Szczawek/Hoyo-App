@@ -1,8 +1,10 @@
-import express, { json } from "express";
+import express from "express";
 import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
+
+const PORT = 80;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -12,7 +14,7 @@ app.use(
     credentials: true,
   })
 );
-const PORT = 80;
+
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -108,15 +110,20 @@ app.post("/create-account", function (req, res) {
 // remove account
 app.post("/remove", function (req, res) {
   const command = "DELETE from user where id =?";
+  const commandComments = "DELETE from comments where userID =?";
+  const commandLikes = "DELETE from likes where userID = ?";
   const user = JSON.parse(req.cookies["logged"])["id"];
   res.clearCookie("logged", { httpOnly: true });
   db.query(command, [user], function (err, data) {
     if (err) throw Error(`Error with database #remove: ${err}`);
-    const command = "DELETE from comments where userID =?";
-    db.query(command, [user], function (err, data) {
-      if (err)
-        throw Error(`Error with database #remove-comments in remove : ${err}`);
-    });
+  });
+  db.query(commandComments, [user], function (err, data) {
+    if (err)
+      throw Error(`Error with database #remove-comments in remove : ${err}`);
+  });
+  db.query(commandLikes, [user], function (err, result) {
+    if (err)
+      throw Error(`Error with database #remove-likes in remove : ${err}`);
   });
   res.sendStatus(200);
 });
@@ -143,15 +150,9 @@ app.post("/login", function (req, res) {
       .then((isMatch) => {
         if (isMatch) {
           const copy = { ...data[0] };
-          const command = "SELECT * from likes where userID = ?";
-          db.query(command, [data[0]["id"]], function (err, result) {
-            if (err)
-              throw Error(`Error with database #login-download-likes: ${err}}`);
-            // copy.likedComments = result;
-            delete copy.password;
-            res.cookie("logged", `${JSON.stringify(copy)}`, { httpOnly: true });
-            res.sendStatus(200);
-          });
+          delete copy.password;
+          res.cookie("logged", `${JSON.stringify(copy)}`, { httpOnly: true });
+          res.sendStatus(200);
           return;
         }
         res.sendStatus(400);
@@ -171,13 +172,20 @@ app.post("/login", function (req, res) {
 
 // Logout
 app.post("/logout", function (req, res) {
+  req.session.destroy((err) => {
+    if (err) throw err;
+  });
   res.clearCookie("logged", { httpOnly: true });
   res.sendStatus(200);
 });
 
+// console.log(2)
 // DONE
 // Check login status
 app.get("/logged", function (req, res) {
+  // console.log(req.session["login"])
+  // res.sendStatus(400)
+  // return
   const login = req.cookies["logged"];
   if (!login) return res.sendStatus(400);
   const command = "SELECT id,nick,about,avatar FROM user where id =?";
