@@ -1,15 +1,2 @@
-# One
-Wszystkie poprzednie problemy zostały zażegnane, został jeszcze jedne z przemieszczaniem się miedzy stronami (błąd, który obniża konfort z przechodzenia między podstronami)
-# Two 
-dodać odpowiedzi pod komentarzami 
-# Three 
-zwiększć wydajność strony po przez pobieranie max pięciu komentarzy. Wraz z przesuwaniem strony dodawać nowe #Twitter copy
-
-# Four 
-jest "Naprawione" (może kiedyś będę wiedział jak to zrobić)
-Error z like
-# importan 
-stworzyć jeden pojemnik dla koments, żeby nie były rozdzielnie jak teraz 
-
-# MAIN 
- - Najprostrze rozwiązania mają najwięcej sensu, nie ma co wymyślać matrixa na nowo("cookie maxAge").
+# One 
+dodać podkomentarze
