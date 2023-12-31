@@ -7,13 +7,12 @@ const News = lazy(() => import("./main-component/News"));
 const EmptyUser = lazy(() => import("./main-component/EmptyUser"));
 const NotFound = lazy(() => import("./main-component/NotFound"));
 export const UserContext = createContext();
-
 export default function App() {
   const [session, setSession] = useState(false);
   const [userData, setUserData] = useState({
     nick: "User",
     avatar: "images/user.svg",
-    likes: []
+    likes: [],
   });
 
   useEffect(() => {
@@ -42,11 +41,12 @@ export default function App() {
         <UserContext.Provider value={userData}>
           <Routes>
             <Route path="/" element={<Header user={userData} />}>
-              <Route path="/" element={<Home session={session} />} />
+              <Route index element={<Home session={session} />} />
               <Route
                 path="news"
                 element={<News user={userData} login={session} />}
               />
+
               <Route path="info" element={<Info />} />
               <Route
                 path="empty-user"

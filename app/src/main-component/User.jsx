@@ -1,10 +1,10 @@
 import Login from "../account/Login";
 import Menu from "../profile/Menu";
-import Comment from "../news-comments/Comment";
+import ComShelf from "../comments/ComShelf";
 import { useContext } from "react";
 import { UserContext } from "../App";
 
-export default function User({ session, user, refreshCom }) {
+export default function User({ session, user }) {
   const loggedUser = useContext(UserContext);
 
   return (
@@ -20,15 +20,7 @@ export default function User({ session, user, refreshCom }) {
           </div>
         </header>
       </div>
-      <div className="comments">
-        {!user["comments"] ? (
-          <p>empty table</p>
-        ) : (
-          user["comments"].map((e) => {
-            return <Comment key={e["id"]} comData={e} refreshCom={refreshCom}/>;
-          })
-        )}
-      </div>
+      <ComShelf id={user["id"]} />
       {user["id"] === loggedUser["id"] && <Menu />}
       {!session && <Login uncloseable={true}></Login>}
     </section>

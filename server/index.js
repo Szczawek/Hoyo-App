@@ -27,12 +27,25 @@ app.get("/", (req, res) => {
 });
 
 // Load comments
-app.get("/comments", function (req, res) {
-  const command =
-    "SELECT user.nick, user.avatar,comments.*,(SELECT COUNT(commentID) FROM likes WHERE commentID = comments.id) AS likes from user JOIN comments ON user.id = comments.userID";
-  db.query(command, function (err, data) {
+app.get("/comments:id", function (req, res) {
+  const id = JSON.parse(req.params["id"]);
+  const optionOne =
+    "SELECT comments.*, (SELECT COUNT(`commentID`) FROM likes where `commentID` = comments.id) as likes FROM comments";
+  const optionTwo =
+    "SELECT comments.*, (SELECT COUNT(`commentID`) FROM likes where `commentID` = comments.id) as likes FROM comments where userID =?";
+  const command = id === 0 ? optionOne : id > 0 ? optionTwo : null;
+  db.query(command, [id], function (err, data) {
     if (err) throw Error(`Error with database #comment: ${err}`);
     res.send(data);
+  });
+});
+
+// remove comment
+app.post("/remove-comment", function (req, res) {
+  const command = "DELETE FROM comments WHERE id = ?";
+  db.query(command, [req.body["id"]], function (err, data) {
+    if (err) throw Error(`Error with database #remove-comment${err}`);
+    res.sendStatus(200);
   });
 });
 
@@ -44,7 +57,7 @@ app.post("/add-comment", function (req, res) {
     return;
   }
   const command =
-    "INSERT INTO comments(userID,content, date,avatar,nick) values(?,?,?,?,?)";
+    "INSERT INTO comments(userID, content, date, avatar, nick) values(?,?,?,?,?)";
   const values = [
     JSON.parse(id)["id"],
     req.body["content"],
@@ -56,15 +69,6 @@ app.post("/add-comment", function (req, res) {
     if (err) throw Error(`Error with database #add-comment${err}`);
     res.sendStatus(200);
   });
-});
-
-// remove comment
-app.post("/remove-comment", function (req, res) {
-  const command = "DELETE FROM comments WHERE id = ?";
-  db.query(command, [req.body["id"]], function (err, data) {
-    if (err) throw Error(`Error with database #remove-comment${err}`);
-  });
-  res.sendStatus(200);
 });
 
 // Create an account
@@ -127,15 +131,8 @@ app.post("/remove", function (req, res) {
   });
   res.sendStatus(200);
 });
-// Login An Account
-// DO ZMIANY
-// DO ZMIANY
-// DO ZMIANY
-// DO ZMIANY
-// DO ZMIANY
-// DO ZMIANY
-// DO ZMIANY
-// DODAĆ DO LOGGED FUNCKJE POBIERANIA DANYCH
+
+// Login to an account
 app.post("/login", function (req, res) {
   const command = "select password,id from user where Login = ?";
   const userLogin = req.body["login"];
@@ -151,7 +148,10 @@ app.post("/login", function (req, res) {
         if (isMatch) {
           const copy = { ...data[0] };
           delete copy.password;
-          res.cookie("logged", `${JSON.stringify(copy)}`, { httpOnly: true });
+          res.cookie("logged", `${JSON.stringify(copy)}`, {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 60 * 24,
+          });
           res.sendStatus(200);
           return;
         }
@@ -172,20 +172,12 @@ app.post("/login", function (req, res) {
 
 // Logout
 app.post("/logout", function (req, res) {
-  req.session.destroy((err) => {
-    if (err) throw err;
-  });
   res.clearCookie("logged", { httpOnly: true });
   res.sendStatus(200);
 });
 
-// console.log(2)
-// DONE
 // Check login status
 app.get("/logged", function (req, res) {
-  // console.log(req.session["login"])
-  // res.sendStatus(400)
-  // return
   const login = req.cookies["logged"];
   if (!login) return res.sendStatus(400);
   const command = "SELECT id,nick,about,avatar FROM user where id =?";
@@ -221,15 +213,8 @@ app.get("/users:nick", function (req, res) {
     const obj = userData.find(
       (e) => e["nick"].toLowerCase() === req.params["nick"].toLowerCase()
     );
-
     if (!obj) return res.sendStatus(405);
-    const command =
-      "SELECT *,(SELECT COUNT(*) FROM likes where commentID = comments.id) as likes from comments where userID = ?";
-    db.query(command, [obj["id"]], function (err, commentsData) {
-      if (err) throw Error(`Error with database comments: ${err}`);
-      obj.comments = commentsData.reverse();
-      res.json(obj);
-    });
+    res.send(obj);
   });
 });
 

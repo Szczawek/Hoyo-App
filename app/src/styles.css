@@ -81,56 +81,6 @@ body {
   scale: 1.2;
   color: var(--contrast);
 }
-.navigation .profil_link {
-  border: 2px solid transparent;
-  border-radius: 50%;
-  aspect-ratio: 1/1;
-}
-.navigation .profil_link:hover,
-.navigation .profil_link:focus-within {
-  border-color: var(--contrast);
-}
-.navigation .search_user_case {
-  display: grid;
-  position: relative;
-  grid-template-columns: repeat(2, max-content);
-  gap: 1rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.4rem;
-  border: 1px solid var(--contrast);
-}
-
-.navigation .find_user {
-  display: grid;
-  align-items: center;
-  gap: 1rem;
-  word-break: break-all;
-  grid-template-columns: 2rem 1fr;
-}
-.navigation .user_list {
-  position: absolute;
-  overflow: hidden;
-  background-color: var(--contrast);
-  top: 2.8rem;
-  border-radius: 0.4rem;
-  right: 0;
-  left: 0;
-}
-.navigation .user_list > * {
-  padding: 0.4rem 0.6rem;
-}
-
-.navigation .user_list li {
-  transition: background-color 200ms ease-out;
-}
-.navigation .user_list li:hover,
-.navigation .user_list li:focus-within {
-  background-color: var(--dark-contrast);
-}
-.navigation .user_list button {
-  width: 100%;
-  text-align: left;
-}
 
 .hamburger_btn,
 .mobile_only {
@@ -146,6 +96,35 @@ body {
   margin-left: auto;
 }
 
+/* NAVIGATION SEARCH BAR */
+.navigation .search_container {
+  position: relative;
+  border: 1px solid var(--contrast);
+  border-radius: 0.1rem;
+}
+.navigation .search_container input {
+  padding: 0.2rem 0.8rem;
+  height: 100%;
+}
+.navigation .list {
+  border-radius: 0.1rem;
+  position: absolute;
+  display: grid;
+  width: 100%;
+  translate: 0 0.8rem;
+  background-color: var(--contrast);
+}
+.navigation .list li {
+  outline: none;
+  padding: 0.4rem 0.8rem;
+  word-break: break-all;
+  transition: background-color 250ms ease-out;
+}
+.navigation .list li:focus,
+.navigation .list li:hover {
+  background-color: var(--dark-contrast);
+}
+
 /* HOME SECTION */
 .home .headline {
   display: grid;
@@ -153,16 +132,6 @@ body {
   justify-content: center;
   grid-template-columns: minmax(300px, 60%);
   text-align: center;
-}
-
-/* INFO */
-.info {
-  grid-template-columns: 70%;
-  display: grid;
-  text-align: center;
-  padding-block: 10rem;
-  justify-content: center;
-  grid-template-rows: repeat(3, max-content);
 }
 
 /* FORM LOGIN/CREATE ACCOUNT */
@@ -299,14 +268,14 @@ body {
   grid-template-columns: minmax(300px, 80%);
 }
 /* MENU */
-.menu {
+.user .menu {
   position: absolute;
   top: 7.8rem;
   right: 0;
   display: grid;
   min-width: 200px;
 }
-.menu .menu_list {
+.user .menu .menu_list {
   background-color: rgba(0, 0, 0, 0.8);
   text-align: center;
   cursor: pointer;
@@ -351,6 +320,11 @@ body {
   aspect-ratio: 1/1;
   border-radius: 50%;
   overflow: hidden;
+  outline: 2px solid transparent;
+  transition: filter 300ms;
+}
+.avatar:hover {
+  filter: brightness(80%);
 }
 .avatar img {
   height: 100%;
@@ -367,147 +341,167 @@ body {
   gap: 2.5rem;
 }
 
-/* DONE */
 /* CREATE COMMENT */
-.create_comment {
+.com_creator {
   display: grid;
-  gap: 1.5rem;
-  align-items: center;
+  gap: 1rem;
+}
+.com_creator .intro {
+  display: grid;
   grid-template-columns: 3rem 1fr;
-  border-bottom: 2px solid var(--contrast);
-  padding-block: 1.5rem;
+  align-items: center;
+  grid-template-rows: 120px;
+  gap: 1rem;
 }
-.create_comment .content {
-  padding: 0.5rem 1rem;
-  height: 6rem;
+
+.com_creator textarea {
   resize: none;
-  border-radius: 0.2rem;
-  border: 1px solid rgb(57, 54, 95);
+  height: 100%;
+  border-radius: 1px;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgb(59, 32, 49);
 }
-.create_comment .open_window {
-  grid-column: 1/3;
+.com_creator .open_confrim_window {
+  position: relative;
   background-color: var(--confirm);
-  border-radius: 0.2rem;
+  border-radius: 1px;
+  padding: 0.4rem 0.8rem;
   max-width: max-content;
   margin-inline: auto;
-  padding: 0.5rem 1rem;
-  transition: filter 350ms;
+  transition: filter 300ms;
 }
-.create_comment .open_window:hover {
+.com_creator .open_confrim_window:hover,
+.com_creator .open_confrim_window:focus {
   filter: brightness(80%);
 }
-
-/* DONE */
-/* CONFIRME COMMENT */
-.news .window {
+.com_creator .window {
   position: fixed;
-  display: grid;
-  place-content: center;
-  height: 100vh;
-  width: 100vw;
-  z-index: 1999;
+  z-index: 99999;
   top: 0;
-  backdrop-filter: blur(30px);
   left: 0;
-}
-.news .sub_window {
+  width: 100%;
+  aspect-ratio: 1/1;
   display: grid;
   place-content: center;
-  height: 250px;
-  padding-inline: 2rem;
-  border-radius: 0.2rem;
-  gap: 1rem;
-  grid-template-columns: repeat(2, 1fr);
-}
-.news .sub_window button {
-  display: grid;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.2rem 0.8rem;
-  border-radius: 0.4rem;
-  grid-template-columns: max-content 1rem;
-  transition: filter 350ms;
-}
-.news .sub_window button:hover {
-  filter: brightness(80%);
-}
-.news .confirme_comment {
-  background-color: var(--confirm);
+  backdrop-filter: brightness(20%);
 }
 
-.news .cancel_comment {
+.com_creator .window .content {
+  display: grid;
+  gap: 1rem;
+  padding: 2rem;
+  border-radius: .3rem;
+  justify-items: center;
+  grid-template-columns: repeat(2, 1fr);
+  background-color: rgb(39, 10, 28);
+}
+
+.com_creator .window h3 {
+  grid-column: 1/3;
+}
+
+.com_creator .window button {
+  padding: 0.2rem 1rem;
+  border-radius: 4px;
+  display: grid;
+  align-items: center;
+transition: filter 300ms;
+  gap: .5rem;
+  grid-template-columns: max-content 1.2rem;
+}
+.com_creator .window button:hover, .com_creator .window button:focus {
+  filter: brightness(80%);
+}
+.com_creator .cancel {
   background-color: var(--cancel);
 }
 
-.comment {
-  display: grid;
-  gap: 1rem;
-  border-radius: 0.3rem;
-  padding: 1rem;
-  border: 1.8px solid rgb(255, 0, 128);
-}
-
-/* ADD COMMENT(WINDOW) */
-
-.com_window {
-  display: grid;
-  place-content: center;
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  width: 100%;
-  height: 100vh;
-  left: 0;
-  backdrop-filter: brightness(20%);
-}
-.com_window .container {
-  display: flex;
-  border-radius: 0.2rem;
-  gap: 2rem;
-  min-width: 300px;
-  padding: 2rem;
-  background-color: rgba(99, 8, 117, 0.664);
-}
-
-.com_window .container button {
-  padding: 0.4rem 0.6rem;
-  transition: filter 300ms;
-  font-size: 0.9rem;
-  display: grid;
-  align-items: center;
-  gap: 1rem;
-  grid-template-columns: repeat(2, max-content);
-  border-radius: 0.2rem;
-}
-.com_window .container button img {
-  width: 1rem;
-}
-.com_window .add_com {
-  background-color: green;
-}
-.com_window .close_win {
-  background-color: red;
-}
-.com_window .container button:hover {
-  filter: brightness(60%);
+.com_creator .confirm {
+  background-color: var(--confirm);
 }
 
 /* COMMENTS */
 .comments {
   display: grid;
+  row-gap: 1.5rem;
+}
+.comment {
+  display: grid;
+  gap: 1rem;
   grid-template-rows: repeat(3, max-content);
-  gap: 1.5rem;
+  padding: 1rem;
+  position: relative;
+  height: max-content;
+  border: 1px solid var(--contrast);
 }
-.comment .com_text {
-  word-break: break-all;
+.comment .showcase {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-content: space-between;
 }
-.comment header {
+.comment .avatar {
+  max-width: 2.8rem;
+}
+.comment .nick {
+  transition: color 300ms;
+}
+.comment .nick:hover {
+  color: var(--contrast);
+}
+.comment .container {
   display: grid;
   align-items: center;
-  justify-content: space-between;
+  gap: 1rem;
   grid-template-columns: repeat(2, max-content);
 }
+.comment .panel {
+  display: grid;
+  grid-template-columns: repeat(2, 3rem);
+  gap: 1rem;
+}
+.comment .panel button {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: center;
+  gap: 0.5rem;
+}
+.comment .super {
+  fill: #1e3050;
+  transition: fill 300ms;
+}
+.comment .super:hover {
+  fill: var(--contrast);
+}
+.comment .liked {
+  fill: var(--contrast);
+}
+
+/* COMMENT MENU */
+.comments .menu {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  background-color: red;
+  border-radius: 0.1rem;
+}
+.comments .menu li {
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  transition: background-color 150ms ease-in;
+}
+.comments .menu li:hover,
+.comments .menu li:hover {
+  background-color: var(--dark-contrast);
+}
+.comments .trash {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 0.5rem;
+}
+.comment .content {
+  word-break: break-all;
+}
+
 .comment .introduction {
   display: grid;
   gap: 1rem;
@@ -571,7 +565,7 @@ body {
     right: 0;
   }
   /* MENU */
-  .menu {
+  .user .menu {
     top: 10rem;
   }
 }
