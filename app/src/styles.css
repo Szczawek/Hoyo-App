@@ -23,6 +23,7 @@ button {
   cursor: pointer;
 }
 a {
+  display: block;
   color: inherit;
   text-decoration: none;
 }
@@ -102,6 +103,7 @@ body {
   border: 1px solid var(--contrast);
   border-radius: 0.1rem;
 }
+
 .navigation .search_container input {
   padding: 0.2rem 0.8rem;
   height: 100%;
@@ -238,6 +240,11 @@ body {
   position: relative;
   grid-template-rows: 200px 1fr;
 }
+.user .profile .container {
+  display: grid;
+  align-items: start;
+  grid-template-columns: repeat(2, 1fr);
+}
 .user .bg-img {
   position: relative;
   background: hsla(332, 94%, 37%, 1);
@@ -344,7 +351,7 @@ body {
 /* CREATE COMMENT */
 .com_creator {
   display: grid;
-  gap: 1rem;
+  gap: 1.8rem;
 }
 .com_creator .intro {
   display: grid;
@@ -353,13 +360,24 @@ body {
   grid-template-rows: 120px;
   gap: 1rem;
 }
-
+.com_creator .content {
+  position: relative;
+  height: 100%;
+}
 .com_creator textarea {
   resize: none;
   height: 100%;
+  width: 100%;
   border-radius: 1px;
   padding: 0.6rem 0.8rem;
   border: 1px solid rgb(59, 32, 49);
+}
+
+.com_creator .rule {
+  right: 0;
+  color: var(--cancel);
+  bottom: -1.5rem;
+  position: absolute;
 }
 .com_creator .open_confrim_window {
   position: relative;
@@ -379,8 +397,8 @@ body {
   z-index: 99999;
   top: 0;
   left: 0;
-  width: 100%;
-  aspect-ratio: 1/1;
+  right: 0;
+  bottom: 0;
   display: grid;
   place-content: center;
   backdrop-filter: brightness(20%);
@@ -390,7 +408,7 @@ body {
   display: grid;
   gap: 1rem;
   padding: 2rem;
-  border-radius: .3rem;
+  border-radius: 0.3rem;
   justify-items: center;
   grid-template-columns: repeat(2, 1fr);
   background-color: rgb(39, 10, 28);
@@ -405,11 +423,12 @@ body {
   border-radius: 4px;
   display: grid;
   align-items: center;
-transition: filter 300ms;
-  gap: .5rem;
+  transition: filter 300ms;
+  gap: 0.5rem;
   grid-template-columns: max-content 1.2rem;
 }
-.com_creator .window button:hover, .com_creator .window button:focus {
+.com_creator .window button:hover,
+.com_creator .window button:focus {
   filter: brightness(80%);
 }
 .com_creator .cancel {
@@ -423,6 +442,7 @@ transition: filter 300ms;
 /* COMMENTS */
 .comments {
   display: grid;
+  grid-template-columns: 100%;
   row-gap: 1.5rem;
 }
 .comment {

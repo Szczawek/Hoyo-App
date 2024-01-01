@@ -2,17 +2,16 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../App.jsx";
 import { LoadComments } from "./ComShelf.jsx";
 import { Link } from "react-router-dom";
-// import { loadComments } from "./loadComments.js";
 import Menu from "./Menu.jsx";
 
 export default function Comment({ data }) {
   const [menu, setMenu] = useState(false);
-  const loggedUserID = useContext(UserContext);
-  const loadComments = useContext(LoadComments);
-  const [liked, setLiked] = useState(
-    loggedUserID["likes"].includes(data["id"])
-  );
-
+  const { userData, verifyLogged } = useContext(UserContext);
+  const { loadComments } = useContext(LoadComments);
+  const [liked, setLiked] = useState();
+  useEffect(() => {
+    setLiked(userData["likes"].includes(data["id"]));
+  }, [data]);
   function closeMenu() {
     setMenu(false);
   }
@@ -39,7 +38,7 @@ export default function Comment({ data }) {
         {menu && (
           <Menu
             fn={closeMenu}
-            loggedUserID={loggedUserID["id"]}
+            loggedUserID={userData["id"]}
             commentID={data["id"]}
             commentUserID={data["userID"]}
           />
@@ -50,11 +49,12 @@ export default function Comment({ data }) {
         <button
           className="super"
           onClick={() => {
-            like(loggedUserID["id"], data["id"]).then((e) => {
-              if (!e.ok) return;
-              loadComments["loadComments"]();
-              setLiked((prev) => !prev);
-            });
+            like(userData["id"], data["id"])
+              .then((e) => {
+                if (!e.ok) return;
+                return verifyLogged();
+              })
+              .then(() => loadComments());
           }}>
           {!liked ? (
             <svg

@@ -5,14 +5,16 @@ import { useContext } from "react";
 import { UserContext } from "../App";
 
 export default function User({ session, user }) {
-  const loggedUser = useContext(UserContext);
-
+  const { userData } = useContext(UserContext);
   return (
     <section className="user">
       <div className="bg-img">
         <header className="profile">
-          <div className="avatar big">
-            <img src={user["avatar"]} alt="profile image" />
+          <div className="container">
+            <div className="avatar big">
+              <img src={user["avatar"]} alt="profile image" />
+            </div>
+            <button>Edit Profile</button>
           </div>
           <div className="account_description">
             <h2>{user["nick"]}</h2>
@@ -21,7 +23,7 @@ export default function User({ session, user }) {
         </header>
       </div>
       <ComShelf id={user["id"]} />
-      {user["id"] === loggedUser["id"] && <Menu />}
+      {user["id"] === userData["id"] && <Menu />}
       {!session && <Login uncloseable={true}></Login>}
     </section>
   );

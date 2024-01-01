@@ -20,7 +20,7 @@ export default function List({ value, fn }) {
               }}
               tabIndex={0}
               key={index}>
-              <Link to={`/${data["nick"]}`} tabIndex={1}>
+              <Link onClick={fn} to={`/${data["nick"]}`} tabIndex={1}>
                 {data["nick"]}
               </Link>
             </li>

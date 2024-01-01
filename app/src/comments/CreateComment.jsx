@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Window from "./Window";
 export default function CreateComment(prop) {
   const [value, setValue] = useState("");
   const [expandMenu, setExpandMenu] = useState(false);
+  const [validArea, setValidArea] = useState(false);
+  const validation = useRef(null);
   const { nick, avatar, loginWindow, login, loadData } = prop;
 
   function setWindow() {
@@ -14,16 +16,25 @@ export default function CreateComment(prop) {
         <div className="avatar">
           <img src={avatar} alt="avatar" />
         </div>
-        <textarea
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="What's up..."
-          minLength={1}
-          maxLength={1500}></textarea>
+        <div className="content">
+          <textarea
+            ref={validation}
+            value={value}
+            onChange={(e) => {
+              setValidArea(false)
+              setValue(e.target.value)}}
+            placeholder="What's up..."
+            minLength={1}
+            required
+            title="check"
+            maxLength={1500}></textarea>
+          {validArea && <small className="rule">The comment cannot be empty!</small>}
+        </div>
       </header>
       <button
         onClick={() => {
           if (!login) return loginWindow();
+          if (!validation.current.checkValidity()) return setValidArea(true);
           setWindow();
         }}
         className="open_confrim_window">

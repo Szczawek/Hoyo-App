@@ -76,7 +76,7 @@ app.post("/create-account", function (req, res) {
   const command = "select id from user where login = ?";
   const login = req.body["login"];
   const nick = req.body["nick"];
-  const avatar = "images/user.svg";
+  const avatar = "/images/user.svg";
   db.query(command, [login], function (err, data) {
     if (err) throw Error(`Error with database: ${err}`);
 

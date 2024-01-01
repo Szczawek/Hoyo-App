@@ -6,6 +6,9 @@ const Info = lazy(() => import("./main-component/Info"));
 const News = lazy(() => import("./main-component/News"));
 const EmptyUser = lazy(() => import("./main-component/EmptyUser"));
 const NotFound = lazy(() => import("./main-component/NotFound"));
+const Settings = lazy(() => import("./main-component/Settings"));
+const Replies = lazy(() => import("./main-component/Replies"));
+
 export const UserContext = createContext();
 export default function App() {
   const [session, setSession] = useState(false);
@@ -35,10 +38,11 @@ export default function App() {
       );
     }
   }
+
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
-        <UserContext.Provider value={userData}>
+        <UserContext.Provider value={{ userData, verifyLogged }}>
           <Routes>
             <Route path="/" element={<Header user={userData} />}>
               <Route index element={<Home session={session} />} />
@@ -46,14 +50,17 @@ export default function App() {
                 path="news"
                 element={<News user={userData} login={session} />}
               />
-
-              <Route path="info" element={<Info />} />
+              <Route path="info" element={<Info />}>
+                <Route path="check" element={<Settings />} />
+              </Route>
               <Route
                 path="empty-user"
                 element={
                   <EmptyUser session={session} userNick={userData["nick"]} />
                 }
               />
+              <Route path="replies" element={<Replies />} />
+              {session && <Route path="settings" element={<Settings />} />}
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
