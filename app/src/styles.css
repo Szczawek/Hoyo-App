@@ -31,6 +31,9 @@ li {
   list-style: none;
 }
 
+textarea {
+  resize: none;
+}
 input,
 button,
 textarea,
@@ -164,20 +167,10 @@ body {
   gap: 1.6rem;
 }
 .account form button[type="submit"] {
-  background-color: var(--confirm);
   max-width: max-content;
   margin-inline: auto;
   padding: 0.2rem 1rem;
   border-radius: 0.2rem;
-  border: 1px solid transparent;
-  transition: background-color, color, border-color, 300ms ease-in;
-}
-
-.account form button[type="submit"]:hover,
-.account form button[type="submit"]:focus {
-  border-color: var(--confirm);
-  color: var(--cancel);
-  background-color: transparent;
 }
 
 .account:not(.cl) header {
@@ -240,10 +233,15 @@ body {
   position: relative;
   grid-template-rows: 200px 1fr;
 }
+
 .user .profile .container {
   display: grid;
   align-items: start;
   grid-template-columns: repeat(2, 1fr);
+}
+.user .about {
+  font-size: 0.8rem;
+  word-break: break-all;
 }
 .user .bg-img {
   position: relative;
@@ -258,13 +256,14 @@ body {
   display: grid;
   align-items: center;
   padding: 1rem;
-  bottom: -3rem;
+  bottom: -6rem;
   left: 10%;
   background-color: #121212;
   border-radius: 1.5rem;
   gap: 1rem;
   position: absolute;
-  min-width: 320px;
+  min-width: 300px;
+  max-width: 600px;
   grid-template-rows: max-content 1fr;
   box-shadow: 0 0.4rem 0.4rem 0.3rem #0a0a0a;
 }
@@ -310,6 +309,36 @@ body {
   }
 }
 
+/* EDIT-PROFILE */
+.edit_window {
+  z-index: 99;
+  display: grid;
+  place-content: center;
+  position: fixed;
+  background-color: rgba(7, 6, 6, 0.247);
+  width: 100%;
+  height: 100%;
+}
+
+.edit_window form {
+  background-color: rgba(90, 21, 50, 0.801);
+  display: grid;
+  min-width: 300px;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 0.2rem;
+}
+.edit_window input,
+.edit_window textarea {
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.2rem;
+  background-color: rgb(65, 5, 45);
+}
+
+.edit_window .cancel {
+  margin-left: auto;
+  width: 1.5rem;
+}
 /* PROFILE PICTURE/AVATAR */
 .big {
   max-width: 5rem;
@@ -365,7 +394,6 @@ body {
   height: 100%;
 }
 .com_creator textarea {
-  resize: none;
   height: 100%;
   width: 100%;
   border-radius: 1px;
@@ -379,19 +407,15 @@ body {
   bottom: -1.5rem;
   position: absolute;
 }
-.com_creator .open_confrim_window {
+.com_creator .confirm {
   position: relative;
-  background-color: var(--confirm);
+
   border-radius: 1px;
   padding: 0.4rem 0.8rem;
   max-width: max-content;
   margin-inline: auto;
-  transition: filter 300ms;
 }
-.com_creator .open_confrim_window:hover,
-.com_creator .open_confrim_window:focus {
-  filter: brightness(80%);
-}
+
 .com_creator .window {
   position: fixed;
   z-index: 99999;
@@ -435,8 +459,17 @@ body {
   background-color: var(--cancel);
 }
 
-.com_creator .confirm {
+button.confirm {
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
   background-color: var(--confirm);
+  transition: color, background-color, border-color, 300ms;
+}
+button.confirm:is(:hover, :focus) {
+  border-color: var(--confirm);
+  color: var(--cancel);
+  background-color: transparent;
 }
 
 /* COMMENTS */
@@ -586,6 +619,7 @@ body {
   }
   /* MENU */
   .user .menu {
-    top: 10rem;
+    top: -5rem;
+    left: -70%;
   }
 }

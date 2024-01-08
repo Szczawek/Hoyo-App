@@ -29,11 +29,11 @@ export default function Comment({ data }) {
             <Link to={`/${data["nick"]}`}>
               <h3 className="nick">{data["nick"]}</h3>
             </Link>
-            <p>{data["date"]}</p>
+            <p className="date">{data["date"]}</p>
           </div>
         </div>
         <button onClick={() => setMenu(true)}>
-          <img className="medium" src="images/threedots.svg" alt="open menu" />
+          <img className="medium" src="/images/threedots.svg" alt="open menu" />
         </button>
         {menu && (
           <Menu
@@ -83,7 +83,7 @@ export default function Comment({ data }) {
           {data["likes"]}
         </button>
         <button className="com">
-          <img src="images/comment.svg" alt="open replies" />
+          <img src="/images/comment.svg" alt="open replies" />
         </button>
       </div>
     </div>

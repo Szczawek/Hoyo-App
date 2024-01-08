@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
+import "dotenv/config";
+import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
 
 const PORT = 80;
@@ -18,7 +20,7 @@ app.use(
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "S#2_x.f{s_[9x",
+  password: process.env.DATABASE_PASSWORD,
   database: "magazine",
 });
 
@@ -51,15 +53,19 @@ app.post("/remove-comment", function (req, res) {
 
 // Add comment to account
 app.post("/add-comment", function (req, res) {
-  const id = req.cookies["logged"];
-  if (!id) {
+  const data = req.cookies["logged"];
+  if (!data) {
     res.sendStatus(400);
     return;
   }
+  // decrypt cookie
+  const bytes = CryptoJS.AES.decrypt(data, process.env.COOKIE_KEY);
+  const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
   const command =
     "INSERT INTO comments(userID, content, date, avatar, nick) values(?,?,?,?,?)";
   const values = [
-    JSON.parse(id)["id"],
+    id,
     req.body["content"],
     new Date(),
     req.body["avatar"],
@@ -69,6 +75,29 @@ app.post("/add-comment", function (req, res) {
     if (err) throw Error(`Error with database #add-comment${err}`);
     res.sendStatus(200);
   });
+});
+
+// Add reply to comment
+app.post("/add-reply", (req, res) => {
+  const { commentID, content, avatar, nick } = req.body;
+  const value = [commentID, content, new Date(), avatar, nick];
+  const command =
+    "INSERT INTO replies(commentID,content,date,avatar,nick) values(?,?,?,?,?)";
+  db.query(command, value, (err, res) => {
+    if (err) throw Error(`Error with database #add-reply: ${err}`);
+    res.sendStatus(200);
+  });
+});
+
+// Replies list
+app.get("/replies", (req, res) => {
+  const value = [req.body["commentID"]];
+  const command = "SELECT * FROM replies where commentID ?";
+  db.query(command, value, (err, res) => {
+    if (err) throw Error(`Error with database #replies: ${err}`);
+    res.sendStatus(200);
+  });
+  res.send("Szczawik");
 });
 
 // Create an account
@@ -85,7 +114,7 @@ app.post("/create-account", function (req, res) {
       "insert into user(Login,Password,Nick,Avatar,About) values(?,?,?,?,?)";
 
     if (!accountExists) {
-      encryption()
+      encryption(req.body["password"])
         .then((password) => {
           db.query(
             command,
@@ -104,28 +133,31 @@ app.post("/create-account", function (req, res) {
     }
     res.sendStatus(400);
   });
-
-  async function encryption() {
-    const result = await bcrypt.hash(req.body["password"], 10);
-    return result;
-  }
 });
 
+// password encryption
+async function encryption(e) {
+  return await bcrypt.hash(e, 10);
+}
 // remove account
 app.post("/remove", function (req, res) {
   const command = "DELETE from user where id =?";
   const commandComments = "DELETE from comments where userID =?";
   const commandLikes = "DELETE from likes where userID = ?";
-  const user = JSON.parse(req.cookies["logged"])["id"];
+  const bytes = CryptoJS.AES.decrypt(
+    req.cookies["logged"],
+    process.env.COOKIE_KEY
+  );
+  const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   res.clearCookie("logged", { httpOnly: true });
-  db.query(command, [user], function (err, data) {
+  db.query(command, [id], function (err, data) {
     if (err) throw Error(`Error with database #remove: ${err}`);
   });
-  db.query(commandComments, [user], function (err, data) {
+  db.query(commandComments, [id], function (err, data) {
     if (err)
       throw Error(`Error with database #remove-comments in remove : ${err}`);
   });
-  db.query(commandLikes, [user], function (err, result) {
+  db.query(commandLikes, [id], function (err, result) {
     if (err)
       throw Error(`Error with database #remove-likes in remove : ${err}`);
   });
@@ -148,7 +180,11 @@ app.post("/login", function (req, res) {
         if (isMatch) {
           const copy = { ...data[0] };
           delete copy.password;
-          res.cookie("logged", `${JSON.stringify(copy)}`, {
+          const encryptID = CryptoJS.AES.encrypt(
+            JSON.stringify(copy),
+            process.env.COOKIE_KEY
+          ).toString();
+          res.cookie("logged", encryptID, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 60 * 24,
           });
@@ -181,15 +217,17 @@ app.get("/logged", function (req, res) {
   const login = req.cookies["logged"];
   if (!login) return res.sendStatus(400);
   const command = "SELECT id,nick,about,avatar FROM user where id =?";
-  const value = [JSON.parse(login)["id"]];
-  db.query(command, [value], function (err, userData) {
+  // decrypt cookie
+  const bytes = CryptoJS.AES.decrypt(login, process.env.COOKIE_KEY);
+  const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  db.query(command, [id], function (err, userData) {
     if (err) throw Error(`Error with database #logged-userData: ${err}`);
 
     const command = "SELECT commentID FROM likes where userID = ?";
     db.query(command, [userData[0]["id"]], function (err, userLikes) {
       if (err) throw Error(`Error with database #logged-userLikes: ${err}`);
-      const id = userLikes.map((e) => e["commentID"]);
-      userData[0]["likes"] = id;
+      const idW = userLikes.map((e) => e["commentID"]);
+      userData[0]["likes"] = idW;
       res.json(userData[0]);
     });
   });
@@ -238,6 +276,22 @@ app.post("/like", function (req, res) {
     }
   });
 
+  res.sendStatus(200);
+});
+
+// Update profile info
+app.post("/update-profile", (req, res) => {
+  const command =
+    "UPDATE user set about = ?, avatar = ?, nick = ? where id = ?";
+  const { avatar, nick, about, id } = req.body;
+  const value = [about, avatar, nick, id];
+  db.query(command, value, (err, ressult) => {
+    if (err) throw Error(`Error with database #update-profile: ${err}`);
+  });
+  const commandTwo = "UPDATE comments set nick = ? where userID = ?";
+  db.query(commandTwo, [nick, id], (err, result) => {
+    if (err) throw Error(`Erorr with database #update-profile-commets: ${err}`);
+  });
   res.sendStatus(200);
 });
 

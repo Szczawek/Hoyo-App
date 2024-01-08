@@ -5,9 +5,12 @@ const Header = lazy(() => import("./main-component/Header"));
 const Info = lazy(() => import("./main-component/Info"));
 const News = lazy(() => import("./main-component/News"));
 const EmptyUser = lazy(() => import("./main-component/EmptyUser"));
-const NotFound = lazy(() => import("./main-component/NotFound"));
+const User = lazy(() => import("./main-component/User"));
 const Settings = lazy(() => import("./main-component/Settings"));
 const Replies = lazy(() => import("./main-component/Replies"));
+const EditProfile = lazy(() => import("./profile/EditProfile"));
+
+const NotFound = lazy(() => import("./main-component/NotFound"));
 
 export const UserContext = createContext();
 export default function App() {
@@ -21,7 +24,6 @@ export default function App() {
   useEffect(() => {
     verifyLogged();
   }, []);
-
   // Check if the user is logged in
   async function verifyLogged() {
     try {
@@ -59,8 +61,13 @@ export default function App() {
                   <EmptyUser session={session} userNick={userData["nick"]} />
                 }
               />
-              <Route path="replies" element={<Replies />} />
+              <Route path="replies" element={<Replies userData={userData} />} />
               {session && <Route path="settings" element={<Settings />} />}
+              <Route path=":nick" element={<User nick={userData["nick"]}/>}>
+                {session && (
+                  <Route path="edit-profile" element={<EditProfile />} />
+                )}
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

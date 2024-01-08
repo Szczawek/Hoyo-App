@@ -1,30 +1,33 @@
-import Login from "../account/Login";
-import Menu from "../profile/Menu";
-import ComShelf from "../comments/ComShelf";
-import { useContext } from "react";
-import { UserContext } from "../App";
+import { useEffect, useState } from "react";
+import Profile from "./Profile";
+import { useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
-export default function User({ session, user }) {
-  const { userData } = useContext(UserContext);
+export default function User({ nick }) {
+  const [exist, setExist] = useState(false);
+  const [userData, setUserData] = useState();
+  const url = useParams();
+
+  useEffect(() => {
+    searchUser();
+  }, [url["nick"]]);
+  async function searchUser() {
+    try {
+      const response = await fetch(`http://localhost/users${url["nick"]}`);
+      if (!response.ok) return setExist(false);
+      const obj = await response.json();
+      setExist(true);
+      setUserData(obj);
+    } catch (error) {
+      throw Error(`Error with download users: ${error}`);
+    }
+  }
+  if (!exist) return <p>nothing</p>;
+
   return (
-    <section className="user">
-      <div className="bg-img">
-        <header className="profile">
-          <div className="container">
-            <div className="avatar big">
-              <img src={user["avatar"]} alt="profile image" />
-            </div>
-            <button>Edit Profile</button>
-          </div>
-          <div className="account_description">
-            <h2>{user["nick"]}</h2>
-            <p>{user["about"]}</p>
-          </div>
-        </header>
-      </div>
-      <ComShelf id={user["id"]} />
-      {user["id"] === userData["id"] && <Menu />}
-      {!session && <Login uncloseable={true}></Login>}
-    </section>
+    <>
+      {nick === userData["nick"] && <Outlet />}
+      <Profile session={true} user={userData} refreshCom={searchUser} />;
+    </>
   );
 }

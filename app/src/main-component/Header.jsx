@@ -9,11 +9,11 @@ export default function Header({ user }) {
     <>
       <header className="navigation_case">
         <button onClick={() => setOpenMenu(true)} className="hamburger_btn">
-          <img src="images/hamburger.svg" alt="open menu btn" />
+          <img src="/images/hamburger.svg" alt="open menu btn" />
         </button>
         <nav className={!openMenu ? "navigation hamburger" : "navigation"}>
           <button className="mobile_only" onClick={() => setOpenMenu(false)}>
-            <img src="images/close.svg" className="medium" />
+            <img src="/images/close.svg" className="medium" />
           </button>
           <SearchBar />
           <ul className="links">

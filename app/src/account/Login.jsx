@@ -16,7 +16,7 @@ export default function Login({ closeFn, uncloseable }) {
           <h2>{currentPage === "login" ? "Login" : "Create Account"}</h2>
           {!uncloseable && (
             <button className="close" onClick={() => closeFn()}>
-              <img src="images/close.svg" alt="close button" />
+              <img src="/images/close.svg" alt="close button" />
             </button>
           )}
         </header>

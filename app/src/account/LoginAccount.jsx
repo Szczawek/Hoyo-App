@@ -106,7 +106,7 @@ export default function LoginAccount({ nextPage }) {
             )}
           </button>
         </label>
-        <button type="submit">Login</button>
+        <button className="confirm" type="submit">Login</button>
       </form>
       <div className="control-panel">
         <p>Click to</p>

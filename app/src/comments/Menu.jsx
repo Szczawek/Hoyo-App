@@ -26,7 +26,7 @@ export default function Menu(prop) {
                 loadComments["loadComments"]()
               );
             }}>
-            <img src="images/remove.svg" alt="remove comment" />
+            <img src="/images/remove.svg" alt="remove comment" />
             delete comment
           </button>
         </li>
