@@ -7,9 +7,6 @@ export default function SearchBar() {
   const label = useRef(null);
   const input = useRef(null);
   const navigate = useNavigate();
-  function send() {
-    alert("sdszczx");
-  }
 
   function defaultSettings() {
     setValue("");
@@ -17,6 +14,11 @@ export default function SearchBar() {
   }
 
   return (
+    // BŁĄD DO POPRAWY Z DROP LIST
+    // BŁĄD DO POPRAWY Z DROP LIST
+    // BŁĄD DO POPRAWY Z DROP LIST
+    // BŁĄD DO POPRAWY Z DROP LIST
+    // PRAWDOPODOBNIE PRZEZ LAZY LOADING COMPONENT
     <label
       className="search_container"
       ref={label}

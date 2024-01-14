@@ -1,10 +1,9 @@
 import { useState } from "react";
-
 import ComShelf from "../comments/ComShelf";
 import addComment from "../comments/addComment";
-
 import CreateComment from "../comments/CreateComment.jsx";
-export default function News({ login }) {
+
+export default function News() {
   const [loadData, setLoadData] = useState(true);
 
   function statusData() {
@@ -13,11 +12,7 @@ export default function News({ login }) {
 
   return (
     <section className="news">
-      <CreateComment
-        loadData={statusData}
-        login={login}
-        addComment={addComment}
-      />
+      <CreateComment loadData={statusData} addComment={addComment} />
       <ComShelf id={0} status={loadData} />
     </section>
   );

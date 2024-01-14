@@ -4,7 +4,6 @@ import SearchBar from "../header-component/SearchBar";
 
 export default function Header({ user }) {
   const [openMenu, setOpenMenu] = useState(false);
-
   return (
     <>
       <header className="navigation_case">

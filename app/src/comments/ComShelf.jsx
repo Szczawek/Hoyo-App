@@ -4,11 +4,10 @@ export const LoadComments = createContext();
 
 export default function ComShelf(props) {
   const [comments, setComments] = useState([]);
-
   useEffect(() => {
     loadComments();
-  }, [props.id,props.status]);
-  
+  }, [props.id, props.status]);
+
   // Loading comments from server
   async function loadComments() {
     try {
@@ -19,15 +18,13 @@ export default function ComShelf(props) {
       throw Error(`${err}`);
     }
   }
+
+  if (!comments.length) return <p className="empty_table">There is nothing</p>;
   return (
     <div className="comments">
-      {!comments.length ? (
-        <p>There is nothing</p>
-      ) : (
-        <LoadComments.Provider value={{loadComments}}>
-          <RenderComment comments={comments} />
-        </LoadComments.Provider>
-      )}
+      <LoadComments.Provider value={{ loadComments }}>
+        <RenderComment comments={comments} />
+      </LoadComments.Provider>
     </div>
   );
 }

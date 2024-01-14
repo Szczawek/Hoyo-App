@@ -8,8 +8,6 @@ const EmptyUser = lazy(() => import("./main-component/EmptyUser"));
 const User = lazy(() => import("./main-component/User"));
 const Settings = lazy(() => import("./main-component/Settings"));
 const Replies = lazy(() => import("./main-component/Replies"));
-const EditProfile = lazy(() => import("./profile/EditProfile"));
-
 const NotFound = lazy(() => import("./main-component/NotFound"));
 
 export const UserContext = createContext();
@@ -17,13 +15,14 @@ export default function App() {
   const [session, setSession] = useState(false);
   const [userData, setUserData] = useState({
     nick: "User",
-    avatar: "images/user.svg",
+    avatar: "/images/user.svg",
     likes: [],
   });
 
   useEffect(() => {
     verifyLogged();
   }, []);
+
   // Check if the user is logged in
   async function verifyLogged() {
     try {
@@ -33,14 +32,26 @@ export default function App() {
       if (!response.ok) return;
       const obj = await response.json();
       setSession(true);
-      setUserData(obj);
+      if (obj["avatar"]) {
+        const reader = new FileReader();
+        reader.readAsDataURL(
+          new Blob([new Uint8Array(obj["avatar"]["data"])], {
+            type: "image/jpeg",
+          })
+        );
+        reader.onload = () => {
+          setUserData({ ...obj, avatar: reader.result });
+        };
+        return;
+      }
+      delete obj["avatar"];
+      setUserData((prev) => ({ ...prev, ...obj }));
     } catch (err) {
       throw Error(
         `An attempt to check whether the user is logged in failed: ${err}`
       );
     }
   }
-
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
@@ -48,10 +59,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Header user={userData} />}>
               <Route index element={<Home session={session} />} />
-              <Route
-                path="news"
-                element={<News user={userData} login={session} />}
-              />
+              <Route path="news" element={<News />} />
               <Route path="info" element={<Info />}>
                 <Route path="check" element={<Settings />} />
               </Route>
@@ -63,11 +71,7 @@ export default function App() {
               />
               <Route path="replies" element={<Replies userData={userData} />} />
               {session && <Route path="settings" element={<Settings />} />}
-              <Route path=":nick" element={<User nick={userData["nick"]}/>}>
-                {session && (
-                  <Route path="edit-profile" element={<EditProfile />} />
-                )}
-              </Route>
+              <Route path=":nick//*" element={<User />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

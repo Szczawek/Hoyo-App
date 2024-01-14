@@ -1,11 +1,8 @@
-import Login from "../account/Login";
 import Menu from "../profile/Menu";
-import ComShelf from "../comments/ComShelf";
 import { useContext } from "react";
 import { UserContext } from "../App";
-
-export default function Profile({ session, user }) {
-  const { userData } = useContext(UserContext);
+export default function Profile({ user }) {
+  const { id } = useContext(UserContext)["userData"];
   return (
     <section className="user">
       <div className="bg-img">
@@ -14,16 +11,14 @@ export default function Profile({ session, user }) {
             <div className="avatar big">
               <img src={user["avatar"]} alt="profile image" />
             </div>
+            {user["id"] === id && <Menu />}
           </div>
           <div className="account_description">
-            <h2>{user["nick"]}</h2>
+            <h2 className="nick">{user["nick"]}</h2>
             <p className="about">{user["about"]}</p>
           </div>
         </header>
       </div>
-      <ComShelf id={user["id"]} />
-      {user["id"] === userData["id"] && <Menu />}
-      {!session && <Login uncloseable={true}></Login>}
     </section>
   );
 }

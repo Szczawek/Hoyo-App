@@ -3,8 +3,10 @@ import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import "dotenv/config";
+import Jimp from "jimp";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
+import multer from "multer";
 
 const PORT = 80;
 const app = express();
@@ -24,6 +26,19 @@ const db = mysql.createConnection({
   database: "magazine",
 });
 
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fieldSize: 1024 * 1024 * 10,
+  },
+});
+
+const fullData = new Date(
+  new Date().getFullYear(),
+  new Date().getMonth(),
+  new Date().getDate()
+);
 app.get("/", (req, res) => {
   res.send("Szczawik");
 });
@@ -38,7 +53,7 @@ app.get("/comments:id", function (req, res) {
   const command = id === 0 ? optionOne : id > 0 ? optionTwo : null;
   db.query(command, [id], function (err, data) {
     if (err) throw Error(`Error with database #comment: ${err}`);
-    res.send(data);
+    res.json(data);
   });
 });
 
@@ -52,52 +67,21 @@ app.post("/remove-comment", function (req, res) {
 });
 
 // Add comment to account
-app.post("/add-comment", function (req, res) {
+app.post("/add-comment", upload.single("myFile"), function (req, res) {
   const data = req.cookies["logged"];
-  if (!data) {
-    res.sendStatus(400);
-    return;
-  }
+  if (!data) return res.sendStatus(400);
+
   // decrypt cookie
   const bytes = CryptoJS.AES.decrypt(data, process.env.COOKIE_KEY);
   const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
+  const { content, nick } = JSON.parse(req.body["data"]);
   const command =
     "INSERT INTO comments(userID, content, date, avatar, nick) values(?,?,?,?,?)";
-  const values = [
-    id,
-    req.body["content"],
-    new Date(),
-    req.body["avatar"],
-    req.body["nick"],
-  ];
+  const values = [id, content, fullData, req.file.buffer, nick];
   db.query(command, values, function (err, data) {
     if (err) throw Error(`Error with database #add-comment${err}`);
     res.sendStatus(200);
   });
-});
-
-// Add reply to comment
-app.post("/add-reply", (req, res) => {
-  const { commentID, content, avatar, nick } = req.body;
-  const value = [commentID, content, new Date(), avatar, nick];
-  const command =
-    "INSERT INTO replies(commentID,content,date,avatar,nick) values(?,?,?,?,?)";
-  db.query(command, value, (err, res) => {
-    if (err) throw Error(`Error with database #add-reply: ${err}`);
-    res.sendStatus(200);
-  });
-});
-
-// Replies list
-app.get("/replies", (req, res) => {
-  const value = [req.body["commentID"]];
-  const command = "SELECT * FROM replies where commentID ?";
-  db.query(command, value, (err, res) => {
-    if (err) throw Error(`Error with database #replies: ${err}`);
-    res.sendStatus(200);
-  });
-  res.send("Szczawik");
 });
 
 // Create an account
@@ -105,26 +89,23 @@ app.post("/create-account", function (req, res) {
   const command = "select id from user where login = ?";
   const login = req.body["login"];
   const nick = req.body["nick"];
-  const avatar = "/images/user.svg";
   db.query(command, [login], function (err, data) {
     if (err) throw Error(`Error with database: ${err}`);
 
     const accountExists = data[0];
-    const command =
-      "insert into user(Login,Password,Nick,Avatar,About) values(?,?,?,?,?)";
 
     if (!accountExists) {
       encryption(req.body["password"])
         .then((password) => {
-          db.query(
-            command,
-            [login, password, nick, avatar, ""],
-            (err, data) => {
-              if (err)
-                throw Error(`Error with database #create-account: ${err}`);
-            }
-          );
-          res.sendStatus(200);
+          const command =
+            "INSERT INTO `user` (`Login`, `Password`, `nick`, `About`, `date`) values(?,?,?,?,?)";
+
+          const value = [login, password, nick, "", fullData];
+
+          db.query(command, value, (err, data) => {
+            if (err) throw Error(`Error with database #create-account: ${err}`);
+            res.sendStatus(200);
+          });
         })
         .catch((err) => {
           throw Error(`Error during email validation: ${err}`);
@@ -208,7 +189,7 @@ app.post("/login", function (req, res) {
 
 // Logout
 app.post("/logout", function (req, res) {
-  res.clearCookie("logged", { httpOnly: true });
+  res.clearCookie("logged", { maxAge: 0 });
   res.sendStatus(200);
 });
 
@@ -216,7 +197,7 @@ app.post("/logout", function (req, res) {
 app.get("/logged", function (req, res) {
   const login = req.cookies["logged"];
   if (!login) return res.sendStatus(400);
-  const command = "SELECT id,nick,about,avatar FROM user where id =?";
+  const command = "SELECT id,nick,about,avatar,date FROM user where id =?";
   // decrypt cookie
   const bytes = CryptoJS.AES.decrypt(login, process.env.COOKIE_KEY);
   const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
@@ -224,10 +205,10 @@ app.get("/logged", function (req, res) {
     if (err) throw Error(`Error with database #logged-userData: ${err}`);
 
     const command = "SELECT commentID FROM likes where userID = ?";
-    db.query(command, [userData[0]["id"]], function (err, userLikes) {
+    db.query(command, [id], function (err, userLikes) {
       if (err) throw Error(`Error with database #logged-userLikes: ${err}`);
-      const idW = userLikes.map((e) => e["commentID"]);
-      userData[0]["likes"] = idW;
+      const likes = userLikes.map((e) => e["commentID"]);
+      userData[0]["likes"] = likes;
       res.json(userData[0]);
     });
   });
@@ -280,19 +261,30 @@ app.post("/like", function (req, res) {
 });
 
 // Update profile info
-app.post("/update-profile", (req, res) => {
-  const command =
-    "UPDATE user set about = ?, avatar = ?, nick = ? where id = ?";
-  const { avatar, nick, about, id } = req.body;
-  const value = [about, avatar, nick, id];
-  db.query(command, value, (err, ressult) => {
-    if (err) throw Error(`Error with database #update-profile: ${err}`);
-  });
-  const commandTwo = "UPDATE comments set nick = ? where userID = ?";
-  db.query(commandTwo, [nick, id], (err, result) => {
-    if (err) throw Error(`Erorr with database #update-profile-commets: ${err}`);
-  });
-  res.sendStatus(200);
+app.post("/update-profile", upload.single("myFile"), async (req, res) => {
+  try {
+    const file = req.file.buffer;
+    const jimpImage = await Jimp.read(file);
+    jimpImage.resize(300, 200);
+    const editImg = await jimpImage.getBufferAsync(Jimp.MIME_JPEG);
+    const { nick, about, id } = JSON.parse(req.body["data"]);
+
+    const command =
+      "UPDATE user set nick = ?, about = ?, avatar = ? where id = ?";
+    const value = [nick, about, editImg, id];
+    db.query(command, value, (err) => {
+      if (err) throw Error(`Error with database #update-profile: ${err}`);
+      const commandTwo =
+        "UPDATE comments set nick = ?, avatar =? where userID = ?";
+      db.query(commandTwo, [nick, editImg, id], (err) => {
+        if (err)
+          throw Error(`Erorr with database #update-profile-commets: ${err}`);
+        res.sendStatus(200);
+      });
+    });
+  } catch (err) {
+    throw err;
+  }
 });
 
 app.listen(PORT, () => {

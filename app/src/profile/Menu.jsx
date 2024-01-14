@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 export default function Menu() {
   const [openMenu, setOpenMenu] = useState(false);
+  const menu = useRef();
   const navigate = useNavigate();
+  useEffect(() => {
+    if (menu.current) menu.current.focus();
+  }, [openMenu]);
 
   const options = {
     method: "POST",
@@ -13,7 +17,8 @@ export default function Menu() {
   // Logout from account
   async function logout() {
     try {
-      await fetch("http://localhost/logout", options);
+      const res = await fetch("http://localhost/logout", options);
+      if (!res.ok) return;
       navigate("/");
       window.location.reload();
     } catch (error) {
@@ -35,11 +40,22 @@ export default function Menu() {
   return (
     <div className="menu">
       {openMenu ? (
-        <ul className="menu_list">
+        <ul
+          ref={menu}
+          tabIndex={0}
+          className="menu_list"
+          onBlur={(e) => {
+            if (e.target.contains(e.relatedTarget)) return;
+            setOpenMenu(false);
+          }}>
           <li>
             <button onClick={() => logout()}>Logout</button>
           </li>
-          <li><Link to={"edit-profile"}>EditProfile</Link></li>
+          <li>
+            <Link onClick={() => setOpenMenu(false)} to={"edit-profile"}>
+              EditProfile
+            </Link>
+          </li>
           <li>
             <button onClick={() => deleteAccount()}>Delete Account</button>
           </li>

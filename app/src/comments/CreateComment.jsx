@@ -2,6 +2,7 @@ import { useContext, useRef, useState } from "react";
 import Window from "./Window";
 import Login from "../account/Login";
 import { UserContext } from "../App";
+import { Link } from "react-router-dom";
 export default function CreateComment(prop) {
   const [loginWindow, setLoginWindow] = useState(false);
   const [value, setValue] = useState("");
@@ -10,7 +11,6 @@ export default function CreateComment(prop) {
   const validation = useRef(null);
   const { avatar, nick, id } = useContext(UserContext)["userData"];
   const { loadData, addComment } = prop;
-
   function setWindow() {
     setExpandMenu((prev) => !prev);
   }
@@ -27,9 +27,11 @@ export default function CreateComment(prop) {
     <>
       <div className="com_creator">
         <header className="intro">
-          <div className="avatar">
-            <img src={avatar} alt="avatar" />
-          </div>
+          <Link to={id ? `/${nick}` : "/empty-user"}>
+            <div className="avatar">
+              <img src={avatar} alt="avatar" />
+            </div>
+          </Link>
           <div className="content">
             <textarea
               ref={validation}

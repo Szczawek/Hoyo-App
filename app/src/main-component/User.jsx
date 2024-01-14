@@ -1,33 +1,21 @@
-import { useEffect, useState } from "react";
 import Profile from "./Profile";
-import { useParams } from "react-router-dom";
-import { Outlet } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
+import useSearchUser from "../profile/useSearchUser";
+import EditProfile from "../profile/EditProfile";
+import ComShelf from "../comments/ComShelf";
+export default function User() {
+  const { userExist, accountUser } = useSearchUser();
 
-export default function User({ nick }) {
-  const [exist, setExist] = useState(false);
-  const [userData, setUserData] = useState();
-  const url = useParams();
-
-  useEffect(() => {
-    searchUser();
-  }, [url["nick"]]);
-  async function searchUser() {
-    try {
-      const response = await fetch(`http://localhost/users${url["nick"]}`);
-      if (!response.ok) return setExist(false);
-      const obj = await response.json();
-      setExist(true);
-      setUserData(obj);
-    } catch (error) {
-      throw Error(`Error with download users: ${error}`);
-    }
-  }
-  if (!exist) return <p>nothing</p>;
+  if (!userExist) return <p className="user_not_found">nothing is here...</p>;
 
   return (
-    <>
-      {nick === userData["nick"] && <Outlet />}
-      <Profile session={true} user={userData} refreshCom={searchUser} />;
-    </>
+    <div className="profile_table">
+      <Profile session={true} user={accountUser} />
+      <Routes>
+        <Route path="/" element={<ComShelf id={accountUser["id"]} />} />
+        <Route path="edit-profile" element={<EditProfile />}></Route>
+      </Routes>
+      <Outlet></Outlet>
+    </div>
   );
 }

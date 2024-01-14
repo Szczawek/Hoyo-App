@@ -8,10 +8,33 @@ export default function Comment({ data }) {
   const [menu, setMenu] = useState(false);
   const { userData, verifyLogged } = useContext(UserContext);
   const { loadComments } = useContext(LoadComments);
+  const [img, setImg] = useState("/images/user.svg");
   const [liked, setLiked] = useState();
   useEffect(() => {
     setLiked(userData["likes"].includes(data["id"]));
   }, [data]);
+  useEffect(() => {
+    if (data["avatar"]) {
+      const render = new FileReader();
+      const file = new Blob([new Uint8Array(data["avatar"]["data"])], {
+        type: "image/png",
+      });
+      render.readAsDataURL(file);
+      render.onload = () => {
+       setImg(render.result)
+      };
+    }
+
+    // if (data["avatar"] != null) {
+    //   const file = new Blob([new Uint8Array(data["avatar"]["data"])], {
+    //     type: "image/png",
+    //   });
+    //   render.readAsDataURL(file);
+    //   render.onload = () => {
+    //     setImg(render.result);
+    //   };
+    // }
+  }, []);
   function closeMenu() {
     setMenu(false);
   }
@@ -22,7 +45,7 @@ export default function Comment({ data }) {
         <div className="container">
           <Link to={`/${data["nick"]}`}>
             <div className="avatar">
-              <img src={data["avatar"]} alt="avatar" />
+              <img src={img} alt="avatar" />
             </div>
           </Link>
           <div className="info">
@@ -49,6 +72,7 @@ export default function Comment({ data }) {
         <button
           className="super"
           onClick={() => {
+            if (!userData["id"]) return;
             like(userData["id"], data["id"])
               .then((e) => {
                 if (!e.ok) return;
