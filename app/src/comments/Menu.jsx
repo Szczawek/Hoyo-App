@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from "react";
 import { LoadComments } from "./ComShelf";
 export default function Menu(prop) {
-  const loadComments = useContext(LoadComments);
+  const { updateComments } = useContext(LoadComments);
   const ul = useRef(null);
   const { fn, loggedUserID, commentID, commentUserID } = prop;
 
@@ -22,9 +22,8 @@ export default function Menu(prop) {
           <button
             className="trash"
             onClick={() => {
-              deleteComment(commentID).then(() =>
-                loadComments["loadComments"]()
-              );
+              deleteComment(commentID).then(() => updateComments(commentID));
+              // loadComments["loadComments"](0)
             }}>
             <img src="/images/remove.svg" alt="remove comment" />
             delete comment

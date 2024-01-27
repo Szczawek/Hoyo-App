@@ -34,24 +34,25 @@ const upload = multer({
   },
 });
 
-const fullData = new Date(
-  new Date().getFullYear(),
-  new Date().getMonth(),
-  new Date().getDate()
-);
 app.get("/", (req, res) => {
   res.send("Szczawik");
 });
 
 // Load comments
-app.get("/comments:id", function (req, res) {
-  const id = JSON.parse(req.params["id"]);
+app.get("/comments", function (req, res) {
+  // Convert string to number
+  const data = {};
+  for (const [key, value] of Object.entries(req.query)) {
+    data[`${key}`] = Number(value);
+  }
+  const { type, start, end } = data;
+
   const optionOne =
     "SELECT comments.*, (SELECT COUNT(`commentID`) FROM likes where `commentID` = comments.id) as likes FROM comments";
   const optionTwo =
     "SELECT comments.*, (SELECT COUNT(`commentID`) FROM likes where `commentID` = comments.id) as likes FROM comments where userID =?";
-  const command = id === 0 ? optionOne : id > 0 ? optionTwo : null;
-  db.query(command, [id], function (err, data) {
+  const command = type === 0 ? optionOne : type > 0 ? optionTwo : null;
+  db.query(command, [type], function (err, data) {
     if (err) throw Error(`Error with database #comment: ${err}`);
     res.json(data);
   });
@@ -71,13 +72,17 @@ app.post("/add-comment", upload.single("myFile"), function (req, res) {
   const data = req.cookies["logged"];
   if (!data) return res.sendStatus(400);
 
+  const { content, nick } = JSON.parse(req.body["data"]);
   // decrypt cookie
   const bytes = CryptoJS.AES.decrypt(data, process.env.COOKIE_KEY);
   const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  const { content, nick } = JSON.parse(req.body["data"]);
+  const values = [id, content, new Date(), nick, null];
+  if (req.file) {
+    values.pop();
+    values.push(req.file.buffer);
+  }
   const command =
-    "INSERT INTO comments(userID, content, date, avatar, nick) values(?,?,?,?,?)";
-  const values = [id, content, fullData, req.file.buffer, nick];
+    "INSERT INTO comments(userID, content, date, nick,avatar) values(?,?,?,?,?)";
   db.query(command, values, function (err, data) {
     if (err) throw Error(`Error with database #add-comment${err}`);
     res.sendStatus(200);
@@ -100,7 +105,7 @@ app.post("/create-account", function (req, res) {
           const command =
             "INSERT INTO `user` (`Login`, `Password`, `nick`, `About`, `date`) values(?,?,?,?,?)";
 
-          const value = [login, password, nick, "", fullData];
+          const value = [login, password, nick, "", new Date()];
 
           db.query(command, value, (err, data) => {
             if (err) throw Error(`Error with database #create-account: ${err}`);
@@ -226,7 +231,8 @@ app.get("/users-list", function (req, res) {
 // DONE
 // Download USER dates
 app.get("/users:nick", function (req, res) {
-  const command = "SELECT nick, about, avatar, id from user";
+  const command =
+    "SELECT nick, about, avatar, id, (SELECT COUNT(id) from followers where personID = user.id) as follow from user";
   db.query(command, function (err, userData) {
     if (err) throw Error(`Error with database #users userData: ${err}`);
     const obj = userData.find(
@@ -262,21 +268,23 @@ app.post("/like", function (req, res) {
 
 // Update profile info
 app.post("/update-profile", upload.single("myFile"), async (req, res) => {
+  const { nick, about, id } = JSON.parse(req.body["data"]);
+  let columnName = "nick = ?";
+  const value = [nick, id];
   try {
-    const file = req.file.buffer;
-    const jimpImage = await Jimp.read(file);
-    jimpImage.resize(300, 200);
-    const editImg = await jimpImage.getBufferAsync(Jimp.MIME_JPEG);
-    const { nick, about, id } = JSON.parse(req.body["data"]);
-
-    const command =
-      "UPDATE user set nick = ?, about = ?, avatar = ? where id = ?";
-    const value = [nick, about, editImg, id];
-    db.query(command, value, (err) => {
+    if (req.file) {
+      columnName = "avatar = ?, nick = ?";
+      const file = req.file.buffer;
+      const jimpImage = await Jimp.read(file);
+      jimpImage.resize(300, 200);
+      const img = await jimpImage.getBufferAsync(Jimp.MIME_JPEG);
+      value.unshift(img);
+    }
+    const command = `UPDATE user set about = ?, ${columnName} where id = ?`;
+    db.query(command, [about, ...value], (err) => {
       if (err) throw Error(`Error with database #update-profile: ${err}`);
-      const commandTwo =
-        "UPDATE comments set nick = ?, avatar =? where userID = ?";
-      db.query(commandTwo, [nick, editImg, id], (err) => {
+      const commandTwo = `UPDATE comments set ${columnName} where userID = ?`;
+      db.query(commandTwo, value, (err) => {
         if (err)
           throw Error(`Erorr with database #update-profile-commets: ${err}`);
         res.sendStatus(200);
@@ -285,6 +293,33 @@ app.post("/update-profile", upload.single("myFile"), async (req, res) => {
   } catch (err) {
     throw err;
   }
+});
+
+// folowers
+app.post("/follow", (req, res) => {
+  function deleteFollow(e) {
+    const command = "DELETE FROM followers where id =?";
+    db.query(command, [e], (err) => {
+      if (err) throw Error(`$Error with database #delete follow: ${err}`);
+      res.json({ value: false });
+    });
+  }
+  function addFollow() {
+    const command = "INSERT INTO followers values(null,?,?)";
+    db.query(command, value, (err) => {
+      if (err) throw Error(`Error with database #folow: ${err}`);
+      res.json({ value: true });
+    });
+  }
+  const { owner, person } = req.body;
+  const value = [owner, person];
+  const checkFolow =
+    "SELECT id from followers where `ownerID` = ? and `personID` = ?";
+  db.query(checkFolow, value, (err, result) => {
+    if (err) throw Error(`Error with database #follow: ${err}`);
+    if (result[0]) return deleteFollow(result[0]["id"]);
+    addFollow();
+  });
 });
 
 app.listen(PORT, () => {

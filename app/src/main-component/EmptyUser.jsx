@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import Login from "../account/Login";
-export default function EmptyUser({ session, userNick }) {
-  if (session) return <Navigate to={`/${userNick}`} />;
+export default function EmptyUser({ data }) {
+  if (data["id"]) return <Navigate to={`/${data["nick"]}`} />;
   return (
     <section className="user">
       <div className="bg-img">

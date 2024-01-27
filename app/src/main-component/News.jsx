@@ -13,7 +13,7 @@ export default function News() {
   return (
     <section className="news">
       <CreateComment loadData={statusData} addComment={addComment} />
-      <ComShelf id={0} status={loadData} />
+      <ComShelf type={0} status={loadData} />
     </section>
   );
 }

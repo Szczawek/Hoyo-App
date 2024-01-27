@@ -1,8 +1,8 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
 export default function EditProfile() {
-  const { userData, verifyLogged } = useContext(UserContext);
+  const { userData, updateUserData } = useContext(UserContext);
   const [data, setData] = useState({
     nick: userData["nick"],
     about: userData["about"],
@@ -12,8 +12,16 @@ export default function EditProfile() {
   const navigate = useNavigate();
   async function haddleSaveData(e) {
     e.preventDefault();
+    if (
+      userData["nick"] === data["nick"] &&
+      userData["about"] === data["about"]
+    )
+      return navigate(-1);
+
     const form = new FormData();
-    form.append("myFile", file);
+    if (userData["avatar"] !== data["avatar"]) {
+      form.append("myFile", file);
+    }
     const values = { ...data, id: userData["id"] };
     delete values["avatar"];
     form.append("data", JSON.stringify(values));
@@ -23,7 +31,7 @@ export default function EditProfile() {
         body: form,
       });
       if (res.ok) {
-        verifyLogged();
+        updateUserData(data);
         navigate(`/${data["nick"]}`);
       }
     } catch (err) {

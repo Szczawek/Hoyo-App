@@ -1,18 +1,22 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../App.jsx";
-import { LoadComments } from "./ComShelf.jsx";
 import { Link } from "react-router-dom";
 import Menu from "./Menu.jsx";
 
 export default function Comment({ data }) {
   const [menu, setMenu] = useState(false);
-  const { userData, verifyLogged } = useContext(UserContext);
-  const { loadComments } = useContext(LoadComments);
+  const { id, likes } = useContext(UserContext)["userData"];
   const [img, setImg] = useState("/images/user.svg");
-  const [liked, setLiked] = useState();
-  useEffect(() => {
-    setLiked(userData["likes"].includes(data["id"]));
-  }, [data]);
+  const [likesNo, setLikesNo] = useState(data["likes"]);
+  const [liked, setLiked] = useState(likes.includes(data["id"]));
+  const [warning, setWarning] = useState();
+
+  // DO OPTYMALIZACJI
+  // DO OPTYMALIZACJI
+  // DO OPTYMALIZACJI
+  // DO OPTYMALIZACJI
+  // DO OPTYMALIZACJI
+
   useEffect(() => {
     if (data["avatar"]) {
       const render = new FileReader();
@@ -21,24 +25,32 @@ export default function Comment({ data }) {
       });
       render.readAsDataURL(file);
       render.onload = () => {
-       setImg(render.result)
+        setImg(render.result);
       };
     }
-
-    // if (data["avatar"] != null) {
-    //   const file = new Blob([new Uint8Array(data["avatar"]["data"])], {
-    //     type: "image/png",
-    //   });
-    //   render.readAsDataURL(file);
-    //   render.onload = () => {
-    //     setImg(render.result);
-    //   };
-    // }
   }, []);
+
   function closeMenu() {
     setMenu(false);
   }
 
+  async function like() {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({ userID: id, commentID: data["id"] }),
+    };
+    try {
+      const response = await fetch("http://localhost/like", options);
+      if (!response.ok) return setWarning(true);
+      setLiked((prev) => !prev);
+      setLikesNo((prev) => (liked ? prev - 1 : prev + 1));
+    } catch (err) {
+      throw Error(`Error when awarding likes: ${err}`);
+    }
+  }
   return (
     <div className="comment">
       <header className="showcase">
@@ -61,7 +73,7 @@ export default function Comment({ data }) {
         {menu && (
           <Menu
             fn={closeMenu}
-            loggedUserID={userData["id"]}
+            loggedUserID={id}
             commentID={data["id"]}
             commentUserID={data["userID"]}
           />
@@ -72,13 +84,8 @@ export default function Comment({ data }) {
         <button
           className="super"
           onClick={() => {
-            if (!userData["id"]) return;
-            like(userData["id"], data["id"])
-              .then((e) => {
-                if (!e.ok) return;
-                return verifyLogged();
-              })
-              .then(() => loadComments());
+            if (!id) return;
+            like();
           }}>
           {!liked ? (
             <svg
@@ -104,7 +111,8 @@ export default function Comment({ data }) {
               />
             </svg>
           )}
-          {data["likes"]}
+          {likesNo}
+          {warning && <small>Error with likes</small>}
         </button>
         <button className="com">
           <img src="/images/comment.svg" alt="open replies" />
@@ -112,20 +120,4 @@ export default function Comment({ data }) {
       </div>
     </div>
   );
-}
-
-async function like(userID, commentID) {
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-type": "application/json",
-    },
-    body: JSON.stringify({ userID: userID, commentID: commentID }),
-  };
-  try {
-    const response = await fetch("http://localhost/like", options);
-    return response;
-  } catch (err) {
-    throw Error(`Error when awarding likes: ${err}`);
-  }
 }

@@ -229,8 +229,16 @@ body {
 /* USER */
 .profile_table {
   display: grid;
+  position: relative;
   grid-template-rows: max-content 1fr;
   gap: 8rem;
+}
+
+.profile_table .replies {
+  position: absolute;
+  background-color: #121212;
+  width: 100%;
+  height: 100%;
 }
 .user_not_found,
 .empty_table {
@@ -254,7 +262,6 @@ body {
 .user .profile .container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 .user .about {
   font-size: 0.8rem;
@@ -283,7 +290,7 @@ body {
   min-width: 300px;
   max-width: 600px;
   height: max-content;
-  grid-template-rows: repeat(2,max-content);
+  grid-template-rows: repeat(2, max-content);
   box-shadow: 0 0.4rem 0.4rem 0.3rem #0a0a0a;
 }
 .profile_table .comments {
@@ -291,6 +298,24 @@ body {
   padding-bottom: 4rem;
   grid-template-columns: minmax(300px, 80%);
 }
+/* Follow table */
+.follow_container {
+  display: grid;
+  grid-template-rows: repeat(2, max-content);
+  padding-top: 1rem;
+  row-gap: 0.4rem;
+  justify-items: right;
+}
+.follow_container button {
+  padding: 0.2rem 0.8rem;
+  border-radius: 0.2rem;
+  background-color: rgba(83, 50, 81, 0.986);
+  transition: filter 300ms;
+}
+.follow_container button:is(:hover, :focus) {
+  filter: brightness(60%);
+}
+
 /* MENU */
 .empty_conent {
   padding: 8rem 1rem;
@@ -365,8 +390,8 @@ body {
   border-radius: 0.2rem;
 }
 .edit_window form button[type="submit"] {
-  padding-block: .4rem;
-  border-radius: .2rem;
+  padding-block: 0.4rem;
+  border-radius: 0.2rem;
 }
 
 .edit_window .tip {
@@ -575,8 +600,15 @@ button.confirm:is(:hover, :focus) {
 .comment .panel button {
   display: grid;
   grid-template-columns: repeat(2, max-content);
+  position: relative;
   align-items: center;
   gap: 0.5rem;
+}
+.comment .panel small {
+  position: absolute;
+  width: max-content;
+  color: var(--cancel);
+  translate: 0 100%;
 }
 .comment .super {
   fill: #1e3050;
@@ -682,5 +714,4 @@ button.confirm:is(:hover, :focus) {
   .user .bg-img .avatar {
     max-width: 3.2rem;
   }
-
 }
