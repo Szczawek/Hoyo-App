@@ -48,6 +48,15 @@ video,
 iframe {
   max-width: 100%;
 }
+
+/* LOAD SITE DIV */
+.loading {
+  display: grid;
+  place-content: center;
+  height: 100vh;
+  font-size: 2rem;
+}
+
 body {
   font-family: "Poppins", sans-serif;
 }
@@ -230,8 +239,7 @@ body {
 .profile_table {
   display: grid;
   position: relative;
-  grid-template-rows: max-content 1fr;
-  gap: 8rem;
+  grid-template-rows: max-content max-content 1fr;
 }
 
 .profile_table .replies {
@@ -247,7 +255,7 @@ body {
   place-content: center;
 }
 .empty_table {
-  padding-inline: 2rem;
+min-height: 100%;
 }
 .user {
   display: grid;
@@ -295,7 +303,9 @@ body {
 }
 .profile_table .comments {
   justify-content: center;
-  padding-bottom: 4rem;
+  top: 9rem;
+  padding-bottom: 8.5rem;
+  position: relative;
   grid-template-columns: minmax(300px, 80%);
 }
 /* Follow table */
@@ -322,7 +332,7 @@ body {
 }
 .user .menu {
   display: grid;
-  /* min-width: 200px; */
+  min-width: 200px;
 }
 .user .menu .menu_list {
   background-color: rgba(0, 0, 0, 0.8);
@@ -592,6 +602,12 @@ button.confirm:is(:hover, :focus) {
   gap: 1rem;
   grid-template-columns: repeat(2, max-content);
 }
+
+.comment .container .info {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 1rem;
+}
 .comment .panel {
   display: grid;
   grid-template-columns: repeat(2, 3rem);
@@ -622,23 +638,23 @@ button.confirm:is(:hover, :focus) {
 }
 
 /* COMMENT MENU */
-.comments .menu {
+.comment_menu {
   position: absolute;
   right: 1rem;
   top: 1rem;
   background-color: red;
   border-radius: 0.1rem;
 }
-.comments .menu li {
+.comment_menu li {
   cursor: pointer;
   padding: 0.4rem 0.8rem;
   transition: background-color 150ms ease-in;
 }
-.comments .menu li:hover,
-.comments .menu li:hover {
+.comment_menu li:hover,
+.commen_menu li:hover {
   background-color: var(--dark-contrast);
 }
-.comments .trash {
+.comment_menu .trash {
   display: grid;
   grid-template-columns: repeat(2, max-content);
   gap: 0.5rem;

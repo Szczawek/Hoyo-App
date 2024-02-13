@@ -1,16 +1,17 @@
-import { useContext, useRef, useState } from "react";
+import { memo, useContext, useRef, useState } from "react";
 import Window from "./Window";
 import Login from "../account/Login";
 import { UserContext } from "../App";
+import addComment from "./addComment";
 import { Link } from "react-router-dom";
-export default function CreateComment(prop) {
+const CreateComment = memo(function CreateComment({ addCommentVS }) {
   const [loginWindow, setLoginWindow] = useState(false);
-  const [value, setValue] = useState("");
   const [expandMenu, setExpandMenu] = useState(false);
   const [validArea, setValidArea] = useState(false);
   const validation = useRef(null);
+  const [value, setValue] = useState("");
   const { avatar, nick, id } = useContext(UserContext)["userData"];
-  const { loadData, addComment } = prop;
+
   function setWindow() {
     setExpandMenu((prev) => !prev);
   }
@@ -19,8 +20,13 @@ export default function CreateComment(prop) {
     setLoginWindow(false);
   }
 
-  function clearValue() {
-    setValue("");
+  function sendCom() {
+    addComment({nick,value,avatar}).then((e) => {
+      if (typeof e !== "object") return alert("Error");
+      setValue("");
+      setWindow();
+      addCommentVS(e);
+    });
   }
 
   return (
@@ -60,19 +66,11 @@ export default function CreateComment(prop) {
           className="confirm">
           Add Comment
         </button>
-        {expandMenu && (
-          <Window
-            cl={clearValue}
-            nick={nick}
-            avatar={avatar}
-            content={value}
-            loadData={loadData}
-            closeWindow={setWindow}
-            addComment={addComment}
-          />
-        )}
+        {expandMenu && <Window closeWindow={setWindow} sendCom={sendCom} />}
       </div>
       {loginWindow && <Login closeFn={closeLoginWindow} />}
     </>
   );
-}
+});
+
+export default CreateComment;

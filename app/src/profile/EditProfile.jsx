@@ -3,37 +3,32 @@ import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
 export default function EditProfile() {
   const { userData, updateUserData } = useContext(UserContext);
-  const [data, setData] = useState({
-    nick: userData["nick"],
-    about: userData["about"],
-    avatar: userData["avatar"],
-  });
+  const { nick, about, avatar, id } = userData;
+  const [data, setData] = useState({ nick, about, avatar, id });
+  const [img, setImg] = useState(avatar);
   const [file, setFile] = useState();
   const navigate = useNavigate();
+
   async function haddleSaveData(e) {
     e.preventDefault();
-    if (
-      userData["nick"] === data["nick"] &&
-      userData["about"] === data["about"]
-    )
-      return navigate(-1);
-
+    const comandRule =
+      data["nick"] === userData["nick"] &&
+      data["about"] === userData["about"] &&
+      img === userData["avatar"];
+    if (comandRule) return navigate(-1);
     const form = new FormData();
-    if (userData["avatar"] !== data["avatar"]) {
-      form.append("myFile", file);
-    }
-    const values = { ...data, id: userData["id"] };
-    delete values["avatar"];
-    form.append("data", JSON.stringify(values));
+    if (img !== userData["avatar"]) form.append("myFile", file);
+    form.append("data", JSON.stringify(data));
     try {
-      const res = await fetch("http://localhost/update-profile", {
+      const response = await fetch("http://localhost/update-profile", {
         method: "POST",
         body: form,
       });
-      if (res.ok) {
+      if (!response.ok) return
+      const imgSrc = await response.json()
+      if (img !== userData["avatar"]) data["avatar"] = imgSrc["imgSrc"]
         updateUserData(data);
         navigate(`/${data["nick"]}`);
-      }
     } catch (err) {
       throw err;
     }
@@ -42,11 +37,11 @@ export default function EditProfile() {
   function handleUpdataImg(e) {
     const fileImg = e.target.files[0];
     if (!fileImg) return;
+    setFile(fileImg);
     const render = new FileReader();
     render.readAsDataURL(fileImg);
     render.onload = () => {
-      setData((prev) => ({ ...prev, avatar: render.result }));
-      setFile(fileImg);
+      setImg(render.result);
     };
   }
 
@@ -65,7 +60,7 @@ export default function EditProfile() {
           </button>
         </header>
         <label className="avatar" htmlFor="choose_img">
-          <img src={data["avatar"]} alt="avatar" />
+          <img src={img} alt="avatar" />
           <input
             accept="image/.png, .jpg, .jpeg"
             type="file"

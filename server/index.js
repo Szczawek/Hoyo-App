@@ -3,7 +3,7 @@ import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import "dotenv/config";
-import Jimp from "jimp";
+import fs from "fs";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
@@ -26,7 +26,15 @@ const db = mysql.createConnection({
   database: "magazine",
 });
 
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "../app/public/users-pictures");
+  },
+  filename: function (req, file, cb) {
+    const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
+    cb(null, `${file.originalname}-${fileName}`);
+  },
+});
 const upload = multer({
   storage: storage,
   limits: {
@@ -38,23 +46,23 @@ app.get("/", (req, res) => {
   res.send("Szczawik");
 });
 
-// Load comments
+// load comments
 app.get("/comments", function (req, res) {
   // Convert string to number
   const data = {};
   for (const [key, value] of Object.entries(req.query)) {
     data[`${key}`] = Number(value);
   }
-  const { type, start, end } = data;
-
-  const optionOne =
-    "SELECT comments.*, (SELECT COUNT(`commentID`) FROM likes where `commentID` = comments.id) as likes FROM comments";
-  const optionTwo =
-    "SELECT comments.*, (SELECT COUNT(`commentID`) FROM likes where `commentID` = comments.id) as likes FROM comments where userID =?";
-  const command = type === 0 ? optionOne : type > 0 ? optionTwo : null;
+  const { type, page } = data;
+  const condition = type === 0 ? "" : type > 0 ? "where userID =?" : null;
+  const command = `SELECT comments.*, (SELECT COUNT(commentID) FROM likes where commentID = comments.id) as likes FROM comments ${condition} ORDER BY id DESC LIMIT 10 OFFSET ${page}`;
   db.query(command, [type], function (err, data) {
     if (err) throw Error(`Error with database #comment: ${err}`);
-    res.json(data);
+    const command = `SELECT COUNT(id) as comments_number FROM COMMENTS ${condition}`;
+    db.query(command, [type], (err, result) => {
+      if (err) throw Error(`Error with comments_length: ${err}`);
+      res.json({ com: data, comments_number: result[0]["comments_number"] });
+    });
   });
 });
 
@@ -68,24 +76,28 @@ app.post("/remove-comment", function (req, res) {
 });
 
 // Add comment to account
-app.post("/add-comment", upload.single("myFile"), function (req, res) {
+app.post("/add-comment", function (req, res) {
   const data = req.cookies["logged"];
   if (!data) return res.sendStatus(400);
+  const { nick, value, avatar } = req.body;
 
-  const { content, nick } = JSON.parse(req.body["data"]);
   // decrypt cookie
   const bytes = CryptoJS.AES.decrypt(data, process.env.COOKIE_KEY);
   const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  const values = [id, content, new Date(), nick, null];
-  if (req.file) {
-    values.pop();
-    values.push(req.file.buffer);
-  }
+  const commentData = [id, nick, value, avatar, new Date()];
+
   const command =
-    "INSERT INTO comments(userID, content, date, nick,avatar) values(?,?,?,?,?)";
-  db.query(command, values, function (err, data) {
+    "INSERT INTO comments(userID, nick, content, avatar, date) values(?,?,?,?,?)";
+  db.query(command, commentData, (err) => {
     if (err) throw Error(`Error with database #add-comment${err}`);
-    res.sendStatus(200);
+
+    // Download the current commentary on function optimization
+    const downloadCommand = "SELECT * FROM comments ORDER BY ID DESC LIMIT 1";
+    db.query(downloadCommand, (err, result) => {
+      if (err) throw Error(`Error with download the last comment: ${err}`);
+      result[0].likes = 0;
+      res.json(result[0]);
+    });
   });
 });
 
@@ -103,9 +115,9 @@ app.post("/create-account", function (req, res) {
       encryption(req.body["password"])
         .then((password) => {
           const command =
-            "INSERT INTO `user` (`Login`, `Password`, `nick`, `About`, `date`) values(?,?,?,?,?)";
+            "INSERT INTO `user` (`Login`, `Password`, `nick`, `About`, `date`, `avatar`) values(?,?,?,?,?,?)";
 
-          const value = [login, password, nick, "", new Date()];
+          const value = [login, password, nick, "", new Date(), "/images/user.svg"];
 
           db.query(command, value, (err, data) => {
             if (err) throw Error(`Error with database #create-account: ${err}`);
@@ -268,26 +280,33 @@ app.post("/like", function (req, res) {
 
 // Update profile info
 app.post("/update-profile", upload.single("myFile"), async (req, res) => {
-  const { nick, about, id } = JSON.parse(req.body["data"]);
-  let columnName = "nick = ?";
-  const value = [nick, id];
+  const { nick, about, avatar, id } = JSON.parse(req.body["data"]);
+  let columns = "";
+  let imgSrc;
+  const value = [about, nick, id];
   try {
     if (req.file) {
-      columnName = "avatar = ?, nick = ?";
-      const file = req.file.buffer;
-      const jimpImage = await Jimp.read(file);
-      jimpImage.resize(300, 200);
-      const img = await jimpImage.getBufferAsync(Jimp.MIME_JPEG);
-      value.unshift(img);
+      imgSrc = `/users-pictures/${req.file.filename}`;
+      columns = "avatar = ?,";
+      value.splice(1, 0, `/users-pictures/${req.file.filename}`);
+
+      if (avatar !== "/images/user.svg") {
+        fs.unlink(`../app/public/${avatar}`, (err) => {
+          if (err) throw err;
+        });
+      }
     }
-    const command = `UPDATE user set about = ?, ${columnName} where id = ?`;
-    db.query(command, [about, ...value], (err) => {
+
+    columns += "nick =?";
+    const updateAccount = `UPDATE user set about = ?, ${columns} where id = ?`;
+    db.query(updateAccount, value, (err) => {
       if (err) throw Error(`Error with database #update-profile: ${err}`);
-      const commandTwo = `UPDATE comments set ${columnName} where userID = ?`;
+      value.splice(0, 1);
+      const commandTwo = `UPDATE comments set ${columns} where userID = ?`;
       db.query(commandTwo, value, (err) => {
         if (err)
           throw Error(`Erorr with database #update-profile-commets: ${err}`);
-        res.sendStatus(200);
+        res.json({ imgSrc: imgSrc }).status(200);
       });
     });
   } catch (err) {

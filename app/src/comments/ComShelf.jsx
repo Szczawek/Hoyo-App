@@ -1,44 +1,90 @@
-import { createContext, useEffect, useState } from "react";
+import {
+  createContext,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import RenderComments from "./RenderComments";
-import useRenderComments from "./useRenderComments";
-export const LoadComments = createContext();
-export default function ComShelf(props) {
-  const [comments, setComments] = useState([]);
-  const testRender = useRenderComments();
-  useEffect(() => {
-    async function loadComments(type) {
-      try {
-        const response = await fetch(
-          `http://localhost/comments?type=${type}&start=0&end=5`
-        );
-        const obj = await response.json();
-        setComments(obj.reverse());
-      } catch (err) {
-        throw Error(`${err}`);
-      }
-    }
-    loadComments(props.type);
-  }, [props.status, props.type]);
+import CreateComment from "./CreateComment";
+export const ComSettings = createContext();
 
-  // Efficient updating of comments
-  function updateComments(id) {
-    const copy = [...comments];
-    const index = copy.find((e) => e["id"] === id);
-    copy.splice(index, 1);
-    setComments(copy);
+const ComShelf = memo(function ComShelf(props) {
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const element = useRef(null);
+
+  //Set the observer to the last item and wait to see it.
+  const defaultSettings = useMemo(() => {
+    setComments([]);
+    setPage(0);
+    setLoading(true);
+  }, [props.type]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(spy);
+    if (observer && element.current) {
+      observer.observe(element.current);
+    }
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [page]);
+
+  function spy(e) {
+    if (e[0].isIntersecting && loading) {
+      loadComments();
+    }
   }
 
-  // ZAMIENIĆ useEffect na to 
-  // function addCommet(obj) {
-  //   setComments((prev) => [obj, ...prev]);
-  // }
+  // Loading comments from database
+  async function loadComments() {
+    try {
+      const response = await fetch(
+        `http://localhost/comments?type=${props.type}&page=${page}`
+      );
+      if (!response.ok) return;
+      const obj = await response.json();
+      if (obj["comments_number"] === comments.length) setLoading(false);
+      setPage((prev) => prev + 10);
+      setComments((prev) => [...prev, ...obj["com"]]);
+    } catch (err) {
+      throw Error(`Error with donwload comments: ${err}`);
+    }
+  }
+  // Version efficace
+  const addCommentVS = useCallback((e) => {
+    setComments((prev) => [e, ...prev]);
+    setPage((prev) => prev + 1);
+  }, []);
 
-  if (!comments.length) return <p className="empty_table">There is nothing</p>;
+  // Version efficace
+  function deleteComment(id) {
+    const index = comments.findIndex((e) => e["id"] === id);
+    setComments((prev) => {
+      const copy = [...prev];
+      copy.splice(index, 1);
+      return copy;
+    });
+  }
+
   return (
-    <div className="comments">
-      <LoadComments.Provider value={{ updateComments }}>
+    <>
+      {props.type === 0 && <CreateComment addCommentVS={addCommentVS} />}
+      <ComSettings.Provider value={deleteComment}>
         <RenderComments data={comments} />
-      </LoadComments.Provider>
-    </div>
+      </ComSettings.Provider>
+      {loading && <p ref={element}>Loading...</p>}
+      {!loading && !comments.length ? (
+        <p className="empty_table">There is nothing</p>
+      ) : null}
+    </>
   );
-}
+});
+
+export default ComShelf;

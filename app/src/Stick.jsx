@@ -1,7 +1,5 @@
 export default function Stick(props) {
-    const {size,name,dd} = props
+  const { size, name, dd } = props;
 
-    return <p>
-        Szczawik
-    </p>
+  return <p>Szczawik</p>;
 }
