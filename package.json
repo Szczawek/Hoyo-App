@@ -1,0 +1,23 @@
+{
+  "name": "page",
+  "version": "1.0.0",
+  "description": "dodać dynamiczne dodawanie komentarzy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cd app && npm run dev && cd .. && cd server && npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Szczawek/auth-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Szczawek/auth-app/issues"
+  },
+  "homepage": "https://github.com/Szczawek/auth-app#readme",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
