@@ -43,7 +43,7 @@ const upload = multer({
 });
 
 app.get("/", (req, res) => {
-  res.send("Szczawik");
+  res.json("Szczawik");
 });
 
 // load comments

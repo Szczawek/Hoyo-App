@@ -18,6 +18,9 @@ export default function App() {
   const [userData, setUserData] = useState(std);
 
   useEffect(() => {
+    fetch("http://localhost")
+      .then((e) => e.json())
+      .then((e) => console.log(e));
     verifyLogged();
   }, []);
 

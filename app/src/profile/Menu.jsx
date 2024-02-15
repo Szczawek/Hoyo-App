@@ -26,16 +26,7 @@ export default function Menu() {
     }
   }
 
-  // Delete account
-  async function deleteAccount() {
-    try {
-      await fetch("http://localhost/remove", options);
-      navigate("/");
-      window.location.reload();
-    } catch (error) {
-      throw Error(`The server isn't responding: ${error}`);
-    }
-  }
+
 
   return (
     <div className="menu">
@@ -57,8 +48,9 @@ export default function Menu() {
             </Link>
           </li>
           <li>
-            <button onClick={() => deleteAccount()}>Delete Account</button>
+            <Link to="/settings">Settings</Link>
           </li>
+     
         </ul>
       ) : (
         <button onClick={() => setOpenMenu(true)} className="open_menu_btn">
