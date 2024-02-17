@@ -1,4 +1,4 @@
-export default async function addComment(obj) {
+export default async function addComment(obj, source) {
   const options = {
     method: "POST",
     credentials: "include",
@@ -8,7 +8,7 @@ export default async function addComment(obj) {
     body: JSON.stringify(obj),
   };
   try {
-    const response = await fetch("http://localhost/add-comment", options);
+    const response = await fetch(`http://localhost/${source}`, options);
     if (!response.ok) return response;
     const obj = await response.json();
     return obj;

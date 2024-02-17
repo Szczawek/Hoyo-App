@@ -18,9 +18,6 @@ export default function App() {
   const [userData, setUserData] = useState(std);
 
   useEffect(() => {
-    fetch("http://localhost")
-      .then((e) => e.json())
-      .then((e) => console.log(e));
     verifyLogged();
   }, []);
 
@@ -67,14 +64,13 @@ export default function App() {
             <Route path="/" element={<Header user={userData} />}>
               <Route index element={<Home session={userData["id"]} />} />
               <Route path="news" element={<News />} />
-              <Route path="info" element={<Info />} />
+              <Route path="info" element={<Info ss={2} title="ssssssss" sb={"s"} />} />
               <Route
                 path="empty-user"
                 element={<EmptyUser data={userData} />}
               />
-              <Route path=":nick//*" element={<User />}>
-                <Route path="replies" element={<Replies />} />
-              </Route>
+              <Route path=":nick//*" element={<User />}></Route>
+              <Route path="replies/:id" element={<Replies />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

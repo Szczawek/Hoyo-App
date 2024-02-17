@@ -4,7 +4,11 @@ import Login from "../account/Login";
 import { UserContext } from "../App";
 import addComment from "./addComment";
 import { Link } from "react-router-dom";
-const CreateComment = memo(function CreateComment({ addCommentVS }) {
+const CreateComment = memo(function CreateComment({
+  addCommentVS,
+  source,
+  commentID,
+}) {
   const [loginWindow, setLoginWindow] = useState(false);
   const [expandMenu, setExpandMenu] = useState(false);
   const [validArea, setValidArea] = useState(false);
@@ -21,23 +25,27 @@ const CreateComment = memo(function CreateComment({ addCommentVS }) {
   }
 
   function sendCom() {
-    addComment({nick,value,avatar}).then((e) => {
-      if (typeof e !== "object") return alert("Error");
-      setValue("");
-      setWindow();
-      addCommentVS(e);
-    });
+    addComment({ nick, value, avatar, commentID }, source).then(
+      (e) => {
+        if (typeof e !== "object") return alert("Error");
+        setValue("");
+        setWindow();
+        addCommentVS(e);
+      }
+    );
   }
 
   return (
     <>
       <div className="com_creator">
         <header className="intro">
-          <Link to={id ? `/${nick}` : "/empty-user"}>
-            <div className="avatar">
-              <img src={avatar} alt="avatar" />
-            </div>
-          </Link>
+          <div className="link">
+            <Link to={id ? `/${nick}` : "/empty-user"}>
+              <div className="avatar">
+                <img src={avatar} alt="avatar" />
+              </div>
+            </Link>
+          </div>
           <div className="content">
             <textarea
               ref={validation}

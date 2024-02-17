@@ -4,18 +4,25 @@ import useSearchUser from "../profile/useSearchUser";
 import EditProfile from "../profile/EditProfile";
 import ComShelf from "../comments/ComShelf";
 import Settings from "./Settings";
+import ProfileLikes from "../profile/ProfileLikes";
 export default function User() {
   const accountUser = useSearchUser();
 
-  if (!accountUser) return <p className="user_not_found">nothing is here...</p>;
+  if (!accountUser) return <p className="user_not_found">User not found...</p>;
 
   return (
     <div className="profile_table">
       <Profile session={true} user={accountUser} />
       <Routes>
-        <Route path="/" element={<ComShelf type={accountUser["id"]} />} />
+        <Route
+          path="/"
+          element={
+            <ComShelf type={accountUser["id"]} source="user-comments" />
+          }
+        />
         <Route path="edit-profile" element={<EditProfile />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="likes" element={<ProfileLikes />} />
       </Routes>
       <Outlet></Outlet>
     </div>

@@ -12,6 +12,7 @@ import CreateComment from "./CreateComment";
 export const ComSettings = createContext();
 
 const ComShelf = memo(function ComShelf(props) {
+  const { type, source, addSource,commentID } = props;
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -22,7 +23,7 @@ const ComShelf = memo(function ComShelf(props) {
     setComments([]);
     setPage(0);
     setLoading(true);
-  }, [props.type]);
+  }, [type]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(spy);
@@ -45,14 +46,19 @@ const ComShelf = memo(function ComShelf(props) {
   // Loading comments from database
   async function loadComments() {
     try {
-      const response = await fetch(
-        `http://localhost/comments?type=${props.type}&page=${page}`
-      );
+      const response = await fetch(`http://localhost/${source}`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ ...props, page }),
+      });
       if (!response.ok) return;
       const obj = await response.json();
+      console.log(obj);
       if (obj["comments_number"] === comments.length) setLoading(false);
       setPage((prev) => prev + 10);
-      setComments((prev) => [...prev, ...obj["com"]]);
+      setComments((prev) => [...prev, ...obj["comments"]]);
     } catch (err) {
       throw Error(`Error with donwload comments: ${err}`);
     }
@@ -75,13 +81,15 @@ const ComShelf = memo(function ComShelf(props) {
 
   return (
     <>
-      {props.type === 0 && <CreateComment addCommentVS={addCommentVS} />}
+      {type === 0 && (
+        <CreateComment addCommentVS={addCommentVS} source={addSource} commentID={commentID } />
+      )}
       <ComSettings.Provider value={deleteComment}>
         <RenderComments data={comments} />
       </ComSettings.Provider>
       {loading && <p ref={element}>Loading...</p>}
       {!loading && !comments.length ? (
-        <p className="empty_table">There is nothing</p>
+        <p className="empty_table">There is no comments...</p>
       ) : null}
     </>
   );

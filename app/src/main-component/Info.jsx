@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import RenderComments from "../comments/RenderComments";
 let block = true;
-export default function Info({ type = 0 }) {
+export default function Info({ title = 0,...rest }) {
+  console.log(rest)
   // const [comments, setComments] = useState([]);
   // const [loading, setLoading] = useState(false);
   // const [comLimit, setComLimit] = useState(0);
@@ -57,5 +58,6 @@ export default function Info({ type = 0 }) {
   //     {loading && <p>Loading...</p>}
   //   </div>
   // );
+
   return <p>Sssx</p>
 }

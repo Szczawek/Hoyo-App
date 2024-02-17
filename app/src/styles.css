@@ -305,6 +305,15 @@ body {
   box-shadow: 0 0.4rem 0.4rem 0.3rem #0a0a0a;
 }
 
+.user .profile_tabs {
+  display: grid;
+  gap: 2.5rem;
+  grid-auto-columns: max-content;
+  grid-auto-flow: column;
+}
+
+/* User Bookmark */
+
 /* Profile settings */
 .profile_settings {
   position: absolute;
@@ -490,12 +499,17 @@ body {
   height: max-content;
   gap: 1.8rem;
 }
+.com_creator .link {
+  display: grid;
+  padding-inline: .4rem;
+  align-items: center;  
+  border: 1px solid var(--contrast);
+}
 .com_creator .intro {
   display: grid;
-  grid-template-columns: 3rem 1fr;
-  align-items: center;
+  grid-template-columns: 3.8rem 1fr;
   grid-template-rows: 120px;
-  gap: 1rem;
+gap: .5rem;
 }
 .com_creator .content {
   position: relative;
@@ -578,6 +592,20 @@ button.confirm:is(:hover, :focus) {
   color: var(--cancel);
   background-color: rgba(122, 13, 13, 0.397);
 }
+/* comments/replies */
+.replies {
+  display: grid;
+  gap: .5rem;
+  justify-content: center;
+  grid-template-columns: minmax(300px, 75%);
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+}
+
+.replies .com_creator {
+  gap: .5rem;
+  padding-bottom: 1.5rem
+}
 
 /* COMMENTS */
 .comments {
@@ -585,8 +613,11 @@ button.confirm:is(:hover, :focus) {
   grid-template-columns: 100%;
   row-gap: 1.5rem;
 }
+
+
 .comment {
   display: grid;
+  cursor: pointer;
   gap: 1rem;
   grid-template-rows: repeat(3, max-content);
   padding: 1rem;
@@ -622,8 +653,8 @@ button.confirm:is(:hover, :focus) {
 }
 .comment .panel {
   display: grid;
-  grid-template-columns: repeat(2, 3rem);
-  gap: 1rem;
+  grid-template-columns: repeat(2, max-content);
+  gap: 2rem;
 }
 .comment .panel button {
   display: grid;

@@ -19,6 +19,7 @@ app.use(
   })
 );
 
+// connecting to a database
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -26,6 +27,7 @@ const db = mysql.createConnection({
   database: "magazine",
 });
 
+// save pictures to a disk
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "../app/public/users-pictures");
@@ -35,6 +37,8 @@ const storage = multer.diskStorage({
     cb(null, `${file.originalname}-${fileName}`);
   },
 });
+
+// picture size limit
 const upload = multer({
   storage: storage,
   limits: {
@@ -42,26 +46,82 @@ const upload = multer({
   },
 });
 
-app.get("/", (req, res) => {
-  res.json("Szczawik");
+// Loads a single comment
+app.post("/selected-comment", (req, res) => {
+  const { id } = req.body;
+  const command =
+    "SELECT *,(SELECT COUNT(ID) FROM likes where commentID = comments.id) as likes FROM comments where id = ?";
+  db.query(command, [id], (err, result) => {
+    if (err) throw Error(`Error with database #single-comment: ${err}`);
+    res.json(result[0]);
+  });
+});
+
+// Loads all user comments
+app.post("/user-comments", (req, res) => {
+  const { type, page } = req.body;
+  const command = `SELECT *,(SELECT COUNT(ID) FROM likes where commentID = comments.id) as likes FROM comments where userID = ? ORDER BY id DESC LIMIT 10 OFFSET ${page}`;
+  db.query(command, [type, page], (err, data) => {
+    if (err) throw Error(`Error with database #user-comments: ${err}`);
+    const comNumber = `SELECT COUNT(id) as comments_number FROM COMMENTS where userID = ?`;
+    db.query(comNumber, [type], (err, result) => {
+      if (err) throw Error(`Error with comments_length: ${err}`);
+      res.json({
+        comments: data,
+        comments_number: result[0]["comments_number"],
+      });
+    });
+  });
 });
 
 // load comments
-app.get("/comments", function (req, res) {
-  // Convert string to number
-  const data = {};
-  for (const [key, value] of Object.entries(req.query)) {
-    data[`${key}`] = Number(value);
-  }
-  const { type, page } = data;
-  const condition = type === 0 ? "" : type > 0 ? "where userID =?" : null;
-  const command = `SELECT comments.*, (SELECT COUNT(commentID) FROM likes where commentID = comments.id) as likes FROM comments ${condition} ORDER BY id DESC LIMIT 10 OFFSET ${page}`;
-  db.query(command, [type], function (err, data) {
-    if (err) throw Error(`Error with database #comment: ${err}`);
-    const command = `SELECT COUNT(id) as comments_number FROM COMMENTS ${condition}`;
-    db.query(command, [type], (err, result) => {
+app.post("/comments", function (req, res) {
+  const { page } = req.body;
+  const command = `SELECT *,(SELECT COUNT(ID) FROM likes where commentID = comments.id) as likes FROM comments ORDER BY id DESC LIMIT 10 OFFSET ${page}`;
+  db.query(command, [page], (err, data) => {
+    if (err) throw Error(`Error with database #user-comments: ${err}`);
+    const comNumber = `SELECT COUNT(id) as comments_number FROM COMMENTS`;
+    db.query(comNumber, (err, result) => {
       if (err) throw Error(`Error with comments_length: ${err}`);
-      res.json({ com: data, comments_number: result[0]["comments_number"] });
+      res.json({
+        comments: data,
+        comments_number: result[0]["comments_number"],
+      });
+    });
+  });
+});
+
+// load replies
+app.post("/replies", (req, res) => {
+  const { page, commentID } = req.body;
+  const command = `SELECT *,(SELECT COUNT(ID) FROM likes where commentID = replies.id) FROM replies where commentID = ? ORDER BY ID DESC LIMIT 10 OFFSET ${page}`;
+  db.query(command, [commentID, page], (err, data) => {
+    if (err) throw Error(`Error with database #replies: ${err}`);
+    const comNumber = `SELECT COUNT(id) as comments_number FROM replies where commentID = ?`;
+    db.query(comNumber, [commentID], (err, result) => {
+      if (err) throw Error(`Error with comments_length: ${err}`);
+      res.json({
+        comments: data,
+        comments_number: result[0]["comments_number"],
+      });
+    });
+  });
+});
+
+// add replies
+app.post("/add-replies", (req, res) => {
+  const { commentID } = req.body;
+  const data = createComment(req, res);
+  data.push(Number(commentID));
+  const command = "INSERT INTO replies VALUES (NULL,?, ?, ?, ?, ?,?)";
+  db.query(command, data, (err) => {
+    if (err) throw Error(`Error with database #add-replies: ${err}`);
+    // Download the current commentary on function optimization
+    const downloadCommand = "SELECT * FROM replies ORDER BY ID DESC LIMIT 1";
+    db.query(downloadCommand, (err, result) => {
+      if (err) throw Error(`Error with download the last replies: ${err}`);
+      result[0].likes = 0;
+      res.json(result[0]);
     });
   });
 });
@@ -69,28 +129,37 @@ app.get("/comments", function (req, res) {
 // remove comment
 app.post("/remove-comment", function (req, res) {
   const command = "DELETE FROM comments WHERE id = ?";
-  db.query(command, [req.body["id"]], function (err, data) {
+  db.query(command, [req.body["id"]], function (err) {
     if (err) throw Error(`Error with database #remove-comment${err}`);
     res.sendStatus(200);
   });
 });
 
-// Add comment to account
-app.post("/add-comment", function (req, res) {
+// create comment first segment
+function createComment(req, res) {
   const data = req.cookies["logged"];
   if (!data) return res.sendStatus(400);
   const { nick, value, avatar } = req.body;
-
   // decrypt cookie
   const bytes = CryptoJS.AES.decrypt(data, process.env.COOKIE_KEY);
   const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  const commentData = [id, nick, value, avatar, new Date()];
+  const commentData = [
+    id,
+    nick,
+    value,
+    avatar,
+    new Date(),
+  ];
+  return commentData;
+}
 
+// Add comment to account
+app.post("/add-comment", function (req, res) {
+  const data = createComment(req, res);
   const command =
     "INSERT INTO comments(userID, nick, content, avatar, date) values(?,?,?,?,?)";
-  db.query(command, commentData, (err) => {
+  db.query(command, data, (err) => {
     if (err) throw Error(`Error with database #add-comment${err}`);
-
     // Download the current commentary on function optimization
     const downloadCommand = "SELECT * FROM comments ORDER BY ID DESC LIMIT 1";
     db.query(downloadCommand, (err, result) => {
@@ -101,25 +170,46 @@ app.post("/add-comment", function (req, res) {
   });
 });
 
+// Load User Profile date
+app.get("/users:nick", function (req, res) {
+  const { nick } = req.params;
+  const command =
+    "SELECT nick, about, avatar, id, (SELECT COUNT(id) from followers where personID = user.id) as follow from user";
+  db.query(command, function (err, userData) {
+    if (err) throw Error(`Error with database #users userData: ${err}`);
+    const obj = userData.find(
+      (e) => e["nick"].toLowerCase() === nick.toLowerCase()
+    );
+    if (!obj) return res.sendStatus(405);
+    res.send(obj);
+  });
+});
+
 // Create an account
 app.post("/create-account", function (req, res) {
   const command = "select id from user where login = ?";
-  const login = req.body["login"];
-  const nick = req.body["nick"];
+  const { login, nick, password } = req.body;
+
   db.query(command, [login], function (err, data) {
     if (err) throw Error(`Error with database: ${err}`);
 
     const accountExists = data[0];
 
     if (!accountExists) {
-      encryption(req.body["password"])
-        .then((password) => {
+      encryption(password)
+        .then((encPassword) => {
           const command =
             "INSERT INTO `user` (`Login`, `Password`, `nick`, `About`, `date`, `avatar`) values(?,?,?,?,?,?)";
 
-          const value = [login, password, nick, "", new Date(), "/images/user.svg"];
-
-          db.query(command, value, (err, data) => {
+          const value = [
+            login,
+            encPassword,
+            nick,
+            "",
+            new Date(),
+            "/images/user.svg",
+          ];
+          db.query(command, value, (err) => {
             if (err) throw Error(`Error with database #create-account: ${err}`);
             res.sendStatus(200);
           });
@@ -137,6 +227,7 @@ app.post("/create-account", function (req, res) {
 async function encryption(e) {
   return await bcrypt.hash(e, 10);
 }
+
 // remove account
 app.post("/remove", function (req, res) {
   const command = "DELETE from user where id =?";
@@ -148,14 +239,14 @@ app.post("/remove", function (req, res) {
   );
   const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   res.clearCookie("logged", { httpOnly: true });
-  db.query(command, [id], function (err, data) {
+  db.query(command, [id], function (err) {
     if (err) throw Error(`Error with database #remove: ${err}`);
   });
-  db.query(commandComments, [id], function (err, data) {
+  db.query(commandComments, [id], function (err) {
     if (err)
       throw Error(`Error with database #remove-comments in remove : ${err}`);
   });
-  db.query(commandLikes, [id], function (err, result) {
+  db.query(commandLikes, [id], function (err) {
     if (err)
       throw Error(`Error with database #remove-likes in remove : ${err}`);
   });
@@ -233,25 +324,10 @@ app.get("/logged", function (req, res) {
 
 // Donwload ALL users
 app.get("/users-list", function (req, res) {
-  const command = "SELECT nick,avatar FROM user";
+  const command = "SELECT nick, avatar FROM user";
   db.query(command, function (err, users) {
     if (err) throw Error(`Error with database #users-list: ${err}`);
     res.json(users);
-  });
-});
-
-// DONE
-// Download USER dates
-app.get("/users:nick", function (req, res) {
-  const command =
-    "SELECT nick, about, avatar, id, (SELECT COUNT(id) from followers where personID = user.id) as follow from user";
-  db.query(command, function (err, userData) {
-    if (err) throw Error(`Error with database #users userData: ${err}`);
-    const obj = userData.find(
-      (e) => e["nick"].toLowerCase() === req.params["nick"].toLowerCase()
-    );
-    if (!obj) return res.sendStatus(405);
-    res.send(obj);
   });
 });
 
@@ -269,7 +345,7 @@ app.post("/like", function (req, res) {
       });
     } else {
       const command = "DELETE FROM likes where id =?";
-      db.query(command, [result[0]["id"]], function (err, result) {
+      db.query(command, [result[0]["id"]], function (err) {
         if (err) throw Error(`Error with database #remove-like${err}`);
       });
     }
