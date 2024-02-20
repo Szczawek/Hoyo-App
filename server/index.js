@@ -91,7 +91,7 @@ app.post("/user-comments", async (req, res) => {
               `Error with database #find id of liked comment: ${err}`
             );
           if (!result[0]) return resolve(0);
-       console.log(22331)
+       
           const annArray = result.map((e) => e["commentID"]);
           resolve(annArray.join(","));
         });
@@ -103,7 +103,6 @@ app.post("/user-comments", async (req, res) => {
       break;
   }
 
-  // console.log(2);
   const command = `SELECT *,(SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes FROM user_comments where ${condition} ORDER BY id DESC LIMIT 8 OFFSET ${page}`;
   db.query(command, (err, result) => {
     if (err) throw Error(`Error with database #user-comments: ${err}`);
