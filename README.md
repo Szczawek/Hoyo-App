@@ -1,5 +1,3 @@
-# One 
-dodać podkomentarze
 # Two 
 host na netify(możliwe, że z mySql nie da rady(mongoDB here))
 
@@ -14,19 +12,16 @@ Na mniejszym rozmiarze okna, animacja koła zębatego dodaje pasek do scroll. Us
 Gdy usunie się wszystkie komentarze załadowane w news/user psuje się strona.
 
 # Error 
-W ComCreator może być pusty komentarz, a nie powinnien. Zablokować możliwość dodania samej spacji do komentarza.
+ w Creator może być pusty komentarz, a nie powinnien. Zablokować możliwość dodania samej spacji do komentarza.
  
 # Error nie aktualizuje odrazu userData po editRpofile #zmiana zdjęcia 
-
-# To change
-zmienić funckje loadComments na funckje, która będzie pobierana z props, w CreateCOmmets to samo
 
 
 # Error
 Dodać polskie znaki do tworzenia konta w from CreateAccount 
 
-# Error 
-useLoadList nie działa 
+# Error w podkomentarzach like się pisuje 
+
 
 # Error 
-selected comment i replies się gryzie 
+funckje deleteComment nie działa po za shelf

@@ -64,7 +64,7 @@ export default function App() {
             <Route path="/" element={<Header user={userData} />}>
               <Route index element={<Home session={userData["id"]} />} />
               <Route path="news" element={<News />} />
-              <Route path="info" element={<Info ss={2} title="ssssssss" sb={"s"} />} />
+              <Route path="info" element={<Info />} />
               <Route
                 path="empty-user"
                 element={<EmptyUser data={userData} />}

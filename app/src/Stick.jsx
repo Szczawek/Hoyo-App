@@ -1,5 +1,8 @@
 export default function Stick(props) {
-  const { size, name, dd } = props;
-
-  return <p>Szczawik</p>;
+  return (
+    <div>
+      <h2>Stick:</h2>
+      {props.children && props.children}
+    </div>
+  );
 }

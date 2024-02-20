@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
+import resizer from "react-image-file-resizer";
 export default function EditProfile() {
   const { userData, updateUserData } = useContext(UserContext);
   const { nick, about, avatar, id } = userData;
@@ -17,18 +18,37 @@ export default function EditProfile() {
       img === userData["avatar"];
     if (comandRule) return navigate(-1);
     const form = new FormData();
-    if (img !== userData["avatar"]) form.append("myFile", file);
-    form.append("data", JSON.stringify(data));
     try {
+      if (img !== userData["avatar"]) {
+        const resizeImg = await new Promise((resolve) => {
+          resizer.imageFileResizer(
+            file,
+            300,
+            300,
+            "JPEG",
+            100,
+            0,
+            (img) => {
+              resolve(img);
+            },
+            "file",
+            200,
+            200
+          );
+        });
+        form.append("myFile", resizeImg);
+      }
+
+      form.append("data", JSON.stringify(data));
       const response = await fetch("http://localhost/update-profile", {
         method: "POST",
         body: form,
       });
-      if (!response.ok) return
-      const imgSrc = await response.json()
-      if (img !== userData["avatar"]) data["avatar"] = imgSrc["imgSrc"]
-        updateUserData(data);
-        navigate(`/${data["nick"]}`);
+      if (!response.ok) return;
+      const imgSrc = await response.json();
+      if (img !== userData["avatar"]) data["avatar"] = imgSrc["imgSrc"];
+      updateUserData(data);
+      navigate(`/${data["nick"]}`);
     } catch (err) {
       throw err;
     }

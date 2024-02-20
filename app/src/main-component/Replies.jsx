@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import ComShelf from "../comments/ComShelf";
-import Comment from "../comments/Comment";
+import Comment from "../comment/Comment";
+import Shelf from "../comment/Shelf";
 import { useParams } from "react-router-dom";
 export default function Replies() {
   const url = useParams();
@@ -28,12 +28,7 @@ export default function Replies() {
   return (
     <div className="replies">
       <Comment key={master["date"]} data={master} />
-      <ComShelf
-        type={0}
-        addSource={"add-replies"}
-        source={"replies"}
-        commentID={url["id"]}
-      />
+      <Shelf creator={true} type="reply" reply={url["id"]} />
     </div>
   );
 }

@@ -2,8 +2,8 @@ import Profile from "./Profile";
 import { Outlet, Route, Routes } from "react-router-dom";
 import useSearchUser from "../profile/useSearchUser";
 import EditProfile from "../profile/EditProfile";
-import ComShelf from "../comments/ComShelf";
 import Settings from "./Settings";
+import Shelf from "../comment/Shelf";
 import ProfileLikes from "../profile/ProfileLikes";
 export default function User() {
   const accountUser = useSearchUser();
@@ -16,12 +16,10 @@ export default function User() {
       <Routes>
         <Route
           path="/"
-          element={
-            <ComShelf type={accountUser["id"]} source="user-comments" />
-          }
+          element={<Shelf id={accountUser["id"]} type="owner" />}
         />
         <Route path="edit-profile" element={<EditProfile />} />
-        <Route path="settings" element={<Settings />} />
+        <Route path="settings" element={<Settings />} /> 
         <Route path="likes" element={<ProfileLikes />} />
       </Routes>
       <Outlet></Outlet>

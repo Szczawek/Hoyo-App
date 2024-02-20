@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { ComSettings } from "./ComShelf";
+import { CommentFn } from "./Shelf";
 export default function DeleteComment({ id, closeMenu }) {
-  const performanceFn = useContext(ComSettings);
+  const deleteComment = useContext(CommentFn);
   async function sendDeleteReq() {
     const options = {
       method: "POST",
@@ -13,7 +13,7 @@ export default function DeleteComment({ id, closeMenu }) {
     try {
       const response = await fetch("http://localhost/remove-comment", options);
       if (!response.ok) return alert("Error");
-      performanceFn(id);
+      deleteComment(id);
       closeMenu();
     } catch (err) {
       throw Error(`There was an error while deleting a comment: ${err}`);

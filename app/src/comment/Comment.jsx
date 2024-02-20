@@ -1,14 +1,13 @@
 import { useContext, useState } from "react";
 import { UserContext } from "../App.jsx";
 import { Link, useNavigate } from "react-router-dom";
-import Like from "./Like.jsx";
-import ComMenu from "./ComMenu.jsx";
+import Like from "../comment/Like.jsx";
+import ComMenu from "../comment/ComMenu.jsx";
 
 export default function Comment({ data }) {
   const { id } = useContext(UserContext)["userData"];
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
-
   function closeMenu() {
     setMenu(false);
   }
@@ -47,7 +46,7 @@ export default function Comment({ data }) {
           {menu && (
             <ComMenu
               closeMenu={closeMenu}
-              authorization={id === data["userID"]}
+              authorization={id === data["ownerID"]}
               commentID={data["id"]}
             />
           )}
