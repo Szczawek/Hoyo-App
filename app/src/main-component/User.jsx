@@ -20,7 +20,7 @@ export default function User() {
         />
         <Route path="edit-profile" element={<EditProfile />} />
         <Route path="settings" element={<Settings />} /> 
-        <Route path="likes" element={<ProfileLikes />} />
+        <Route path="likes" element={<ProfileLikes id={accountUser["id"]} />} />
       </Routes>
       <Outlet></Outlet>
     </div>

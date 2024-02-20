@@ -18,6 +18,7 @@ export default function Replies() {
         });
         if (!response.ok) return alert("Error");
         const obj = await response.json();
+ 
         setMaster(obj);
       } catch (err) {
         throw Error(`Error with replies: ${err}`);

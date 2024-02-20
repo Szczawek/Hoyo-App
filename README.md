@@ -23,5 +23,4 @@ Dodać polskie znaki do tworzenia konta w from CreateAccount
 # Error w podkomentarzach like się pisuje 
 
 
-# Error 
-funckje deleteComment nie działa po za shelf
+

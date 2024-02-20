@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-
-export default function ProfileLikes() {
-  const [comments, setComments] = useState([]);
-
+import Shelf from "../comment/Shelf";
+export default function ProfileLikes({ id }) {
   return (
     <div className="profile_likes">
       <p>likes</p>
+      <Shelf type="likes" id={id} />
     </div>
   );
 }

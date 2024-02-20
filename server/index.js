@@ -71,7 +71,7 @@ app.post("/create-comment", (req, res) => {
 });
 
 // load commetns
-app.post("/user-comments", (req, res) => {
+app.post("/user-comments", async (req, res) => {
   const { type, id, reply, page } = req.body;
   let condition;
 
@@ -82,11 +82,28 @@ app.post("/user-comments", (req, res) => {
     case "reply":
       condition = `reply = ${reply}`;
       break;
+    case "likes":
+      const findCom = "SELECT commentID FROM likes where `userID` = ?";
+      const comments = await new Promise((resolve) => {
+        db.query(findCom, [id], (err, result) => {
+          if (err)
+            throw Error(
+              `Error with database #find id of liked comment: ${err}`
+            );
+          if (!result[0]) return resolve(0);
+       console.log(22331)
+          const annArray = result.map((e) => e["commentID"]);
+          resolve(annArray.join(","));
+        });
+      });
+      condition = `id IN (${comments})`;
+      break;
     default:
       condition = "id";
       break;
   }
 
+  // console.log(2);
   const command = `SELECT *,(SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes FROM user_comments where ${condition} ORDER BY id DESC LIMIT 8 OFFSET ${page}`;
   db.query(command, (err, result) => {
     if (err) throw Error(`Error with database #user-comments: ${err}`);
@@ -181,7 +198,7 @@ async function encryption(e) {
 // remove account
 app.post("/remove", function (req, res) {
   const command = "DELETE from user where id =?";
-  const commandComments = "DELETE from comments where userID =?";
+  const commandComments = "DELETE from user_comments where userID =?";
   const commandLikes = "DELETE from likes where userID = ?";
   const bytes = CryptoJS.AES.decrypt(
     req.cookies["logged"],
@@ -305,11 +322,6 @@ app.post("/like", function (req, res) {
 });
 
 // Update profile info
-
-app.post("/mixer", upload.single("myFile"), async (req, res) => {
-  res.send("sdsdsd");
-});
-
 app.post("/update-profile", upload.single("myFile"), async (req, res) => {
   console.log(req.file);
   const { nick, about, avatar, id } = JSON.parse(req.body["data"]);

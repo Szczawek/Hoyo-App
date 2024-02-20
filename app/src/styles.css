@@ -250,7 +250,7 @@ body {
 .profile_table {
   display: grid;
   position: relative;
-  grid-template-rows: max-content max-content 1fr;
+  grid-template-rows: repeat(2,max-content)
 }
 
 .profile_table .replies {
@@ -336,7 +336,7 @@ body {
 .profile_table .shelf {
   justify-content: center;
   top: 9rem;
-  padding-bottom: 8.5rem;
+  padding-bottom: 8.5rem; 
   position: relative;
   grid-template-columns: minmax(300px, 80%);
 }
@@ -625,6 +625,11 @@ button.confirm:is(:hover, :focus) {
   row-gap: 1.5rem;
 }
 
+.shelf .empty-message {
+display: grid;
+padding-top: 4rem;
+justify-content: center;
+}
 
 .comment {
   display: grid;
