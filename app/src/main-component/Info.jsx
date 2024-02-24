@@ -1,5 +1,6 @@
 export default function Info() {
-return <p>Szczawik</p>
+  return <div style={{display:"grid"}} className="SDSDSDSs">
+  </div>
 }
 
 function Test() {

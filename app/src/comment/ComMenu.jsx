@@ -16,7 +16,7 @@ export default function ComMenu(prop) {
         if (!ul.current.contains(e.relatedTarget)) closeMenu();
       }}
       className="comment_menu">
-      <li>Check</li>
+      <li>Shere</li>
       {authorization && <DeleteComment id={commentID} closeMenu={closeMenu} />}
     </ul>
   );

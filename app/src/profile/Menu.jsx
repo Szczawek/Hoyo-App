@@ -1,23 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-export default function Menu() {
-  const [openMenu, setOpenMenu] = useState(false);
-  const menu = useRef();
+export default function Menu({ closeMenu }) {
+  const menu = useRef(null);
   const navigate = useNavigate();
-  useEffect(() => {
-    if (menu.current) menu.current.focus();
-  }, [openMenu]);
-
-  const options = {
-    method: "POST",
-    credentials: "include",
-  };
 
   // Logout from account
   async function logout() {
     try {
-      const res = await fetch("http://localhost/logout", options);
+      const res = await fetch("http://localhost/logout", {
+        method: "POST",
+        credentials: "include",
+      });
       if (!res.ok) return;
       navigate("/");
       window.location.reload();
@@ -25,19 +19,15 @@ export default function Menu() {
       throw Error(`The server isn't responding: ${error}`);
     }
   }
-
-
-
   return (
-    <div className="menu">
-      {openMenu ? (
+    <>
+      <div className="menu">
         <ul
-          ref={menu}
-          tabIndex={0}
           className="menu_list"
+          ref={menu}
           onBlur={(e) => {
-            if (e.target.contains(e.relatedTarget)) return;
-            setOpenMenu(false);
+            if (menu.current.contains(e.relatedTarget)) return;
+            closeMenu();
           }}>
           <li>
             <button onClick={() => logout()}>Logout</button>
@@ -48,15 +38,10 @@ export default function Menu() {
             </Link>
           </li>
           <li>
-            <Link to="/settings">Settings</Link>
+            <Link to="settings">Settings</Link>
           </li>
-     
         </ul>
-      ) : (
-        <button onClick={() => setOpenMenu(true)} className="open_menu_btn">
-          <img src="/images/settings.svg" alt="" />
-        </button>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

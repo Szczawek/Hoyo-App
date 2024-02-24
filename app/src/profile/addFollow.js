@@ -1,4 +1,4 @@
-export default async function follow(owner, person) {
+export default async function addFollow(owner, person) {
   const options = {
     method: "POST",
     headers: {

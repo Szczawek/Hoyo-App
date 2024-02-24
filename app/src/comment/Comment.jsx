@@ -36,10 +36,9 @@ export default function Comment({ data }) {
             </div>
           </Link>
         </div>
-        <div onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => setMenu(true)}>
+        <div className="menu-container" onClick={(e) => e.stopPropagation()}>
+          <button tabIndex={0} className="menu-btn" onClick={() => setMenu(true)}>
             <img
-              className="medium"
               src="/images/threedots.svg"
               alt="open menu"
             />

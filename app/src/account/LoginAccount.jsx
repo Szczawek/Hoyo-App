@@ -64,6 +64,7 @@ export default function LoginAccount({ nextPage }) {
             id="email"
             type="email"
             name="email"
+            autoComplete="email"
             required
           />
         </label>
@@ -81,6 +82,7 @@ export default function LoginAccount({ nextPage }) {
             id="password"
             name="password"
             type="password"
+            autoComplete="current-password"
             required
           />
           <button

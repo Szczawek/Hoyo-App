@@ -7,6 +7,7 @@ import fs from "fs";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import { resolve } from "path";
 
 const PORT = 80;
 const app = express();
@@ -91,7 +92,7 @@ app.post("/user-comments", async (req, res) => {
               `Error with database #find id of liked comment: ${err}`
             );
           if (!result[0]) return resolve(0);
-       
+
           const annArray = result.map((e) => e["commentID"]);
           resolve(annArray.join(","));
         });
@@ -140,14 +141,11 @@ app.post("/remove-comment", (req, res) => {
 app.get("/users:nick", function (req, res) {
   const { nick } = req.params;
   const command =
-    "SELECT nick, about, avatar, id, (SELECT COUNT(id) from followers where personID = user.id) as follow from user";
-  db.query(command, function (err, userData) {
+    "SELECT nick, about, avatar, id,(SELECT COUNT(ID) FROM followers where personID = user.id) as followers,(SELECT COUNT(ID) from followers where ownerID = user.id) as following from user where nick = ?";
+  db.query(command, [nick], (err, result) => {
     if (err) throw Error(`Error with database #users userData: ${err}`);
-    const obj = userData.find(
-      (e) => e["nick"].toLowerCase() === nick.toLowerCase()
-    );
-    if (!obj) return res.sendStatus(405);
-    res.send(obj);
+    console.log(result[0])
+    res.send(result[0]);
   });
 });
 
@@ -268,24 +266,48 @@ app.post("/logout", function (req, res) {
 });
 
 // Check login status
-app.get("/logged", function (req, res) {
-  const login = req.cookies["logged"];
-  if (!login) return res.sendStatus(400);
-  const command = "SELECT id,nick,about,avatar,date FROM user where id =?";
-  // decrypt cookie
-  const bytes = CryptoJS.AES.decrypt(login, process.env.COOKIE_KEY);
-  const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-  db.query(command, [id], function (err, userData) {
-    if (err) throw Error(`Error with database #logged-userData: ${err}`);
-
-    const command = "SELECT commentID FROM likes where userID = ?";
-    db.query(command, [id], function (err, userLikes) {
-      if (err) throw Error(`Error with database #logged-userLikes: ${err}`);
-      const likes = userLikes.map((e) => e["commentID"]);
-      userData[0]["likes"] = likes;
-      res.json(userData[0]);
+app.get("/logged", async (req, res) => {
+  try {
+    const login = req.cookies["logged"];
+    if (!login) return res.sendStatus(400);
+    // decrypt cookie
+    const bytes = CryptoJS.AES.decrypt(login, process.env.COOKIE_KEY);
+    const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    // download user dates
+    const userData = await new Promise((resolve) => {
+      const command = "SELECT id,nick,about,avatar,date FROM user where id =?";
+      db.query(command, [id], (err, result) => {
+        if (err) throw Error(`Error with database #logged-userData: ${err}`);
+        resolve(result[0]);
+      });
     });
-  });
+
+    // donwload user likes
+    const likes = await new Promise((resolve) => {
+      const command = "SELECT commentID FROM likes where userID = ?";
+      db.query(command, [id], (err, result) => {
+        if (err) throw Error(`Error with database #logged-userLikes: ${err}`);
+        const array = result.map((e) => e["commentID"]);
+        resolve(array);
+      });
+    });
+
+    // load folowing
+    const folowing = await new Promise((resolve) => {
+      const command = "SELECT personID FROM followers where `ownerID` = ?;";
+      db.query(command, [id], (err, result) => {
+        if (err) throw Error(`Error with database #following: ${err}`);
+        const array = result.map((e) => e["personID"]);
+        resolve(array);
+      });
+    });
+
+    userData["likes"] = likes;
+    userData["following"] = folowing;
+    res.json(userData);
+  } catch (err) {
+    throw err;
+  }
 });
 
 // Donwload ALL users

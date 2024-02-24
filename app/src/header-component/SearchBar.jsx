@@ -23,7 +23,10 @@ export default function SearchBar() {
       className="search_container"
       ref={label}
       onBlur={(e) => {
-        if (!label.current.contains(e.relatedTarget)) setExpandList(false);
+        if (!label.current.contains(e.relatedTarget)) {
+          setExpandList(false);
+          setValue("");
+        }
       }}
       onFocus={() => {
         setExpandList(true);
