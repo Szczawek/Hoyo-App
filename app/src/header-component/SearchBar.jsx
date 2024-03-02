@@ -17,7 +17,7 @@ export default function SearchBar() {
       className="search_container"
       ref={label}
       onBlur={(e) => {
-        if (!label.current || !e.relatedTarget) return;
+        if (!label.current || !e.relatedTarget) return defaultSettings();
         if (!label.current.contains(e.relatedTarget)) {
           defaultSettings();
         }
