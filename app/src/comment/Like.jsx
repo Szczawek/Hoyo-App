@@ -33,7 +33,7 @@ export default function Like(props) {
   return (
     <>
       <button
-      title="like"
+        title="like"
         className="super"
         onClick={() => {
           if (!id) return;
@@ -43,8 +43,6 @@ export default function Like(props) {
           {!liked ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              height="16"
-              width="16"
               viewBox="0 0 512 512">
               <path
                 opacity="1"
@@ -55,8 +53,6 @@ export default function Like(props) {
             <svg
               className="liked"
               xmlns="http://www.w3.org/2000/svg"
-              height="16"
-              width="16"
               viewBox="0 0 512 512">
               <path
                 opacity="1"
@@ -65,7 +61,7 @@ export default function Like(props) {
             </svg>
           )}
         </div>
-        <p className="like-number">{likesNo}</p>
+        <p className="num">{likesNo}</p>
         {warning && <small>Error with likes</small>}
       </button>
     </>

@@ -1,6 +1,7 @@
 import Comment from "./Comment";
-export default function Rendering({ comments }) {
-  if (!comments[0]) return <p className="empty-message">There is no comments...</p>;
+export default function Rendering({ comments, loading }) {
+  if (!comments[0] && !loading)
+    return <p className="dynamic-title">There is no comments</p>;
 
   return (
     <>

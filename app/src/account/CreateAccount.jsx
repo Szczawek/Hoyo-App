@@ -123,7 +123,9 @@ export default function CreateAccount({ nextPage }) {
             )}
           </button>
         </label>
-        <button className="confirm" type="submit">Create</button>
+        <button className="confirm" type="submit">
+          Create
+        </button>
       </form>
       <div className="control-panel">
         <p>Click to</p>

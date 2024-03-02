@@ -79,8 +79,10 @@ export default function EditProfile() {
             </svg>
           </button>
         </header>
-        <label className="avatar" htmlFor="choose_img">
-          <img src={img} alt="avatar" />
+        <label className="choose_img" htmlFor="choose_img">
+          <img className="avatar" src={img} alt="avatar" />
+          <img className="add_icon" src="/images/add_photo.svg" alt="decoration" />
+
           <input
             accept="image/.png, .jpg, .jpeg"
             type="file"

@@ -6,7 +6,7 @@ export default function useLoadList(value) {
     async function loadUserList() {
       try {
         const res = await fetch("http://localhost/account-list");
-        if (!res.ok) console.error(res.status);
+        if (!res.ok) return console.error(res.status);
         const obj = await res.json();
         setObj(obj);
       } catch (err) {

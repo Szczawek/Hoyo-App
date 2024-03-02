@@ -46,7 +46,9 @@ export default function App() {
 
   // It does the same thing as the "updateUserData" function, but with likes
   function updateLikes(boolean, id) {
-    const copy = userData["likes"];
+    const { likes } = userData;
+    const copy = [...likes];
+
     if (boolean) {
       const index = copy.findIndex((e) => e === id);
       copy.splice(index, 1);
@@ -56,10 +58,26 @@ export default function App() {
     setUserData((prev) => ({ ...prev, likes: copy }));
   }
 
+  // update followers
+  function updateFollowers(id) {
+    const { following } = userData;
+    const index = following.findIndex((e) => e === id);
+    const copy = [...following];
+    if (index !== -1) {
+      copy.splice(index, 1);
+    } else {
+      copy.push(id);
+    }
+    setUserData((prev) => ({
+      ...prev,
+      following: copy,
+    }));
+  }
   return (
     <>
       <Suspense fallback={<div className="loading">Loading...</div>}>
-        <UserContext.Provider value={{ userData, updateUserData, updateLikes }}>
+        <UserContext.Provider
+          value={{ userData, updateUserData, updateLikes, updateFollowers }}>
           <Routes>
             <Route path="/" element={<Header user={userData} />}>
               <Route index element={<Home session={userData["id"]} />} />

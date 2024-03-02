@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-
 export default function LoginAccount({ nextPage }) {
   const [warningMessage, setWarningMessage] = useState(false);
   const [account, setAccount] = useState({ login: "", password: "" });
@@ -108,7 +107,9 @@ export default function LoginAccount({ nextPage }) {
             )}
           </button>
         </label>
-        <button className="confirm" type="submit">Login</button>
+        <button className="confirm" type="submit">
+          Login
+        </button>
       </form>
       <div className="control-panel">
         <p>Click to</p>

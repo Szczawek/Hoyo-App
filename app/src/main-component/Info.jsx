@@ -1,6 +1,20 @@
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 export default function Info() {
-  return <div style={{display:"grid"}} className="SDSDSDSs">
-  </div>
+  const t2 = useRef(null);
+  const tr = useRef(null);
+
+  useEffect(() => {
+    t2.current.focus();
+    tr.current.focus();
+  }, []);
+  return (
+    <div className="" style={{ display: "gird" }}>
+      <input style={{ backgroundColor: "red" }} ref={t2} className="dvi" />
+      <input style={{ backgroundColor: "blue" }} ref={tr} className="213" />
+    </div>
+  );
 }
 
 function Test() {

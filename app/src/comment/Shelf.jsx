@@ -63,16 +63,15 @@ export default function Shelf(props) {
       }
     }
   }
-  console.log(2);
 
   if (warning) return <p>Error with comments</p>;
   return (
     <div className="shelf">
       {creator && <Creator addComment={addComment} reply={reply} />}
       <CommentFn.Provider value={deleteComment}>
-        <Rendering comments={comments} />
+        <Rendering loading={loading} comments={comments} />
       </CommentFn.Provider>
-      {loading && <p ref={loadingElemet}>Loading...</p>}
+      {loading && <p className="dynamic-title" ref={loadingElemet}>Loading...</p>}
     </div>
   );
 }

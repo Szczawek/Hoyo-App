@@ -12,6 +12,9 @@ html {
 
 :root {
   --contrast: #ff0080;
+  --contrast-shadow: #ff008028;
+  --blue-shadow: #0044ff28;
+  --yellow-shadow: #ffc40028;
   --dark-contrast: #99004d;
   --confirm: rgba(18, 131, 18, 0.836);
   --cancel: rgb(233, 25, 25);
@@ -37,7 +40,8 @@ textarea {
 input,
 button,
 textarea,
-hr,a {
+hr,
+a {
   background-color: transparent;
   outline: none;
   border: none;
@@ -128,14 +132,24 @@ body {
   translate: 0 0.8rem;
   background-color: var(--contrast);
 }
-.navigation .list li {
+
+.navigation .empty {
+  border-radius: 0.1rem;
+  position: absolute;
+  display: grid;
+  width: 100%;
+  background-color: var(--dark-contrast);
+  translate: 0 0.8rem;
+}
+.navigation .list a,
+.navigation .empty {
   outline: none;
   padding: 0.4rem 0.8rem;
   word-break: break-all;
   transition: background-color 250ms ease-out;
 }
-.navigation .list li:focus,
-.navigation .list li:hover {
+.navigation .list a:is(:hover, :focus),
+.navigation .list .active {
   background-color: var(--dark-contrast);
 }
 
@@ -257,6 +271,7 @@ body {
   width: 100%;
   height: 100%;
 }
+
 .user_not_found,
 .empty_table {
   height: 100%;
@@ -347,7 +362,7 @@ body {
   display: grid;
   border: 1px solid transparent;
   border-radius: 0.2rem;
-  padding: .2rem;
+  padding: 0.2rem;
   transition: border-color 300ms;
 }
 .open_menu_btn:is(:focus-within, :hover) {
@@ -359,7 +374,6 @@ body {
 }
 .open_menu_btn:is(:hover, :focus) img {
   animation: gear 1.5s ease-out;
-
 }
 @keyframes gear {
   0% {
@@ -472,22 +486,35 @@ body {
 .edit_window textarea {
   min-height: 100px;
 }
-.edit_window .avatar {
+.edit_window .choose_img {
   cursor: pointer;
-  justify-content: center;
   max-width: 120px;
+  position: relative;
+  aspect-ratio: 1/1;
   margin-inline: auto;
-  justify-items: center;
+}
+.edit_window .avatar {
+  width: 100%;
+}
+.edit_window .add_icon {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  opacity: 0.8;
+  padding: 2.4rem;
+  left: 0;
 }
 
-.edit_window .avatar input {
+.edit_window .choose_img input {
   display: none;
 }
 .edit_window .complement {
   color: rgb(200, 255, 0);
   margin-inline: auto;
 }
-/* PROFILE PICTURE/AVATAR */
+
+/* AVATAR SETTINGS ON WHOLE SITE  */
+
 .big {
   max-width: 5rem;
 }
@@ -507,7 +534,8 @@ body {
   outline: 2px solid transparent;
   transition: filter 300ms;
 }
-.avatar:hover {
+.avatar:hover,
+.choose_img:hover .avatar {
   filter: brightness(80%);
 }
 .avatar img {
@@ -638,6 +666,9 @@ button.confirm:is(:hover, :focus) {
   gap: 0.5rem;
   padding-bottom: 1.5rem;
 }
+.replies .dynamic-title {
+  padding-block: 2rem;
+}
 
 /* COMMENTS */
 .shelf {
@@ -645,11 +676,13 @@ button.confirm:is(:hover, :focus) {
   grid-template-columns: 100%;
   row-gap: 1.5rem;
 }
-
-.shelf .empty-message {
+/* ALL P WITH LOADING STATUS */
+.dynamic-title {
   display: grid;
-  padding-top: 4rem;
   justify-content: center;
+}
+.shelf .empty-message {
+  padding-top: 4rem;
 }
 
 .comment {
@@ -658,8 +691,8 @@ button.confirm:is(:hover, :focus) {
   gap: 1rem;
   grid-template-rows: repeat(3, max-content);
   padding: 1rem;
+  padding-bottom: 0;
   position: relative;
-  height: max-content;
   border: 1px solid var(--contrast);
 }
 /*  open comment menu */
@@ -709,10 +742,12 @@ button.confirm:is(:hover, :focus) {
 }
 .comment .panel {
   display: grid;
-  grid-template-columns: repeat(2, max-content);
-  gap: 4rem;
+  grid-auto-columns: max-content;
+  grid-auto-flow: column;
+  gap: 1.5rem;
+  max-width: max-content;
 }
-.comment .panel button {
+.comment .panel > * {
   display: grid;
   grid-template-columns: repeat(2, max-content);
   position: relative;
@@ -733,6 +768,10 @@ button.confirm:is(:hover, :focus) {
 .comment .super:hover {
   fill: var(--contrast);
 }
+.comment .super .svg-parent svg {
+  width: 1.1rem;
+}
+
 .comment .svg-parent {
   display: grid;
   align-items: center;
@@ -740,19 +779,28 @@ button.confirm:is(:hover, :focus) {
   padding: 0.6rem;
   transition: box-shadow 400ms ease-out;
 }
-.comment .super:hover .svg-parent {
-  box-shadow: inset 1rem 2rem #ff008028;
+
+.comment .svg-parent svg {
+  aspect-ratio: 1/1;
+  width: 1.5rem;
 }
-.comment .like-number {
+
+.comment .super:hover .svg-parent {
+  box-shadow: inset 1rem 2rem var(--contrast-shadow);
+}
+.comment .num {
   transition: color 400ms ease-out;
 }
-.comment .super:hover .like-number {
+.comment .super:hover .num {
   color: var(--contrast);
 }
 .comment .liked {
   fill: var(--contrast);
 }
 
+.comment .share:hover .svg-parent {
+  box-shadow: inset 1rem 2rem var(--yellow-shadow);
+}
 /* COMMENT MENU */
 .comment_menu {
   position: absolute;
@@ -795,20 +843,6 @@ button.confirm:is(:hover, :focus) {
 }
 .comment .remove_com:hover {
   scale: 1.2;
-}
-.comment .likes {
-  display: grid;
-  align-items: center;
-  gap: 1rem;
-  grid-template-columns: repeat(2, max-content);
-}
-.comment .likes svg {
-  transition: fill 300ms;
-  fill: #302a2a;
-}
-.comment .likes svg:hover,
-.comment .liked svg {
-  fill: rgb(255, 0, 212);
 }
 
 @media (max-width: 600px) {

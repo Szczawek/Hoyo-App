@@ -4,21 +4,32 @@ import mysql from "mysql";
 import bcrypt from "bcrypt";
 import "dotenv/config";
 import fs from "fs";
+import https from "https";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
-import { resolve } from "path";
 
+// Dodaj middleware do obsługi żądań HTTPS
+const options = {
+  key: fs.readFileSync("server.key"),
+  cert: fs.readFileSync("server.cert"),
+};
+
+// const PORT = 443;
 const PORT = 80;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
+    // netlify
+    // origin: "https://resilient-concha-442d2e.netlify.app",
     origin: "http://localhost:5173",
     credentials: true,
   })
 );
+
+const server = https.createServer(options, app);
 
 // connecting to a database
 const db = mysql.createConnection({
@@ -66,6 +77,7 @@ app.post("/create-comment", (req, res) => {
     db.query(lastComment, (err, result) => {
       if (err) throw Error(`Error with database #last-comment: ${err}`);
       result[0].likes = 0;
+      result[0].replies = 0;
       res.json(result[0]);
     });
   });
@@ -104,7 +116,7 @@ app.post("/user-comments", async (req, res) => {
       break;
   }
 
-  const command = `SELECT *,(SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes FROM user_comments where ${condition} ORDER BY id DESC LIMIT 8 OFFSET ${page}`;
+  const command = `SELECT *,(SELECT COUNT(id) FROM user_comments REPLY where reply.reply = user_comments.id) as replies,(SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes FROM user_comments where ${condition} ORDER BY id DESC LIMIT 8 OFFSET ${page}`;
   db.query(command, (err, result) => {
     if (err) throw Error(`Error with database #user-comments: ${err}`);
     const maxComments = `SELECT COUNT(ID) as 'limit' from user_comments where ${condition}`;
@@ -120,10 +132,10 @@ app.post("/user-comments", async (req, res) => {
 app.post("/selected-comment", (req, res) => {
   const { id } = req.body;
   const command =
-    "SELECT *,(SELECT COUNT(ID) FROM likes where commentID = user_comments.id) as likes FROM user_comments where id = ?";
+    "SELECT *,(SELECT COUNT(id) FROM user_comments REPLY where reply.reply = user_comments.id) as replies ,(SELECT COUNT(ID) FROM likes where commentID = user_comments.id) as likes FROM user_comments where id = ?";
   db.query(command, [id], (err, result) => {
     if (err) throw Error(`Error with database #single-comment: ${err}`);
-    res.json(result[0]);
+    res.json(result);
   });
 });
 
@@ -140,12 +152,12 @@ app.post("/remove-comment", (req, res) => {
 // Load User Profile date
 app.get("/users:nick", function (req, res) {
   const { nick } = req.params;
+
   const command =
     "SELECT nick, about, avatar, id,(SELECT COUNT(ID) FROM followers where personID = user.id) as followers,(SELECT COUNT(ID) from followers where ownerID = user.id) as following from user where nick = ?";
   db.query(command, [nick], (err, result) => {
     if (err) throw Error(`Error with database #users userData: ${err}`);
-    console.log(result[0])
-    res.send(result[0]);
+    res.json(result);
   });
 });
 
@@ -241,6 +253,7 @@ app.post("/login", function (req, res) {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 60 * 24,
           });
+
           res.sendStatus(200);
           return;
         }
@@ -312,7 +325,7 @@ app.get("/logged", async (req, res) => {
 
 // Donwload ALL users
 app.get("/account-list", (req, res) => {
-  const command = "SELECT nick,avatar FROM `user`";
+  const command = "SELECT nick, avatar FROM `user`";
   db.query(command, function (err, users) {
     if (err) throw Error(`Error with database #users-list: ${err}`);
     res.json(users);
@@ -344,7 +357,6 @@ app.post("/like", function (req, res) {
 
 // Update profile info
 app.post("/update-profile", upload.single("myFile"), async (req, res) => {
-  console.log(req.file);
   const { nick, about, avatar, id } = JSON.parse(req.body["data"]);
   let columns = "";
   let imgSrc;
@@ -367,7 +379,7 @@ app.post("/update-profile", upload.single("myFile"), async (req, res) => {
     db.query(updateAccount, value, (err) => {
       if (err) throw Error(`Error with database #update-profile: ${err}`);
       value.splice(0, 1);
-      const commandTwo = `UPDATE comments set ${columns} where userID = ?`;
+      const commandTwo = `UPDATE user_comments set ${columns} where ownerID = ?`;
       db.query(commandTwo, value, (err) => {
         if (err)
           throw Error(`Erorr with database #update-profile-commets: ${err}`);
@@ -405,6 +417,10 @@ app.post("/follow", (req, res) => {
     addFollow();
   });
 });
+
+// server.listen(PORT, () => {
+//   console.log(`The server has been activated: https://localhost:${PORT} `);
+// });
 
 app.listen(PORT, () => {
   console.log(`The server has been activated: http://localhost:${PORT} `);

@@ -1,5 +1,5 @@
 import Menu from "../profile/Menu";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "../App";
 import { Link } from "react-router-dom";
 import Follow from "../profile/Follow";
@@ -7,8 +7,15 @@ import addFollow from "../profile/addFollow";
 export default function Profile({ user }) {
   const [message, setMessage] = useState();
   const [menu, setMenu] = useState(false);
-  const { id } = useContext(UserContext)["userData"];
+  const { userData, updateFollowers } = useContext(UserContext);
+  const { id, following } = userData;
+  const [accountFollowed, setAccountFollowed] = useState(false);
   const btn = useRef(null);
+
+  useEffect(() => {
+    const followed = following.find((e) => e === user["id"]);
+    setAccountFollowed(followed);
+  }, [following, message]);
 
   // close/open manu
   function menuDoor() {
@@ -18,7 +25,6 @@ export default function Profile({ user }) {
   // Anty spam button
   function slowDownBtn(e) {
     btn.current.disabled = true;
-    console.log(e["value"]);
     setMessage(e["value"]);
     setTimeout(() => {
       setMessage();
@@ -37,8 +43,13 @@ export default function Profile({ user }) {
             <div className="follow_container">
               <button
                 ref={btn}
-                onClick={() => addFollow(id, user["id"]).then(slowDownBtn)}>
-                Follow
+                onClick={() =>
+                  addFollow(id, user["id"]).then((e) => {
+                    slowDownBtn(e);
+                    updateFollowers(user["id"]);
+                  })
+                }>
+                {accountFollowed ? "followed" : "follow"}
               </button>
             </div>
           ) : !menu ? (

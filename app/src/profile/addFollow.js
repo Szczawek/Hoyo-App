@@ -9,6 +9,7 @@ export default async function addFollow(owner, person) {
   try {
     const res = await fetch("http://localhost/follow", options);
     if (!res.ok) alert("Error with follow");
+
     return await res.json();
   } catch (err) {
     throw err;

@@ -12,20 +12,14 @@ export default function SearchBar() {
     setValue("");
     setExpandList(false);
   }
-
   return (
-    // BŁĄD DO POPRAWY Z DROP LIST
-    // BŁĄD DO POPRAWY Z DROP LIST
-    // BŁĄD DO POPRAWY Z DROP LIST
-    // BŁĄD DO POPRAWY Z DROP LIST
-    // PRAWDOPODOBNIE PRZEZ LAZY LOADING COMPONENT
     <label
       className="search_container"
       ref={label}
       onBlur={(e) => {
+        if (!label.current || !e.relatedTarget) return;
         if (!label.current.contains(e.relatedTarget)) {
-          setExpandList(false);
-          setValue("");
+          defaultSettings();
         }
       }}
       onFocus={() => {
@@ -43,8 +37,8 @@ export default function SearchBar() {
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && e.target.checkValidity()) {
-            defaultSettings();
-            input.current.blur();
+            // defaultSettings();
+            // input.current.blur();
             navigate(`/${e.target.value}`);
           }
         }}

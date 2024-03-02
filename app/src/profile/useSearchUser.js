@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function useSearchUser() {
-  const [accountUser, setAccountUser] = useState(null);
+  const [accountUser, setAccountUser] = useState([]);
   const url = useParams();
 
   useEffect(() => {
@@ -12,8 +12,10 @@ export default function useSearchUser() {
   async function load() {
     try {
       const response = await fetch(`http://localhost/users${url["nick"]}`);
-      if (!response.ok) return;
-      const data = await response.json();
+      if (!response.ok)
+        return console.error(`Error with users load: ${response.status}`);
+      const data = (await response.json())[0];
+      if (!data) return setAccountUser(null);
       if (!data["avatar"]) data["avatar"] = "/images/user.svg";
       setAccountUser(data);
     } catch (error) {

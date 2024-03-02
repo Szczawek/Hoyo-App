@@ -1,4 +1,4 @@
-export default async function loadComments(page,type, reply, id) {
+export default async function loadComments(page, type, reply, id) {
   try {
     const res = await fetch("http://localhost/user-comments", {
       method: "POST",
