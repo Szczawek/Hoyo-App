@@ -11,8 +11,7 @@ export default function Comment({ data }) {
 
   function closeMenu() {
     setMenu(false);
-  }
-
+  } 
   return (
     <div
       className="comment"

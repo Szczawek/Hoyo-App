@@ -1,15 +1,15 @@
 export default function Follow(props) {
   const { followers, following } = props;
   return (
-    <ul className="follow">
-      <li>
-        <h3>following</h3>
+    <div className="follow">
+      <div>
+        <h5>following</h5>
         <p>{following}</p>
-      </li>
-      <li>
-        <h4>followers</h4>
+      </div>
+      <div>
+        <h5>followers</h5>
         <p>{followers}</p>
-      </li>
-    </ul>
+      </div>
+    </div>
   );
 }

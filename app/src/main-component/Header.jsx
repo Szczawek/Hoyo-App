@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import SearchBar from "../header-component/SearchBar";
 
 export default function Header({ user }) {
@@ -17,18 +17,18 @@ export default function Header({ user }) {
           <SearchBar />
           <ul className="links">
             <li>
-              <Link to="/">Home</Link>
+              <NavLink to="/">Home</NavLink>
             </li>
             <li>
-              <Link to="info">Info</Link>
+              <NavLink to="info">Info</NavLink>
             </li>
             <li>
-              <Link to="news">News</Link>
+              <NavLink to="news">News</NavLink>
             </li>
             <li className="profil_link">
-              <Link className="avatar medium" to="empty-user">
+              <NavLink className="avatar medium" to="empty-user">
                 <img src={user["avatar"]} alt="link to user profile" />
-              </Link>
+              </NavLink>
             </li>
           </ul>
         </nav>

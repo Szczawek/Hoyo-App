@@ -18,7 +18,6 @@ export default function EmptyUser({ data }) {
           </div>
         </header>
       </div>
-      <p className="empty_conent">Empty table...</p>
       <Login uncloseable={true} />
     </section>
   );

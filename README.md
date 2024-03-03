@@ -18,13 +18,13 @@ Dodać polskie znaki do tworzenia konta w from CreateAccount
 
 # dodać wydajne doadawnie liczby podkomentarzy
 
-# error
-
-useSearchUser.js:20 Uncaught (in promise) Error: Error with download users: SyntaxError: Unexpected end of JSON input
-at load (useSearchUser.js:20:13)
-
-    naprawić useSearchUser
-
 # add
 
 dodać potwierdzanie emaila
+
+
+# To fix
+w Like zmienić alert na p> z wiadomością, gdy nie usern nie jest zalogowany
+
+# idea
+dodać animacje wsuwania karty profile podczas wszchodzenie na profil innego użytkownika w searchBar

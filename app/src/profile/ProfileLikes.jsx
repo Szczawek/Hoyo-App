@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import Shelf from "../comment/Shelf";
 export default function ProfileLikes({ id }) {
   return (

@@ -36,7 +36,7 @@ export default function Like(props) {
         title="like"
         className="super"
         onClick={() => {
-          if (!id) return;
+          if (!id) return alert("Login to your account to give a like");
           like();
         }}>
         <div className="svg-parent">
