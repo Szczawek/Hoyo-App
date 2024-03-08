@@ -116,11 +116,6 @@ body {
   width: 2rem;
 }
 
-.mobile_only {
-  padding: 1rem 2rem;
-  margin-left: auto;
-}
-
 /* NAVIGATION SEARCH BAR */
 .navigation .search_container {
   position: relative;
@@ -370,12 +365,13 @@ body {
 /* Profile Tabs */
 .user .profile_tabs {
   display: grid;
-  gap: 2.5rem;
-  grid-auto-columns: max-content;
-  grid-auto-flow: column;
+  column-gap: 2.5rem;
+  row-gap: 0.2rem;
+  grid-template-columns: repeat(auto-fill, 4rem);
 }
 .user .profile_tabs a {
-  padding: 0.2rem 0.5rem;
+  text-align: center;
+  padding-block: 0.2rem;
   transition: color, scale, 300ms;
   border-bottom: 4px solid transparent;
 }
@@ -715,7 +711,9 @@ button.confirm:is(:hover, :focus) {
   grid-auto-flow: row;
   grid-auto-rows: max-content;
 }
-
+.replies > .comment {
+  margin-top: 1.5rem;
+}
 .replies .creator {
   gap: 0.5rem;
   padding-bottom: 1.5rem;
@@ -744,8 +742,7 @@ button.confirm:is(:hover, :focus) {
   cursor: pointer;
   gap: 1rem;
   grid-template-rows: repeat(3, max-content);
-  padding: 1rem;
-  padding-bottom: 0;
+  padding: 1rem 1rem 0.4rem 1rem;
   position: relative;
   border: 1px solid var(--contrast);
 }
@@ -814,6 +811,16 @@ button.confirm:is(:hover, :focus) {
   translate: 0 100%;
 }
 
+/* share in panel */
+.comment .copy-message {
+  position: absolute;
+  bottom: 0.7rem;
+  border-radius: 0.2rem;
+  padding: 0.2rem 0.6rem;
+  background-color: var(--confirm);
+  left: 50%;
+}
+
 /* like in panel */
 .comment .super {
   fill: #1e3050;
@@ -823,7 +830,7 @@ button.confirm:is(:hover, :focus) {
   fill: var(--contrast);
 }
 .comment .super .svg-parent svg {
-  width: 1.1rem;
+  width: 1.3rem;
 }
 
 .comment .svg-parent {
@@ -831,7 +838,7 @@ button.confirm:is(:hover, :focus) {
   align-items: center;
   border-radius: 50%;
   padding: 0.6rem;
-  transition: box-shadow 400ms ease-out;
+  transition: box-shadow 250ms ease-out;
 }
 
 .comment .svg-parent svg {
@@ -840,8 +847,15 @@ button.confirm:is(:hover, :focus) {
 }
 
 .comment .super:hover .svg-parent {
-  box-shadow: inset 1rem 2rem var(--contrast-shadow);
+  box-shadow: 0 4rem inset #99004d40;
 }
+.comment .share:hover .svg-parent {
+  box-shadow: 0 4rem inset #994a0040;
+}
+.comment .com:hover .svg-parent {
+  box-shadow: 0 4rem inset #00619940;
+}
+
 .comment .num {
   transition: color 400ms ease-out;
 }
@@ -850,10 +864,6 @@ button.confirm:is(:hover, :focus) {
 }
 .comment .liked {
   fill: var(--contrast);
-}
-
-.comment .share:hover .svg-parent {
-  box-shadow: inset 1rem 2rem var(--yellow-shadow);
 }
 /* COMMENT MENU */
 .comment_menu {
@@ -908,9 +918,17 @@ button.confirm:is(:hover, :focus) {
   .navigation_case .hamburger {
     display: none;
   }
+  .profil_link a {
+    margin-inline: auto;
+  }
+  .links a {
+    font-size: 1.4rem;
+  }
+  .search_container {
+    padding-block: 0.4rem;
+  }
   .navigation {
-    top: 0;
-    left: 0;
+    animation: navMove 400ms forwards ease-in-out;
     width: 100vw;
     height: 100vh;
     backdrop-filter: blur(15px);
@@ -919,19 +937,82 @@ button.confirm:is(:hover, :focus) {
     justify-items: center;
     grid-template-rows: repeat(3, max-content);
   }
+  .navigation .links {
+    grid-template-columns: 1fr;
+  }
+
+  .search_container {
+    grid-row: 3/4;
+  }
+  @keyframes navMove {
+    0% {
+      right: -100vw;
+    }
+
+    100% {
+      right: 0;
+    }
+  }
 
   .hamburger_btn,
   .mobile_only {
     display: block;
   }
+  .mobile_only {
+    margin-left: auto;
+
+    padding: 1rem 2rem 0 2rem;
+  }
+  .mobile_only img {
+    transition: scale 250ms;
+    animation: spin 500ms 500ms;
+  }
+
+  .mobile_only img:hover {
+    scale: 1.4;
+  }
+
+  @keyframes spin {
+    0% {
+      rotate: 0deg;
+    }
+    100% {
+      rotate: 360deg;
+    }
+  }
 
   /* USER */
   .user .profile {
-    left: 0;
+    animation: forwards load_profile_phone 500ms ease-out;
     right: 0;
     max-width: 630px;
   }
+  .profile .about {
+    font-size: 0.7em;
+  }
   .user .bg-img .avatar {
     max-width: 3.2rem;
+  }
+  /* comment SHare */
+  .comment .copy-message {
+    left: auto;
+    font-size: 0.8rem;
+    right: 0.5rem;
+    padding-inline: 0.2rem;
+  }
+}
+
+@keyframes load_profile_phone {
+  0% {
+    translate: -50vw 0;
+  }
+  100% {
+    left: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .news {
+    padding: 0;
   }
 }

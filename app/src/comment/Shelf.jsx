@@ -64,7 +64,7 @@ export default function Shelf(props) {
     }
   }
 
-  if (warning) return <p>Error with comments</p>;
+  if (warning) return <p className="dynamic-title">Error with comments</p>;
   return (
     <div className="shelf">
       {creator && <Creator addComment={addComment} reply={reply} />}

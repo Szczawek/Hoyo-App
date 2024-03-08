@@ -111,12 +111,21 @@ app.post("/user-comments", async (req, res) => {
       });
       condition = `id IN (${comments})`;
       break;
+    case "owner-replies":
+      condition = `ownerID = ${id} AND reply IS NOT NULL`;
+      break;
     default:
       condition = "id";
       break;
   }
 
-  const command = `SELECT *,(SELECT COUNT(id) FROM user_comments REPLY where reply.reply = user_comments.id) as replies,(SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes FROM user_comments where ${condition} ORDER BY id DESC LIMIT 8 OFFSET ${page}`;
+  const repliesNum =
+    "(SELECT COUNT(id) FROM user_comments REPLY where reply.reply = user_comments.id) as replies";
+
+  const likesNum =
+    "(SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes";
+    
+  const command = `SELECT *,${repliesNum},${likesNum} FROM user_comments where ${condition} ORDER BY id DESC LIMIT 8 OFFSET ${page}`;
   db.query(command, (err, result) => {
     if (err) throw Error(`Error with database #user-comments: ${err}`);
     const maxComments = `SELECT COUNT(ID) as 'limit' from user_comments where ${condition}`;

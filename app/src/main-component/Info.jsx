@@ -1,6 +1,8 @@
-import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-
 export default function Info() {
-  return <div></div>;
+  return (
+    <div className="info">
+      <h3>Info</h3>
+      <p>12</p>
+    </div>
+  );
 }

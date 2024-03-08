@@ -85,6 +85,9 @@ const Profile = memo(function Profile({ user }) {
           <li>
             <NavLink to={"likes"}>Likes</NavLink>
           </li>
+          <li>
+            <NavLink to={"owner-replies"}>Replies</NavLink>
+          </li>
         </ul>
       </header>
     </section>
