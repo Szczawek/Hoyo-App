@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-export default function useSearchUser() {
+export default function useSearchUser(data) {
   const [accountUser, setAccountUser] = useState([]);
   const url = useParams();
-
-  useEffect(() => {
-    load();
-  }, [url["nick"]]);
+  useEffect(
+    () => {
+      load();
+    },
+    [url["nick"],data]
+  );
 
   async function load() {
     try {

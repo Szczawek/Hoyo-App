@@ -10,7 +10,7 @@ export default function Settings() {
     }
   }
   return (
-    <div className="profile_settings">
+    <div className="settings">
       <h2>Settings</h2>
       <ul>
         <li>

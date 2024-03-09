@@ -1,57 +1,28 @@
 import { useContext, useState } from "react";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router-dom";
-import resizer from "react-image-file-resizer";
+import updateProfileData from "./updateProfileData";
 export default function EditProfile() {
   const { userData, updateUserData } = useContext(UserContext);
   const { nick, about, avatar, id } = userData;
-  const [data, setData] = useState({ nick, about, avatar, id });
+  const [data, setData] = useState({ nick, about, id });
   const [img, setImg] = useState(avatar);
   const [file, setFile] = useState();
   const navigate = useNavigate();
 
   async function haddleSaveData(e) {
-    e.preventDefault();
     const comandRule =
-      data["nick"] === userData["nick"] &&
-      data["about"] === userData["about"] &&
-      img === userData["avatar"];
-    if (comandRule) return navigate(-1);
-    const form = new FormData();
-    try {
-      if (img !== userData["avatar"]) {
-        const resizeImg = await new Promise((resolve) => {
-          resizer.imageFileResizer(
-            file,
-            300,
-            300,
-            "JPEG",
-            100,
-            0,
-            (img) => {
-              resolve(img);
-            },
-            "file",
-            200,
-            200
-          );
-        });
-        form.append("myFile", resizeImg);
-      }
-
-      form.append("data", JSON.stringify(data));
-      const response = await fetch("http://localhost/update-profile", {
-        method: "POST",
-        body: form,
-      });
-      if (!response.ok) return;
-      const imgSrc = await response.json();
-      if (img !== userData["avatar"]) data["avatar"] = imgSrc["imgSrc"];
-      updateUserData(data);
-      navigate(`/${data["nick"]}`);
-    } catch (err) {
-      throw err;
-    }
+      data["nick"] === nick && data["about"] === about && img === avatar;
+    updateProfileData(
+      navigate,
+      comandRule,
+      e,
+      img,
+      data,
+      avatar,
+      updateUserData,
+      file
+    );
   }
   // UPDATE IMG
   function handleUpdataImg(e) {
@@ -79,9 +50,13 @@ export default function EditProfile() {
             </svg>
           </button>
         </header>
-        <label className="choose_img" htmlFor="choose_img">
-          <img className="avatar" src={img} alt="avatar" />
-          <img className="add_icon" src="/images/add_photo.svg" alt="decoration" />
+        <label className="avatar" htmlFor="choose_img">
+          <img className="profile_img" src={img} alt="avatar" />
+          <img
+            className="add_icon"
+            src="/images/add_photo.svg"
+            alt="decoration"
+          />
 
           <input
             accept="image/.png, .jpg, .jpeg"

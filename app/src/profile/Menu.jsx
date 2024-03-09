@@ -47,6 +47,7 @@ export default function Menu({ closeMenu }) {
       <ul
         tabIndex={0}
         onBlur={(e) => {
+          if (!menu.current) return;
           if (!menu.current.contains(e.relatedTarget)) {
             closeMenu();
           }
@@ -61,15 +62,12 @@ export default function Menu({ closeMenu }) {
           </button>
         </li>
         <li>
-          <Link
-            ref={currentItem === 1 ? itemInList : null}
-            onClick={() => setOpenMenu(false)}
-            to={"edit-profile"}>
+          <Link ref={currentItem === 1 ? itemInList : null} to={"edit-profile"}>
             EditProfile
           </Link>
         </li>
         <li>
-          <Link ref={currentItem === 2 ? itemInList : null} to="settings">
+          <Link ref={currentItem === 2 ? itemInList : null} to="/settings">
             Settings
           </Link>
         </li>

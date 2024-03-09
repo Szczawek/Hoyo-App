@@ -18,17 +18,17 @@ export default function Header({ user }) {
           </div>
           <SearchBar />
           <ul className="links">
-            <li>
+            <li className="place">
               <NavLink to="/">Home</NavLink>
-            </li>
-            <li>
+            </li >
+            <li className="place">
               <NavLink to="info">Info</NavLink>
             </li>
-            <li>
+            <li className="place">
               <NavLink to="news">News</NavLink>
             </li>
             <li className="profil_link">
-              <NavLink className="avatar medium" to="empty-user">
+              <NavLink className="avatar"  to="empty-user">
                 <img src={user["avatar"]} alt="link to user profile" />
               </NavLink>
             </li>

@@ -22,7 +22,7 @@ const Profile = memo(function Profile({ user }) {
   function menuDoor() {
     setMenu((prev) => !prev);
   }
-  console.log(2);
+  
   // Anty spam button
   function slowDownBtn(e) {
     btn.current.disabled = true;
@@ -36,40 +36,42 @@ const Profile = memo(function Profile({ user }) {
     <section className="user">
       <div className="bg-img"></div>
       <header className="profile">
-        <div className="container">
-          <div className="avatar big">
-            <img src={user["avatar"]} alt="profile image" />
-          </div>
-          {user["id"] !== id ? (
-            <div className="follow_container">
-              <button
-                ref={btn}
-                onClick={() =>
-                  addFollow(id, user["id"]).then((e) => {
-                    slowDownBtn(e);
-                    updateFollowers(user["id"]);
-                  })
-                }>
-                {accountFollowed ? "followed" : "follow"}
-              </button>
-              <div className="message">
-                {message ? (
-                  <small>Add follow</small>
-                ) : message !== undefined ? (
-                  <small>Delete follow</small>
-                ) : null}
-              </div>
+        <div className="baner">
+          <div className="container">
+            <div className="avatar big">
+              <img src={user["avatar"]} alt="profile image" />
             </div>
-          ) : !menu ? (
-            <button
-              tabIndex={0}
-              onClick={() => menuDoor()}
-              className="open_menu_btn">
-              <img src="/images/settings.svg" alt="" />
-            </button>
-          ) : (
-            <Menu closeMenu={menuDoor} />
-          )}
+            {user["id"] !== id ? (
+              <div className="follow_container">
+                <button
+                  ref={btn}
+                  onClick={() =>
+                    addFollow(id, user["id"]).then((e) => {
+                      slowDownBtn(e);
+                      updateFollowers(user["id"]);
+                    })
+                  }>
+                  {accountFollowed ? "followed" : "follow"}
+                </button>
+                <div className="message">
+                  {message ? (
+                    <small>Add follow</small>
+                  ) : message !== undefined ? (
+                    <small>Delete follow</small>
+                  ) : null}
+                </div>
+              </div>
+            ) : !menu ? (
+              <button
+                tabIndex={0}
+                onClick={() => menuDoor()}
+                className="open_menu_btn">
+                <img src="/images/settings.svg" alt="" />
+              </button>
+            ) : (
+              <Menu closeMenu={menuDoor} />
+            )}
+          </div>
         </div>
         <div className="account_description">
           <h2 className="nick">{user["nick"]}</h2>

@@ -7,6 +7,7 @@ const News = lazy(() => import("./main-component/News"));
 const EmptyUser = lazy(() => import("./main-component/EmptyUser"));
 const User = lazy(() => import("./main-component/User"));
 const Replies = lazy(() => import("./main-component/Replies"));
+const Settings = lazy(() => import("./main-component/Settings"));
 const NotFound = lazy(() => import("./main-component/NotFound"));
 export const UserContext = createContext();
 const std = {
@@ -87,7 +88,8 @@ export default function App() {
                 path="empty-user"
                 element={<EmptyUser data={userData} />}
               />
-              <Route path=":nick//*" element={<User />}></Route>
+              <Route path="settings" element={<Settings />} />
+              <Route path=":nick//*" element={<User data={userData} />}></Route>
               <Route path="replies/:id" element={<Replies />} />
               <Route path="*" element={<NotFound />} />
             </Route>

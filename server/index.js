@@ -392,6 +392,7 @@ app.post("/update-profile", upload.single("myFile"), async (req, res) => {
       db.query(commandTwo, value, (err) => {
         if (err)
           throw Error(`Erorr with database #update-profile-commets: ${err}`);
+          console.log(imgSrc)
         res.json({ imgSrc: imgSrc }).status(200);
       });
     });
