@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     https: {
-      key: 'key.pem',
-      cert: 'cert.pem'
+      key: 'key.key',
+      cert: 'cert.cert'
     }
   },
 });
