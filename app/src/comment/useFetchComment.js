@@ -5,7 +5,7 @@ export default function useFetchComment(id) {
   useEffect(() => {
     async function loadMaster() {
       try {
-        const response = await fetch("http://localhost/selected-comment", {
+        const response = await fetch("https://localhost:443/selected-comment", {
           method: "POST",
           headers: {
             "Content-type": "application/json",

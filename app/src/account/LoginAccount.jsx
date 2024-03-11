@@ -11,7 +11,7 @@ export default function LoginAccount({ nextPage }) {
   }, [account]);
   function airplane(e) {
     e.preventDefault();
-    fetch("http://localhost/login", {
+    fetch("https://localhost:443/login", {
       method: "POST",
       headers: {
         "Content-type": "application/json",

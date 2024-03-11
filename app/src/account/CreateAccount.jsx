@@ -23,7 +23,10 @@ export default function CreateAccount({ nextPage }) {
       body: JSON.stringify(account),
     };
     try {
-      const response = await fetch("http://localhost/create-account", options);
+      const response = await fetch(
+        "https://localhost:443/create-account",
+        options
+      );
       if (response.ok) {
         nextPage();
         alert("The account was created successfully!");

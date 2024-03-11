@@ -34,7 +34,7 @@ export default async function updateProfileData(
     }
 
     form.append("data", JSON.stringify({ ...updatedData, avatar }));
-    const response = await fetch("http://localhost/update-profile", {
+    const response = await fetch("https://localhost:443/update-profile", {
       method: "POST",
       body: form,
     });
@@ -44,7 +44,7 @@ export default async function updateProfileData(
     console.log(avatar);
     const copy = { ...updatedData, avatar };
     if (imgSrc["imgSrc"]) {
-      console.log(imgSrc)
+      console.log(imgSrc);
       console.log("src");
       copy["avatar"] = imgSrc["imgSrc"];
     }

@@ -13,7 +13,10 @@ export default function DeleteComment({ id, closeMenu, place }) {
       body: JSON.stringify({ id: id }),
     };
     try {
-      const response = await fetch("http://localhost/remove-comment", options);
+      const response = await fetch(
+        "https://localhost:443/remove-comment",
+        options
+      );
       if (!response.ok) return alert("Error");
       closeMenu();
       if (!deleteComment) return navigate(-1);

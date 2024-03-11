@@ -15,8 +15,8 @@ const options = {
   cert: fs.readFileSync("server.cert"),
 };
 
-// const PORT = 443;
-const PORT = 80;
+const PORT = 443;
+// const PORT = 80;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -24,7 +24,7 @@ app.use(
   cors({
     // netlify
     // origin: "https://resilient-concha-442d2e.netlify.app",
-    origin: "http://localhost:5173",
+    origin: "https://localhost:5173",
     credentials: true,
   })
 );
@@ -428,10 +428,10 @@ app.post("/follow", (req, res) => {
   });
 });
 
-// server.listen(PORT, () => {
-//   console.log(`The server has been activated: https://localhost:${PORT} `);
-// });
-
-app.listen(PORT, () => {
-  console.log(`The server has been activated: http://localhost:${PORT} `);
+server.listen(PORT, () => {
+  console.log(`The server has been activated: https://localhost:${PORT} `);
 });
+
+// app.listen(PORT, () => {
+//   console.log(`The server has been activated: http://localhost:${PORT} `);
+// });

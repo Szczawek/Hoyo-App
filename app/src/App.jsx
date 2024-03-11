@@ -25,7 +25,7 @@ export default function App() {
   // Check if the user is logged in
   async function verifyLogged() {
     try {
-      const response = await fetch("http://localhost/logged", {
+      const response = await fetch("https://localhost:443/logged", {
         credentials: "include",
       });
       if (!response.ok) return setUserData(std);

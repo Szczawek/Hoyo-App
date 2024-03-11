@@ -2,7 +2,7 @@ export default function Settings() {
   // Delete account
   async function deleteAccount() {
     try {
-      await fetch("http://localhost/remove", options);
+      await fetch("https://localhost:443/remove", options);
       navigate("/");
       window.location.reload();
     } catch (error) {

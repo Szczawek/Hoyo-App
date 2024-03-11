@@ -31,7 +31,7 @@ export default function Menu({ closeMenu }) {
   // Logout from account
   async function logout() {
     try {
-      const res = await fetch("http://localhost/logout", {
+      const res = await fetch("https://localhost:443/logout", {
         method: "POST",
         credentials: "include",
       });

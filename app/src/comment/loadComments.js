@@ -1,6 +1,6 @@
 export default async function loadComments(page, type, reply, id) {
   try {
-    const res = await fetch("http://localhost/user-comments", {
+    const res = await fetch("https://localhost:443/user-comments", {
       method: "POST",
       headers: {
         "Content-type": "application/json",

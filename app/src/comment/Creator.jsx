@@ -32,7 +32,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
       reply,
     };
     try {
-      const res = await fetch("http://localhost/create-comment", {
+      const res = await fetch("https://localhost:443/create-comment", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -47,7 +47,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
       throw Error(`Error wtih #CREATOR ${err}`);
     }
   }
-  
+
   return (
     <div className="creator">
       <header className="intro">

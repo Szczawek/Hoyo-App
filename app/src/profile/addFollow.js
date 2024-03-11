@@ -7,7 +7,7 @@ export default async function addFollow(owner, person) {
     body: JSON.stringify({ owner: owner, person: person }),
   };
   try {
-    const res = await fetch("http://localhost/follow", options);
+    const res = await fetch("https://localhost:443/follow", options);
     if (!res.ok) alert("Error with follow");
 
     return await res.json();
