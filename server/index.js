@@ -22,9 +22,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    // netlify
-    // origin: "https://resilient-concha-442d2e.netlify.app",
-    origin: "https://localhost:5173",
+    origin: [
+      "https://localhost:5173",
+      "https://resplendent-sable-c3ed12.netlify.app",
+      "https://stack-998d6.web.app",
+    ],
     credentials: true,
   })
 );
@@ -124,7 +126,7 @@ app.post("/user-comments", async (req, res) => {
 
   const likesNum =
     "(SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes";
-    
+
   const command = `SELECT *,${repliesNum},${likesNum} FROM user_comments where ${condition} ORDER BY id DESC LIMIT 8 OFFSET ${page}`;
   db.query(command, (err, result) => {
     if (err) throw Error(`Error with database #user-comments: ${err}`);
@@ -261,6 +263,8 @@ app.post("/login", function (req, res) {
           res.cookie("logged", encryptID, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 60 * 24,
+            sameSite: "none",
+            secure: true,
           });
 
           res.sendStatus(200);
@@ -392,7 +396,7 @@ app.post("/update-profile", upload.single("myFile"), async (req, res) => {
       db.query(commandTwo, value, (err) => {
         if (err)
           throw Error(`Erorr with database #update-profile-commets: ${err}`);
-          console.log(imgSrc)
+        console.log(imgSrc);
         res.json({ imgSrc: imgSrc }).status(200);
       });
     });

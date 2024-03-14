@@ -25,7 +25,7 @@ export default function Comment({ data }) {
           <Link to={`/${data["nick"]}`}>
             <div className="info">
               <div className="avatar">
-                <img src={data["avatar"]} alt="avatar" />
+                <img loading="lazy" src={data["avatar"]} alt="avatar" />
               </div>
               <div>
                 <h3 className="nick">{data["nick"]}</h3>
