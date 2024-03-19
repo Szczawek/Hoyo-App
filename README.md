@@ -32,10 +32,26 @@ w Like zmienić alert na p> z wiadomością, gdy nie usern nie jest zalogowany
 
 dodać animacje wsuwania karty profile podczas wszchodzenie na profil innego użytkownika w searchBar
 
-# add
-
-zmienić zdjęcie w editProfile na zdjęcie lepszej jakości
-
 # error
 
 zmienić kształ profile img w header
+
+# account
+
+dodać code z inp do sprawdzenie poprawności kodu,
+dodac setInerwal(() =>) ustawiony na 3min, zapisać jego do zmiennej i zmienną dodać do
+tablicy useEffect, by po upływnie czasu resetowało code
+
+# zaszyfrować code w ciasteczka
+
+# error
+
+nie wiem czemu czasami code generusię sie z długością 5 a powinnien mieć 6
+
+# zmiennić window.location.reload()w confirm email na wydajną funkcje
+
+# naprawić funckje code
+
+zaszyfrować ją,
+naprawić wydajność
+dowiedzieć się czemu funcka sendCode wywołue się dwa razy

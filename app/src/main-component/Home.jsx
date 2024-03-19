@@ -1,13 +1,6 @@
 import {  useState } from "react";
-import Login from "../account/Login";
 export default function Home({ session }) {
-  const [window, setWindow] = useState(true);
-  function closeWindow() {
-    setWindow(false);
-  }
   return (
-    <>
-      {window && !session ? <Login closeFn={closeWindow} /> : null}
       <section className="home">
         <header className="headline">
           <h1 className="introduction">
@@ -18,6 +11,5 @@ export default function Home({ session }) {
           <p className="description">enjoy your trip</p>
         </header>
       </section>
-    </>
   );
 }

@@ -223,14 +223,14 @@ body {
   justify-items: center;
 }
 
-.account label {
+.account .lb_data {
   display: grid;
   background-color: var(--dark-contrast);
   align-items: center;
   grid-template-columns: 1fr 3rem;
   border-radius: 0.1rem;
 }
-.account input {
+.account .lb_data input {
   font-size: 0.8rem;
   padding: 0.6rem 1rem;
 }
@@ -262,8 +262,48 @@ body {
   color: red;
   font-size: 0.9rem;
 }
-.account .close {
-  height: 1.4rem;
+
+/* Confirm Email */
+.confirm_email {
+  display: grid;
+  padding: 2rem;
+  max-width: 600px;
+  border: 1.5px solid var(--dark-contrast);
+  border-radius: 0.2rem;
+  row-gap: 2rem;
+}
+.confirm_email header {
+  text-align: center;
+}
+.confirm_email .enter_code {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.confirm_email .enter_code label {
+  border-radius: 0.4rem;
+  border: 1px solid red;
+  display: block;
+  width: 3.5rem;
+  aspect-ratio: 1/1;
+  transition: box-shadow, filter, border-widht, 300ms ease-in-out;
+}
+.confirm_email .enter_code label:is(:hover, :focus, :focus-within) {
+  box-shadow: 0 0 2rem 0rem red;
+  filter: brightness(130%);
+  border-width: 2px;
+}
+.confirm_email .num_box:is(:hover, :focus) {
+  scale: 1.2;
+}
+.confirm_email .num_box {
+  width: 100%;
+  display: grid;
+  transition: scale 250ms ease-in;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
   aspect-ratio: 1/1;
 }
 
@@ -294,6 +334,7 @@ body {
 /* User */
 .user {
   position: relative;
+  display: grid;
 }
 
 .user .bg-img {

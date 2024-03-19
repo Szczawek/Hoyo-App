@@ -14,15 +14,17 @@ const Profile = memo(function Profile({ user }) {
   const btn = useRef(null);
 
   useEffect(() => {
-    const followed = following.find((e) => e === user["id"]);
-    setAccountFollowed(followed);
+    if (id) {
+      const followed = following.find((e) => e === user["id"]);
+      setAccountFollowed(followed);
+    }
   }, [following, message]);
 
   // close/open manu
   function menuDoor() {
     setMenu((prev) => !prev);
   }
-  
+
   // Anty spam button
   function slowDownBtn(e) {
     btn.current.disabled = true;
@@ -44,6 +46,7 @@ const Profile = memo(function Profile({ user }) {
             {user["id"] !== id ? (
               <div className="follow_container">
                 <button
+                  disabled={id ? false : true}
                   ref={btn}
                   onClick={() =>
                     addFollow(id, user["id"]).then((e) => {

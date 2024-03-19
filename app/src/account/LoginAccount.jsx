@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-
+import { Link } from "react-router-dom";
 export default function LoginAccount({ nextPage }) {
   const [warningMessage, setWarningMessage] = useState(false);
   const [account, setAccount] = useState({ login: "", password: "" });
@@ -46,11 +46,12 @@ export default function LoginAccount({ nextPage }) {
 
   return (
     <>
-      <form onSubmit={(e) => airplane(e)}>
+      <form className="container" onSubmit={(e) => airplane(e)}>
+        <header><h2>Login</h2></header>
         {warningMessage && (
           <small>Your email address or password is incorrect!</small>
         )}
-        <label htmlFor="email">
+        <label className="lb_data" htmlFor="email">
           <input
             value={account["login"]}
             onChange={(e) => {
@@ -67,7 +68,7 @@ export default function LoginAccount({ nextPage }) {
             required
           />
         </label>
-        <label htmlFor="password">
+        <label className="lb_data" htmlFor="password">
           <input
             ref={inputPassword}
             value={account["password"]}
@@ -113,10 +114,9 @@ export default function LoginAccount({ nextPage }) {
       </form>
       <div className="control-panel">
         <p>Click to</p>
-        <button className="conveyor" onClick={() => nextPage()}>
-          {" "}
+        <Link to="create-account" className="conveyor" >
           Create Account
-        </button>
+        </Link>
       </div>
     </>
   );

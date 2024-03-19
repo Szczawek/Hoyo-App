@@ -19,7 +19,7 @@ export default function Header({ user }) {
           <SearchBar />
           <ul className="links">
             <li className="place">
-              <NavLink to="/">Home</NavLink>
+              <NavLink to="home">Home</NavLink>
             </li >
             <li className="place">
               <NavLink to="info">Info</NavLink>

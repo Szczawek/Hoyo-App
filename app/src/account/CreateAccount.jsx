@@ -1,40 +1,37 @@
 import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function CreateAccount({ nextPage }) {
+export default function CreateAccount() {
   const [warning, setWarning] = useState(false);
   const [eyelock, setEyelock] = useState(true);
+  const navigate = useNavigate();
+  const inputPassword = useRef(null);
   const [account, setAccount] = useState({
     nick: "",
     login: "",
     password: "",
   });
 
-  const inputPassword = useRef(null);
-
-  // Creating an account
-  async function create(e) {
+  // Check if an account with that email already exists
+  async function checkAccountAvailability(e) {
     e.preventDefault();
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(account),
-    };
     try {
-      const response = await fetch(
-        "https://localhost:443/create-account",
-        options
-      );
-      if (response.ok) {
-        nextPage();
-        alert("The account was created successfully!");
-        return;
+      const res = await fetch("https://localhost:443/account-availability", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(account),
+      });
+      const obj = await res.json();
+      if (!res.ok) {
+        setWarning(true);
+        return console.error(`${obj}: ${res.status}`);
       }
-      setWarning(true);
+      localStorage.setItem("accountData", JSON.stringify(account));
+      navigate("/empty-user/confirm-email")
     } catch (err) {
-      throw Error(`The server isn't responding: ${err}`);
+      throw err;
     }
   }
 
@@ -61,14 +58,17 @@ export default function CreateAccount({ nextPage }) {
   }
   return (
     <>
-      <form onSubmit={(e) => create(e)}>
+      <form className="container" onSubmit={(e) => checkAccountAvailability(e)}>
+        <header>
+          <h2>Create Account</h2>
+        </header>
         {warning && (
           <small className="warning">
             An account with this email address already exists
           </small>
         )}
 
-        <label htmlFor="create-nick">
+        <label className="lb_data" htmlFor="create-nick">
           <input
             value={account["nick"]}
             onChange={(e) => update("nick", e)}
@@ -80,7 +80,7 @@ export default function CreateAccount({ nextPage }) {
             required
           />
         </label>
-        <label htmlFor="create-email">
+        <label className="lb_data" htmlFor="create-email">
           <input
             value={account["login"]}
             onChange={(e) => update("login", e)}
@@ -91,7 +91,7 @@ export default function CreateAccount({ nextPage }) {
             required
           />
         </label>
-        <label htmlFor="create-password">
+        <label className="lb_data" htmlFor="create-password">
           <input
             ref={inputPassword}
             value={account["password"]}
@@ -132,9 +132,9 @@ export default function CreateAccount({ nextPage }) {
       </form>
       <div className="control-panel">
         <p>Click to</p>
-        <button className="conveyor" onClick={() => nextPage()}>
+        <Link to="/empty-user" className="conveyor">
           Login
-        </button>
+        </Link>
       </div>
     </>
   );

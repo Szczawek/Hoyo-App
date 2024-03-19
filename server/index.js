@@ -8,6 +8,18 @@ import https from "https";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.ethereal.email",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "earthwenus@gmail.com",
+    pass: `rwij fvhe npay fpit`,
+  },
+});
 
 // Dodaj middleware do obsługi żądań HTTPS
 const options = {
@@ -173,41 +185,108 @@ app.get("/users:nick", function (req, res) {
 });
 
 // Create an account
-app.post("/create-account", function (req, res) {
-  const command = "select id from user where login = ?";
-  const { login, nick, password } = req.body;
 
-  db.query(command, [login], function (err, data) {
-    if (err) throw Error(`Error with database: ${err}`);
+// Check if email is already in use
+app.post("/account-availability", async (req, res) => {
+  const { login } = req.body;
+  const findUserCmd = "SELECT id from user where login = ?";
+  try {
+    const user = await new Promise((resolve) => {
+      db.query(findUserCmd, [login], (err, userData) => {
+        if (err)
+          throw Error(`Error wtih database #account-availability: ${err}`);
+        resolve(userData[0]);
+      });
+    });
 
-    const accountExists = data[0];
+    if (user)
+      return res.status(400).json("Account with that email already exists!");
+    res.json("Account message");
+  } catch (err) {
+    throw err;
+  }
+});
 
-    if (!accountExists) {
-      encryption(password)
-        .then((encPassword) => {
-          const command =
-            "INSERT INTO `user` (`Login`, `Password`, `nick`, `About`, `date`, `avatar`) values(?,?,?,?,?,?)";
-
-          const value = [
-            login,
-            encPassword,
-            nick,
-            "",
-            new Date(),
-            "/images/user.svg",
-          ];
-          db.query(command, value, (err) => {
-            if (err) throw Error(`Error with database #create-account: ${err}`);
-            res.sendStatus(200);
-          });
-        })
-        .catch((err) => {
-          throw Error(`Error during email validation: ${err}`);
-        });
-      return;
+// send code to email
+app.post("/send-confirm-code", async (req, res) => {
+  try {
+    if (!req.cookies["code"]) {
+      let code = "";
+      while (code.length < 6) {
+        const num = Math.round(Math.random() * 9);
+        code += num;
+      }
+      code = Number(code);
+      res.cookie("code", JSON.stringify(code), {
+        httpOnly: true,
+        secure: true,
+        sameSite: false,
+        maxAge: 1000 * 60 * 3,
+      });
+      console.log(1233333);
+      // await transporter.sendMail({
+      //   from: '"Szczawik 👻" <earthwenus@gmail.com>',
+      //   // zmianić to na "login"
+      //   to: "szczawik.rozwoju@wp.pl",
+      //   subject: "Hello ✔",
+      //   text: "Exampler message",
+      //   html: `<div style='background-color:red'><b>Hello world?</b><p>Pss...</p>
+      //   <p>Code is below</p>
+      //   <p>${code}</p></div>`,
+      // });
     }
-    res.sendStatus(400);
-  });
+    res.sendStatus(200);
+  } catch (err) {}
+});
+
+app.post("/confirm-code", (req, res) => {
+  const { codeToCheck } = req.body;
+  const { code } = req.cookies;
+  if (codeToCheck === JSON.parse(code)) {
+    return res.sendStatus(200);
+  }
+  res.sendStatus(400);
+});
+
+// Create account
+app.post("/create-account", async (req, res) => {
+  const addAccount = "INSERT INTO user values(?,?,?,?,?,?,?)";
+  const { login, nick, password } = req.body;
+  try {
+    const newPassword = await encryption(password);
+    const values = [
+      null,
+      login,
+      newPassword,
+      "",
+      nick,
+      new Date(),
+      "/images/user.svg",
+    ];
+    await new Promise((resolve) => {
+      db.query(addAccount, values, (err) => {
+        if (err) throw Error(`Error with database #create-account: ${err}`);
+        resolve();
+      });
+    });
+    const loginToUserAccount = "SELECT id FROM user where login = ?";
+    db.query(loginToUserAccount, [login], (err, result) => {
+      if (err)
+        throw Error(
+          `Error with database #create-account donwload user data: ${err}`
+        );
+      res.clearCookie("code", {
+        httpOnly: true,
+        secure: true,
+        sameSite: false,
+        maxAge: 0,
+      });
+      setLoggedCookies(result[0]["id"], res);
+      res.sendStatus(200);
+    });
+  } catch (err) {
+    throw err;
+  }
 });
 
 // password encryption
@@ -218,8 +297,9 @@ async function encryption(e) {
 // remove account
 app.post("/remove", function (req, res) {
   const command = "DELETE from user where id =?";
-  const commandComments = "DELETE from user_comments where userID =?";
+  const commandComments = "DELETE from user_comments where ownerID =?";
   const commandLikes = "DELETE from likes where userID = ?";
+  const removeFollowers = "DELETE from followers where ownerID =?";
   const bytes = CryptoJS.AES.decrypt(
     req.cookies["logged"],
     process.env.COOKIE_KEY
@@ -237,54 +317,50 @@ app.post("/remove", function (req, res) {
     if (err)
       throw Error(`Error with database #remove-likes in remove : ${err}`);
   });
+  db.query(removeFollowers, [id], function (err) {
+    if (err)
+      throw Error(`Error with database #remove-likes in remove : ${err}`);
+  });
   res.sendStatus(200);
 });
 
 // Login to an account
-app.post("/login", function (req, res) {
+app.post("/login", (req, res) => {
   const command = "select password,id from user where Login = ?";
-  const userLogin = req.body["login"];
-
-  db.query(command, [userLogin], function (err, data) {
-    if (err) throw Error(`Error with database #login: ${err}`);
-    if (!data[0]) {
+  const { login, password } = req.body;
+  try {
+    db.query(command, [login], async (err, data) => {
+      if (err) throw Error(`Error with database #login: ${err}`);
+      if (!data[0]) return res.sendStatus(400);
+      const passwordIsCorrect = await bcrypt.compare(
+        password,
+        data[0]["password"]
+      );
+      if (passwordIsCorrect) {
+        setLoggedCookies(data[0]["id"], res);
+        return res.sendStatus(200);
+      }
       res.sendStatus(400);
-      return;
-    }
-    checkPassword(data)
-      .then((isMatch) => {
-        if (isMatch) {
-          const copy = { ...data[0] };
-          delete copy.password;
-          const encryptID = CryptoJS.AES.encrypt(
-            JSON.stringify(copy),
-            process.env.COOKIE_KEY
-          ).toString();
-          res.cookie("logged", encryptID, {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 60 * 24,
-            sameSite: "none",
-            secure: true,
-          });
-
-          res.sendStatus(200);
-          return;
-        }
-        res.sendStatus(400);
-      })
-      .catch((err) => {
-        throw Error(`Error during password validation: ${err}`);
-      });
-  });
-
-  async function checkPassword(data) {
-    const passwordToCheck = req.body["password"];
-    const correctPassword = data[0]["password"];
-    const result = await bcrypt.compare(passwordToCheck, correctPassword);
-    return result;
+    });
+  } catch (err) {
+    throw Error(`Error during password validation: ${err}`);
   }
 });
 
+function setLoggedCookies(id, res) {
+  const encryptID = CryptoJS.AES.encrypt(
+    JSON.stringify({ id: id }),
+    process.env.COOKIE_KEY
+  ).toString();
+
+  res.cookie("logged", encryptID, {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 60 * 24,
+    sameSite: "none",
+    secure: true,
+  });
+  console.log("cookies");
+}
 // Logout
 app.post("/logout", function (req, res) {
   res.clearCookie("logged", { maxAge: 0 });
@@ -294,10 +370,10 @@ app.post("/logout", function (req, res) {
 // Check login status
 app.get("/logged", async (req, res) => {
   try {
-    const login = req.cookies["logged"];
-    if (!login) return res.sendStatus(400);
+    const { logged } = req.cookies;
+    if (!logged) return res.sendStatus(400);
     // decrypt cookie
-    const bytes = CryptoJS.AES.decrypt(login, process.env.COOKIE_KEY);
+    const bytes = CryptoJS.AES.decrypt(logged, process.env.COOKIE_KEY);
     const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     // download user dates
     const userData = await new Promise((resolve) => {

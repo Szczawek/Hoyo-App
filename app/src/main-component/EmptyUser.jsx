@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import Login from "../account/Login";
+import Account from "../account/Account";
 export default function EmptyUser({ data }) {
   if (data["id"]) return <Navigate to={`/${data["nick"]}`} />;
   return (
@@ -18,7 +18,7 @@ export default function EmptyUser({ data }) {
           </div>
         </header>
       </div>
-      <Login uncloseable={true} />
+      <Account />
     </section>
   );
 }

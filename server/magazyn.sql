@@ -34,3 +34,15 @@ SELECT *, (SELECT COUNT(*) FROM user_comments reply WHERE reply.reply = uc.id) A
 SELECT * FROM user_comments
 
 SELECT *,(SELECT COUNT(id) FROM user_comments REPLY where reply.reply = user_comments.id) as replies, (SELECT COUNT(ID) from likes where commentID = user_comments.id) as likes FROM user_comments where ownerID = 72 AND reply IS NOT NULL ORDER BY id DESC LIMIT 8 OFFSET 0
+
+
+SELECT * FROM `user`
+
+SHOW TABLESPACE
+
+SELECT * from followers
+
+
+SELECT * FROM likes
+
+SELECT * FROM user_comments

@@ -9,6 +9,12 @@ const User = lazy(() => import("./main-component/User"));
 const Replies = lazy(() => import("./main-component/Replies"));
 const Settings = lazy(() => import("./main-component/Settings"));
 const NotFound = lazy(() => import("./main-component/NotFound"));
+const Account = lazy(() => import("./account/Account"));
+const Empty = lazy(() => import("./main-component/Empty"));
+import LoginAccount from "./account/LoginAccount";
+import ConfirmEmail from "./account/ConfirmEmail";
+import CreateAccount from "./account/CreateAccount";
+import NotFoundAcc from "./account/NotFoundAcc";
 export const UserContext = createContext();
 const std = {
   nick: "User",
@@ -81,13 +87,16 @@ export default function App() {
           value={{ userData, updateUserData, updateLikes, updateFollowers }}>
           <Routes>
             <Route path="/" element={<Header user={userData} />}>
-              <Route index element={<Home session={userData["id"]} />} />
+              <Route path="/" element={<Empty />} />
+              <Route path="home" element={<Home session={userData["id"]} />} />
               <Route path="news" element={<News />} />
               <Route path="info" element={<Info />} />
-              <Route
-                path="empty-user"
-                element={<EmptyUser data={userData} />}
-              />
+              <Route path="empty-user/" element={<EmptyUser data={userData} />}>
+                <Route index element={<LoginAccount />} />
+                <Route path="create-account" element={<CreateAccount />} />
+                <Route path="confirm-email" element={<ConfirmEmail />} />
+                <Route path="*" element={<NotFoundAcc />} />
+              </Route>
               <Route path="settings" element={<Settings />} />
               <Route path=":nick//*" element={<User data={userData} />}></Route>
               <Route path="replies/:id" element={<Replies />} />

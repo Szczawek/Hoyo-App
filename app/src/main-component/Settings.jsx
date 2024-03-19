@@ -1,10 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Settings() {
+  const navigate = useNavigate()
   // Delete account
   async function deleteAccount() {
     try {
-      await fetch("https://localhost:443/remove", options);
+      await fetch("https://localhost:443/remove", {method:"POST",credentials:"include"});
       navigate("/");
-      window.location.reload();
     } catch (error) {
       throw Error(`The server isn't responding: ${error}`);
     }

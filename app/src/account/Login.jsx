@@ -10,19 +10,22 @@ export default function Login({ closeFn, uncloseable }) {
     });
   }
   return (
-    <div className={`account${!uncloseable ? " cl" : ""}`}>
-      <div className="container">
-        <header>
-          <h2>{currentPage === "login" ? "Login" : "Create Account"}</h2>
-          {!uncloseable && (
-            <button className="close" onClick={() => closeFn()}>
-              <img src="/images/close.svg" alt="close button" />
-            </button>
-          )}
-        </header>
-        {currentPage === "login" && <LoginAccount nextPage={switchPage} />}
-        {currentPage === "creator" && <CreateAccount nextPage={switchPage} />}
+    <>
+      <p className="alert">The account has been created!</p>
+      <div className={`account${!uncloseable ? " cl" : ""}`}>
+        <div className="container">
+          <header>
+            <h2>{currentPage === "login" ? "Login" : "Create Account"}</h2>
+            {!uncloseable && (
+              <button className="close" onClick={() => closeFn()}>
+                <img src="/images/close.svg" alt="close button" />
+              </button>
+            )}
+          </header>
+          {currentPage === "login" && <LoginAccount nextPage={switchPage} />}
+          {currentPage === "creator" && <CreateAccount nextPage={switchPage} />}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
