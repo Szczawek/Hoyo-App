@@ -1,9 +1,5 @@
 # dodać baner profilowy
 
-# Two
-
-host na netify(możliwe, że z mySql nie da rady(mongoDB here))
-
 # Error
 
 Na mniejszym rozmiarze okna, animacja koła zębatego dodaje pasek do scroll. Usunąć to
@@ -32,10 +28,6 @@ w Like zmienić alert na p> z wiadomością, gdy nie usern nie jest zalogowany
 
 dodać animacje wsuwania karty profile podczas wszchodzenie na profil innego użytkownika w searchBar
 
-# error
-
-zmienić kształ profile img w header
-
 # account
 
 dodać code z inp do sprawdzenie poprawności kodu,
@@ -44,14 +36,12 @@ tablicy useEffect, by po upływnie czasu resetowało code
 
 # zaszyfrować code w ciasteczka
 
-# error
-
-nie wiem czemu czasami code generusię sie z długością 5 a powinnien mieć 6
-
-# zmiennić window.location.reload()w confirm email na wydajną funkcje
-
 # naprawić funckje code
 
 zaszyfrować ją,
 naprawić wydajność
 dowiedzieć się czemu funcka sendCode wywołue się dwa razy
+
+# Error Creator 
+
+Dodać możliwość logowanie się, gdy chcesz dodać com, ale nie jesteś zalogowany.

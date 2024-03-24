@@ -184,15 +184,13 @@ app.get("/users:nick", function (req, res) {
   });
 });
 
-// Create an account
-
 // Check if email is already in use
 app.post("/account-availability", async (req, res) => {
-  const { login } = req.body;
-  const findUserCmd = "SELECT id from user where login = ?";
+  const { login, password, nick } = req.body;
+  const findUserCmd = "SELECT id from user where login = ? OR nick = ?";
   try {
     const user = await new Promise((resolve) => {
-      db.query(findUserCmd, [login], (err, userData) => {
+      db.query(findUserCmd, [login, nick], (err, userData) => {
         if (err)
           throw Error(`Error wtih database #account-availability: ${err}`);
         resolve(userData[0]);
@@ -201,57 +199,82 @@ app.post("/account-availability", async (req, res) => {
 
     if (user)
       return res.status(400).json("Account with that email already exists!");
+    res.cookie("createAccountData", JSON.stringify({ login, password, nick }), {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      maxAge: 1000 * 60 * 4,
+    });
+    sendConfrimCode(res);
     res.json("Account message");
   } catch (err) {
     throw err;
   }
 });
 
-// send code to email
-app.post("/send-confirm-code", async (req, res) => {
+async function sendConfrimCode(res) {
+  console.log(223232323)
   try {
-    if (!req.cookies["code"]) {
-      let code = "";
-      while (code.length < 6) {
-        const num = Math.round(Math.random() * 9);
-        code += num;
-      }
-      code = Number(code);
-      res.cookie("code", JSON.stringify(code), {
-        httpOnly: true,
-        secure: true,
-        sameSite: false,
-        maxAge: 1000 * 60 * 3,
-      });
-      console.log(1233333);
-      // await transporter.sendMail({
-      //   from: '"Szczawik 👻" <earthwenus@gmail.com>',
-      //   // zmianić to na "login"
-      //   to: "szczawik.rozwoju@wp.pl",
-      //   subject: "Hello ✔",
-      //   text: "Exampler message",
-      //   html: `<div style='background-color:red'><b>Hello world?</b><p>Pss...</p>
-      //   <p>Code is below</p>
-      //   <p>${code}</p></div>`,
-      // });
+    const arrayWithCode = [];
+    for (let i = 0; i < 6; i++) {
+      arrayWithCode.push(Math.round(Math.random() * 9));
     }
-    res.sendStatus(200);
-  } catch (err) {}
-});
+    const code = arrayWithCode.join("");
+    res.cookie(
+      "confirmCode",
+      JSON.stringify({ code: Number(code), timer: new Date() }),
+      {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 1000 * 60 * 3,
+      }
+    );
 
-app.post("/confirm-code", (req, res) => {
-  const { codeToCheck } = req.body;
-  const { code } = req.cookies;
-  if (codeToCheck === JSON.parse(code)) {
-    return res.sendStatus(200);
+    // SEND EMAIL TO USER ACCOUNT
+    await transporter.sendMail({
+      from: '"Szczawik 👻" <earthwenus@gmail.com>',
+      // zmianić to na "login"
+      to: "szczawik.rozwoju@wp.pl",
+      subject: "Hello ✔",
+      text: "Exampler message",
+      html: `<div style='background-color:red'><b>Hello world?</b><p>Pss...</p>
+      <p>Code is below</p>
+      <p>${code}</p></div>`,
+    });
+  } catch (err) {
+    throw err;
   }
-  res.sendStatus(400);
+}
+
+// DOWNLOAD MAXAGE CONFRIMCODE COOKIE
+app.get("/code-timer", (req, res) => {
+  const cookies = req.cookies["confirmCode"];
+  if (!cookies) return res.sendStatus(400);
+  const { timer } = JSON.parse(cookies);
+  const ms = Math.abs(new Date(timer) - new Date());
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  res.json({ minutes, seconds });
 });
 
-// Create account
-app.post("/create-account", async (req, res) => {
+// COMPARE USER INPUTS CODE WITH ORIGIN
+app.post("/confirm-code", async (req, res) => {
+  const { codeToCheck } = req.body;
+  const { createAccountData, confirmCode } = req.cookies;
+  const createAccountDataObj = JSON.parse(createAccountData);
+  const { code } = JSON.parse(confirmCode);
+  if (codeToCheck === code) {
+    await createAccount(req, res, createAccountDataObj);
+    return res.json({ nick: createAccountDataObj["nick"] });
+  }
+  res.status(400).json(":/");
+});
+
+// Create account FN
+async function createAccount(req, res, userData) {
+  const { login, password, nick } = userData;
   const addAccount = "INSERT INTO user values(?,?,?,?,?,?,?)";
-  const { login, nick, password } = req.body;
   try {
     const newPassword = await encryption(password);
     const values = [
@@ -270,24 +293,22 @@ app.post("/create-account", async (req, res) => {
       });
     });
     const loginToUserAccount = "SELECT id FROM user where login = ?";
-    db.query(loginToUserAccount, [login], (err, result) => {
-      if (err)
-        throw Error(
-          `Error with database #create-account donwload user data: ${err}`
-        );
-      res.clearCookie("code", {
-        httpOnly: true,
-        secure: true,
-        sameSite: false,
-        maxAge: 0,
+    await new Promise((resolve) => {
+      db.query(loginToUserAccount, [login], (err, result) => {
+        if (err)
+          throw Error(
+            `Error with database #create-account donwload user data: ${err}`
+          );
+        res.clearCookie("confirmCode");
+        res.clearCookie("createAccountData");
+        setLoggedCookies(result[0]["id"], res);
+        resolve();
       });
-      setLoggedCookies(result[0]["id"], res);
-      res.sendStatus(200);
     });
   } catch (err) {
-    throw err;
+    throw Error(`Error with #create-account FN: ${err}`);
   }
-});
+}
 
 // password encryption
 async function encryption(e) {
@@ -304,7 +325,7 @@ app.post("/remove", function (req, res) {
     req.cookies["logged"],
     process.env.COOKIE_KEY
   );
-  const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  const id = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   res.clearCookie("logged", { httpOnly: true });
   db.query(command, [id], function (err) {
     if (err) throw Error(`Error with database #remove: ${err}`);
@@ -349,17 +370,15 @@ app.post("/login", (req, res) => {
 
 function setLoggedCookies(id, res) {
   const encryptID = CryptoJS.AES.encrypt(
-    JSON.stringify({ id: id }),
+    JSON.stringify(id),
     process.env.COOKIE_KEY
   ).toString();
-
   res.cookie("logged", encryptID, {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 60 * 24,
     sameSite: "none",
     secure: true,
   });
-  console.log("cookies");
 }
 // Logout
 app.post("/logout", function (req, res) {
@@ -374,7 +393,8 @@ app.get("/logged", async (req, res) => {
     if (!logged) return res.sendStatus(400);
     // decrypt cookie
     const bytes = CryptoJS.AES.decrypt(logged, process.env.COOKIE_KEY);
-    const { id } = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    const id = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
     // download user dates
     const userData = await new Promise((resolve) => {
       const command = "SELECT id,nick,about,avatar,date FROM user where id =?";
@@ -390,6 +410,7 @@ app.get("/logged", async (req, res) => {
       db.query(command, [id], (err, result) => {
         if (err) throw Error(`Error with database #logged-userLikes: ${err}`);
         const array = result.map((e) => e["commentID"]);
+
         resolve(array);
       });
     });
@@ -472,7 +493,6 @@ app.post("/update-profile", upload.single("myFile"), async (req, res) => {
       db.query(commandTwo, value, (err) => {
         if (err)
           throw Error(`Erorr with database #update-profile-commets: ${err}`);
-        console.log(imgSrc);
         res.json({ imgSrc: imgSrc }).status(200);
       });
     });
@@ -511,7 +531,3 @@ app.post("/follow", (req, res) => {
 server.listen(PORT, () => {
   console.log(`The server has been activated: https://localhost:${PORT} `);
 });
-
-// app.listen(PORT, () => {
-//   console.log(`The server has been activated: http://localhost:${PORT} `);
-// });

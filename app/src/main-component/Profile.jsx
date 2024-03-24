@@ -12,7 +12,6 @@ const Profile = memo(function Profile({ user }) {
   const { id, following } = userData;
   const [accountFollowed, setAccountFollowed] = useState(false);
   const btn = useRef(null);
-
   useEffect(() => {
     if (id) {
       const followed = following.find((e) => e === user["id"]);

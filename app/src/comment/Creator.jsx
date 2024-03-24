@@ -1,7 +1,7 @@
-import { memo, useContext, useRef, useState } from "react";
+ import { memo, useContext, useRef, useState } from "react";
 import { UserContext } from "../App";
 import { Link } from "react-router-dom";
-import Login from "../account/Login";
+import Account from "../account/Account";
 import Window from "./Window";
 
 const Creator = memo(function Creator({ addComment, reply }) {
@@ -72,6 +72,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
             placeholder="What's up..."
             minLength={1}
             required
+            name="comment value"
             title="comment content"
             maxLength={1500}></textarea>
           {validArea && (
@@ -95,7 +96,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
       {expandMenu && (
         <Window closeWindow={setWindow} addComment={createComment} />
       )}
-      {loginWindow && <Login closeFn={closeLoginWindow} />}
+      {loginWindow && <Account closeFn={closeLoginWindow} />}
     </div>
   );
 });

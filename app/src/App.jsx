@@ -22,6 +22,8 @@ const std = {
   likes: [],
 };
 export default function App() {
+  // to change in the future 
+  const [confrimCodePath, setConfirmCodePath] = useState(true);
   const [userData, setUserData] = useState(std);
 
   useEffect(() => {
@@ -36,6 +38,7 @@ export default function App() {
       });
       if (!response.ok) return setUserData(std);
       const obj = await response.json();
+      console.log(obj)
       if (!obj["avatar"]) obj["avatar"] = "/images/user.svg";
       setUserData(obj);
     } catch (err) {
@@ -84,7 +87,13 @@ export default function App() {
     <>
       <Suspense fallback={<div className="loading">Loading...</div>}>
         <UserContext.Provider
-          value={{ userData, updateUserData, updateLikes, updateFollowers }}>
+          value={{
+            userData,
+            updateUserData,
+            updateLikes,
+            updateFollowers,
+            verifyLogged,
+          }}>
           <Routes>
             <Route path="/" element={<Header user={userData} />}>
               <Route path="/" element={<Empty />} />
@@ -94,7 +103,9 @@ export default function App() {
               <Route path="empty-user/" element={<EmptyUser data={userData} />}>
                 <Route index element={<LoginAccount />} />
                 <Route path="create-account" element={<CreateAccount />} />
-                <Route path="confirm-email" element={<ConfirmEmail />} />
+                {confrimCodePath && (
+                  <Route path="confirm-email" element={<ConfirmEmail />} />
+                )}
                 <Route path="*" element={<NotFoundAcc />} />
               </Route>
               <Route path="settings" element={<Settings />} />

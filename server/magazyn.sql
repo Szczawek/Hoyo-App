@@ -46,3 +46,8 @@ SELECT * from followers
 SELECT * FROM likes
 
 SELECT * FROM user_comments
+
+
+SELECT * FROM `user`
+
+SELECT * from `user` where id = 102

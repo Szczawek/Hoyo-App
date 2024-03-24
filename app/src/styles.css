@@ -307,6 +307,13 @@ body {
   aspect-ratio: 1/1;
 }
 
+.confirm_email .check_code:disabled {
+  background-color: rgb(59, 45, 45);
+  color: white;
+  border-color: yellow;
+  border-width: 2px;
+  cursor: not-allowed;
+}
 /* USER */
 .profile_table {
   display: grid;

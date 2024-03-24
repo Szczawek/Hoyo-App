@@ -1,5 +1,6 @@
 import YouTube from "react-youtube";
 import Account from "../account/Account";
+import { useEffect } from "react";
 export default function Info() {
   const opts = {
     height: "390",
@@ -8,7 +9,15 @@ export default function Info() {
       autoplay: 1,
     },
   };
+  const tt = Number([1,2].join("")) * 1000
+  console.log(tt)
 
+  localStorage.setItem("ttd", new Date());
+  useEffect(() => {
+    fetch("https://localhost:443/code-timer", {
+      credentials: "include",
+    });
+  }, []);
   function onPlayerReady(event) {
     // access to player in all event handlers via event.target
     event.target.pauseVideo();

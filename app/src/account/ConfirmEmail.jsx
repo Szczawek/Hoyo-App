@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import Timer from "./Timer";
-import sendCreateReq from "./sendCreateReq";
 import { useNavigate } from "react-router-dom";
-
+import { UserContext } from "../App";
 export default function ConfirmEmail() {
   const navigate = useNavigate();
-  const accountData = JSON.parse(localStorage.getItem("accountData"));
+  const { verifyLogged } = useContext(UserContext);
+  const checkCodeBtn = useRef(null);
   const [code, setCode] = useState({
     0: "",
     1: "",
@@ -15,28 +15,11 @@ export default function ConfirmEmail() {
     5: "",
   });
 
-  useEffect(() => {
-    return () => sendCode();
-  }, []);
-  
-  // Send Confirm Code
-  async function sendCode() {
-    console.log("tlkapsdada")
-    try {
-      const res = await fetch("https://localhost:443/send-confirm-code", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!res.ok)
-        return console.error(
-          `An error with generating confirm-code: ${res.status}`
-        );
-    } catch (err) {
-      throw err;
-    }
+  function disabledBtn() {
+    checkCodeBtn.current.disabled = true;
   }
-  // DODAĆ POBIERANIE CZASU ILE JESZCZE UTRZYMAHJĄ SIĘ CIASTECZKA
 
+  // DODAĆ POBIERANIE CZASU ILE JESZCZE UTRZYMAHJĄ SIĘ CIASTECZKA
   async function confrimCode(e) {
     e.preventDefault();
     let codeToCheck = "";
@@ -55,9 +38,9 @@ export default function ConfirmEmail() {
         body: JSON.stringify({ codeToCheck }),
       });
       if (!res.ok) return console.error(`Invalid code: ${res.status}`);
-      await sendCreateReq(accountData);
-      navigate(`/${accountData["nick"]}`);
-      window.location.reload()
+      const { nick } = await res.json();
+      verifyLogged();
+      navigate(`/${nick}`);
     } catch (err) {
       throw err;
     }
@@ -101,8 +84,10 @@ export default function ConfirmEmail() {
           })}
         </div>
       </div>
-      <Timer sendCode={sendCode} />
-      <button className="confirm">Check Code</button>
+      <Timer stopBtnFn={disabledBtn} />
+      <button ref={checkCodeBtn} className="confirm check_code">
+        Check Code
+      </button>
     </form>
   );
 }

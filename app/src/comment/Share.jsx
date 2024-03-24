@@ -14,7 +14,7 @@ export default function Share({ id }) {
         onClick={async () => {
           try {
             await navigator.clipboard.writeText(
-              `http://localhost:5173/replies/${id}`
+              `${window.location.origin}/replies/${id}`
             );
             setShareWin(true);
           } catch (err) {

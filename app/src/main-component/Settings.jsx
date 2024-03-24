@@ -1,11 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
+import { useContext } from "react";
 
 export default function Settings() {
-  const navigate = useNavigate()
+  const { verifyLogged } = useContext(UserContext);
+  const navigate = useNavigate();
   // Delete account
   async function deleteAccount() {
     try {
-      await fetch("https://localhost:443/remove", {method:"POST",credentials:"include"});
+      const res = await fetch("https://localhost:443/remove", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) return console.log(res.status);
+      verifyLogged();
       navigate("/");
     } catch (error) {
       throw Error(`The server isn't responding: ${error}`);

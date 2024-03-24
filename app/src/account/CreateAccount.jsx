@@ -4,13 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 export default function CreateAccount() {
   const [warning, setWarning] = useState(false);
   const [eyelock, setEyelock] = useState(true);
-  const navigate = useNavigate();
   const inputPassword = useRef(null);
   const [account, setAccount] = useState({
     nick: "",
     login: "",
     password: "",
   });
+  const navigate = useNavigate();
 
   // Check if an account with that email already exists
   async function checkAccountAvailability(e) {
@@ -21,6 +21,7 @@ export default function CreateAccount() {
         headers: {
           "Content-type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(account),
       });
       const obj = await res.json();
@@ -28,8 +29,7 @@ export default function CreateAccount() {
         setWarning(true);
         return console.error(`${obj}: ${res.status}`);
       }
-      localStorage.setItem("accountData", JSON.stringify(account));
-      navigate("/empty-user/confirm-email")
+      navigate("/empty-user/confirm-email");
     } catch (err) {
       throw err;
     }
