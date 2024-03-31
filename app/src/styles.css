@@ -11,13 +11,16 @@ html {
 }
 
 :root {
-  --contrast: #ff0080;
+  --window-component-bgc: #4d0026;
+  --component-contrast-green: #1aff8c;
+  --contrast: #ff1a8c;
   --contrast-shadow: #ff008028;
   --blue-shadow: #0044ff28;
   --yellow-shadow: #ffc40028;
   --dark-contrast: #99004d;
   --confirm: rgba(18, 131, 18, 0.836);
   --cancel: rgb(233, 25, 25);
+  --very-dark-def: rgb(78, 19, 43);
 }
 
 button {
@@ -193,19 +196,15 @@ body {
   place-content: center;
 }
 
-.account .container {
-  padding: 2rem;
-  display: grid;
-  gap: 1.5rem;
-  border-radius: 0.3rem;
-  background-color: black;
-  border: 2px solid var(--contrast);
-}
-
 .account form {
+  background-color: var(--window-component-bgc);
   display: grid;
-  min-width: 300px;
+  padding: 2rem;
+  border: 1px solid var(--contrast);
+  width: clamp(320px, 60vw, 420px);
   gap: 1.6rem;
+
+  border-radius: 0.3rem;
 }
 .account form button[type="submit"] {
   max-width: max-content;
@@ -216,6 +215,7 @@ body {
 
 .account:not(.cl) header {
   grid-template-columns: 1fr;
+  font-size: 1.2rem;
 }
 .account header {
   display: grid;
@@ -225,24 +225,45 @@ body {
 
 .account .lb_data {
   display: grid;
-  background-color: var(--dark-contrast);
+  color: var(--component-contrast-green);
+  position: relative;
   align-items: center;
-  grid-template-columns: 1fr 3rem;
-  border-radius: 0.1rem;
+  grid-template-rows: max-content 1fr;
+  gap: 0.2rem;
+  font-weight: 900;
+  letter-spacing: 2px;
 }
 .account .lb_data input {
-  font-size: 0.8rem;
-  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  box-shadow: 0 0 1rem -0.1rem black;
+  background-color: var(--dark-contrast);
+  padding: 0.4rem 0.6rem;
+  border: 2px solid transparent;
+  border-radius: 0.2rem;
+  transition: border-color 300ms;
+}
+.account .lb_data input:is(:focus-visible, :hover) {
+  border-color: var(--contrast);
+}
+.account .lb_data input:is(:focus-visible, :hover)::placeholder {
+  position: absolute;
+  translate: 0.1rem -0.2rem;
+}
+.account .lb_data .password_inp {
+  padding-right: 2.4rem;
 }
 .account input::placeholder {
+  transition: translate 300ms ease-in-out;
   color: rgba(255, 255, 255, 0.815);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 /* button show password */
 .account .show-password {
   display: grid;
-  justify-content: center;
-  width: 100%;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0.3rem 0.6rem;
 }
 .account .show-password svg {
   width: 1.4rem;
@@ -284,6 +305,7 @@ body {
 .confirm_email .enter_code label {
   border-radius: 0.4rem;
   border: 1px solid red;
+  background-color: black;
   display: block;
   width: 3.5rem;
   aspect-ratio: 1/1;
@@ -294,25 +316,58 @@ body {
   filter: brightness(130%);
   border-width: 2px;
 }
-.confirm_email .num_box:is(:hover, :focus) {
+.confirm_email .num_box:is(:hover, :focus-within) {
   scale: 1.2;
+}
+.confirm_email .num_box:is(:hover, :focus-within)::placeholder {
+  opacity: 0.5;
 }
 .confirm_email .num_box {
   width: 100%;
   display: grid;
-  transition: scale 250ms ease-in;
+  transition: scale 350ms ease-in;
   font-size: 2rem;
   font-weight: bold;
   text-align: center;
   aspect-ratio: 1/1;
 }
+.confirm_email .num_box::placeholder {
+  position: absolute;
+  color: red;
+  display: grid;
+  height: 100%;
+  transition: opacity 350ms ease-in-out;
+  top: 0;
+  place-content: center;
+  right: 0;
+  left: 0;
+}
 
-.confirm_email .check_code:disabled {
-  background-color: rgb(59, 45, 45);
-  color: white;
-  border-color: yellow;
-  border-width: 2px;
+.confirm_email .timer {
+  display: grid;
+  gap: 1rem;
+}
+.confirm_email .refresh {
+  gap: 1rem;
+  background-color: transparent;
+  max-width: max-content;
+  box-shadow: 0 0 1rem black;
+  align-items: center;
+  grid-template-columns: repeat(2, max-content);
+}
+.confirm_email button {
+  display: grid;
+  padding: 0.2rem 0.8rem;
+  border-radius: 0.2rem;
+}
+.confirm_email .temporary:disabled {
   cursor: not-allowed;
+  background-color: rgb(158, 153, 126);
+  color: rgba(0, 0, 0, 0.76);
+  text-decoration: line-through;
+  border: 2px solid rgb(207, 207, 17);
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 /* USER */
 .profile_table {
@@ -365,7 +420,7 @@ body {
   border-radius: 2rem;
   gap: 1rem;
   position: absolute;
-  min-width: 420px;
+  min-width: 520px;
   max-width: 700px;
   min-height: 200px;
   grid-auto-flow: row;
@@ -385,6 +440,11 @@ body {
 .user .nick {
   word-break: break-all;
 }
+.user .baner-img {
+  max-height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
 
 .user .baner {
   height: 100px;
@@ -396,7 +456,8 @@ body {
   position: absolute;
   display: grid;
   width: 100%;
-  translate: 0 80%;
+  bottom: -2rem;
+  padding-inline: 1rem;
   grid-template-columns: repeat(2, max-content);
   justify-content: space-between;
   align-items: center;
@@ -563,6 +624,110 @@ body {
   height: 100%;
 }
 
+/* EDIT-PROFILE BANER/AVATAR IMG */
+.edit_window .set_images {
+  display: grid;
+  grid-template-rows: 8rem max-content;
+  gap: 6rem;
+}
+
+.edit_window .baner-img {
+  max-height: 100%;
+  z-index: -1;
+  width: 100%;
+  object-fit: cover;
+  position: absolute;
+}
+.edit_window .baner {
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 100;
+}
+.edit_window .set_images input {
+  display: none;
+}
+
+.edit_window .avatar::before {
+  width: 110%;
+  z-index: -1;
+  background-color: var(--very-dark-def);
+  position: absolute;
+  top: -0.8rem;
+  left: -5%;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
+}
+
+.edit_window .avatar {
+  position: relative;
+  max-width: 120px;
+  background-color: rgb(0, 0, 0);
+  cursor: pointer;
+  top: 55%;
+  left: 10%;
+}
+
+.edit_window .add_image_box {
+  position: absolute;
+  display: grid;
+  place-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.edit_window .icon_box {
+  border-radius: 50%;
+  border: 2px solid rgb(5, 64, 104);
+  box-shadow: 0 0 2rem rgb(174, 0, 255);
+  background-color: #15a0a567;
+  width: 4rem;
+  display: grid;
+  place-content: center;
+  aspect-ratio: 1/1;
+  transition: filter, scale, rotate, 350ms ease-out;
+  animation: puls_box 3s infinite ease-in-out;
+}
+
+@keyframes puls_box {
+  0% {
+    scale: 1;
+  }
+  5% {
+    scale: 1.2;
+    filter: brightness(200%);
+  }
+  15% {
+    scale: 1;
+    rotate: 180deg;
+    filter: brightness(100%);
+  }
+  25% {
+    scale: 1.2;
+    filter: brightness(200%);
+  }
+  50% {
+    scale: 1;
+    rotate: -180deg;
+    filter: brightness(100%);
+  }
+  70% {
+    scale: 1.3;
+    filter: brightness(200%);
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+.edit_window .add_image_box:is(:hover, :focus-within) .icon_box {
+  rotate: -60deg;
+  scale: 1.2;
+}
+.edit_window .add_icon {
+  width: 2.5rem;
+}
+
 /* header */
 .edit_window header {
   display: flex;
@@ -580,7 +745,7 @@ body {
 }
 /* form */
 .edit_window form {
-  background-color: rgb(78, 19, 43);
+  background-color: var(--window-component-bgc);
   display: grid;
   width: clamp(320px, 60vw, 600px);
   gap: 2.5rem;
@@ -594,7 +759,8 @@ body {
 
 .edit_window .tip {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.3rem;
+  color: var(--component-contrast-green);
 }
 .edit_window input,
 .edit_window textarea {
@@ -607,26 +773,7 @@ body {
 .edit_window textarea {
   min-height: 100px;
 }
-.edit_window .avatar {
-  position: relative;
-  max-width: 120px;
-  cursor: pointer;
-  aspect-ratio: 1/1;
-  margin-inline: auto;
-}
 
-.edit_window .add_icon {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  opacity: 0.8;
-  padding: 2.4rem;
-  left: 0;
-}
-
-.edit_window .avatar input {
-  display: none;
-}
 .edit_window .complement {
   color: rgb(200, 255, 0);
   margin-inline: auto;
@@ -647,18 +794,14 @@ body {
 
 .avatar {
   display: grid;
-  aspect-ratio: 1/1;
   border-radius: 50%;
-  overflow: hidden;
   outline: 2px solid transparent;
   transition: filter 300ms;
 }
-.avatar:hover,
-.choose_img:hover .avatar {
-  filter: brightness(80%);
-}
+
 .avatar img {
-  height: 100%;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
   object-fit: cover;
   width: 100%;
 }
@@ -760,16 +903,13 @@ body {
 }
 
 button.confirm {
-  border-width: 1px;
-  border-style: solid;
-  border-color: transparent;
+  border: 1px solid transparent;
   background-color: var(--confirm);
-  transition: color, background-color, border-color, 300ms;
+  transition: filter, scale, 300ms ease-out;
 }
 button.confirm:is(:hover, :focus) {
-  border-color: var(--confirm);
-  color: var(--cancel);
-  background-color: rgba(122, 13, 13, 0.397);
+  filter: drop-shadow(0 0 0.8rem rgb(255, 0, 55)) brightness(115%);
+  scale: 1.1;
 }
 /* shelf/replies */
 .replies {
@@ -1050,12 +1190,11 @@ button.confirm:is(:hover, :focus) {
     }
   }
 
-  /* USER */
   .user .profile {
     animation: forwards load_profile_phone 500ms ease-out;
     right: 0;
-    min-width: 320px;
-    max-width: 630px;
+    max-width: 100%;
+    min-width: 300px;
   }
   .profile .about {
     font-size: 0.7em;

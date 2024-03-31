@@ -45,13 +45,13 @@ export default function LoginAccount({ nextPage }) {
   }
 
   return (
-    <>
       <form className="container" onSubmit={(e) => airplane(e)}>
         <header><h2>Login</h2></header>
         {warningMessage && (
           <small>Your email address or password is incorrect!</small>
         )}
         <label className="lb_data" htmlFor="email">
+         Email
           <input
             value={account["login"]}
             onChange={(e) => {
@@ -69,6 +69,7 @@ export default function LoginAccount({ nextPage }) {
           />
         </label>
         <label className="lb_data" htmlFor="password">
+          Password
           <input
             ref={inputPassword}
             value={account["password"]}
@@ -111,13 +112,13 @@ export default function LoginAccount({ nextPage }) {
         <button className="confirm" type="submit">
           Login
         </button>
-      </form>
       <div className="control-panel">
         <p>Click to</p>
         <Link to="create-account" className="conveyor" >
           Create Account
         </Link>
       </div>
-    </>
+      </form>
+
   );
 }

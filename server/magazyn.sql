@@ -51,3 +51,19 @@ SELECT * FROM user_comments
 SELECT * FROM `user`
 
 SELECT * from `user` where id = 102
+
+ALTER TABLE `user` ADD hashName VARCHAR(255)
+
+
+ALTER Table user_comments ADD hashName VARCHAR(255)
+
+SELECT * FROM user
+
+ALTER TABLE user ADD baner TEXT;
+
+UPDATE TABLE user set "./images/baner.png" where id > 0
+
+
+SELECT * from user_comments
+
+UPDATE user_comments SET avatar = "/images/user.svg" where nick = "Deku";

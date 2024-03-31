@@ -1,6 +1,6 @@
- import { memo, useContext, useRef, useState } from "react";
+import { memo, useContext, useRef, useState } from "react";
 import { UserContext } from "../App";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Account from "../account/Account";
 import Window from "./Window";
 
@@ -12,7 +12,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
   const [expandMenu, setExpandMenu] = useState(false);
   const validation = useRef(null);
   const { id, nick, avatar } = useContext(UserContext)["userData"];
-
+  const navigate = useNavigate();
   function setWindow() {
     setExpandMenu((prev) => !prev);
   }
@@ -85,7 +85,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
           const regexp = /^\s*$/;
           const emptySpace = regexp.test(value);
           // In the standard settings, the ID does not exist, so if it does, it means that the user is logged in
-          if (!id) return setLoginWindow(true);
+          if (!id) return navigate("/empty-user");
           if (!validation.current.checkValidity() || emptySpace)
             return setValidArea(true);
           setWindow();

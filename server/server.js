@@ -58,9 +58,10 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "../app/public/users-pictures");
   },
+  // /users-pictures
   filename: function (req, file, cb) {
     const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
-    cb(null, `${file.originalname}-${fileName}`);
+    cb(null, fileName);
   },
 });
 
@@ -177,7 +178,7 @@ app.get("/users:nick", function (req, res) {
   const { nick } = req.params;
 
   const command =
-    "SELECT nick, about, avatar, id,(SELECT COUNT(ID) FROM followers where personID = user.id) as followers,(SELECT COUNT(ID) from followers where ownerID = user.id) as following from user where nick = ?";
+    "SELECT nick, about, avatar,baner,hashName, id,(SELECT COUNT(ID) FROM followers where personID = user.id) as followers,(SELECT COUNT(ID) from followers where ownerID = user.id) as following from user where nick = ?";
   db.query(command, [nick], (err, result) => {
     if (err) throw Error(`Error with database #users userData: ${err}`);
     res.json(result);
@@ -186,7 +187,7 @@ app.get("/users:nick", function (req, res) {
 
 // Check if email is already in use
 app.post("/account-availability", async (req, res) => {
-  const { login, password, nick } = req.body;
+  const { login, password, nick,name } = req.body;
   const findUserCmd = "SELECT id from user where login = ? OR nick = ?";
   try {
     const user = await new Promise((resolve) => {
@@ -199,21 +200,20 @@ app.post("/account-availability", async (req, res) => {
 
     if (user)
       return res.status(400).json("Account with that email already exists!");
-    res.cookie("createAccountData", JSON.stringify({ login, password, nick }), {
+    res.cookie("createAccountData", JSON.stringify({ login, password, nick,name }), {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 1000 * 60 * 4,
+      maxAge: 1000 * 60 * 60,
     });
-    sendConfrimCode(res);
+    sendConfrimCode(res, login);
     res.json("Account message");
   } catch (err) {
     throw err;
   }
 });
 
-async function sendConfrimCode(res) {
-  console.log(223232323)
+async function sendConfrimCode(res, login) {
   try {
     const arrayWithCode = [];
     for (let i = 0; i < 6; i++) {
@@ -233,29 +233,40 @@ async function sendConfrimCode(res) {
 
     // SEND EMAIL TO USER ACCOUNT
     await transporter.sendMail({
-      from: '"Szczawik 👻" <earthwenus@gmail.com>',
-      // zmianić to na "login"
-      to: "szczawik.rozwoju@wp.pl",
-      subject: "Hello ✔",
-      text: "Exampler message",
-      html: `<div style='background-color:red'><b>Hello world?</b><p>Pss...</p>
+      from: '"Hoyo Earth" <earthwenus@gmail.com>',
+      to: login,
+      subject: "Confirm code",
+      text: "Code:",
+      html: `<div style='background-color:red,padding:1rem,font-size:1.5rem,display:grid,place-content:center'><h1>Hello world?</h1><p>Pss...</p>
       <p>Code is below</p>
-      <p>${code}</p></div>`,
+      <code>${code}</code></div>`,
     });
   } catch (err) {
     throw err;
   }
 }
 
+app.post("/refresh", (req, res) => {
+  const { createAccountData } = req.cookies;
+  if (!createAccountData) return res.sendStatus(400);
+  const { login } = JSON.parse(createAccountData);
+  console.log(login);
+  // sendConfrimCode(res, login);
+  res.sendStatus(200);
+});
+
 // DOWNLOAD MAXAGE CONFRIMCODE COOKIE
 app.get("/code-timer", (req, res) => {
   const cookies = req.cookies["confirmCode"];
   if (!cookies) return res.sendStatus(400);
   const { timer } = JSON.parse(cookies);
-  const ms = Math.abs(new Date(timer) - new Date());
-  const minutes = Math.floor(ms / 60000);
-  const seconds = Math.floor((ms % 60000) / 1000);
-  res.json({ minutes, seconds });
+  const ms = Math.abs(new Date() - new Date(timer));
+  const gapInMinutes = Math.floor(ms / 60000);
+  const gapInSeconds = Math.floor((ms % 60000) / 1000);
+  const seconds = 59 - gapInSeconds;
+  const minutes = 2 - gapInMinutes;
+  if (minutes < 0) return res.json({ seconds: 0, minutes: 0 });
+  res.json({ seconds, minutes });
 });
 
 // COMPARE USER INPUTS CODE WITH ORIGIN
@@ -273,18 +284,20 @@ app.post("/confirm-code", async (req, res) => {
 
 // Create account FN
 async function createAccount(req, res, userData) {
-  const { login, password, nick } = userData;
-  const addAccount = "INSERT INTO user values(?,?,?,?,?,?,?)";
+  const { login, password, nick, name } = userData;
+  const addAccount =
+    "INSERT INTO user(login,nick,password,about,date,avatar,hashName,baner) values(?,?,?,?,?,?,?,?)";
   try {
     const newPassword = await encryption(password);
     const values = [
-      null,
       login,
+      nick,
       newPassword,
       "",
-      nick,
       new Date(),
       "/images/user.svg",
+      name,
+      "/images/baner.png"
     ];
     await new Promise((resolve) => {
       db.query(addAccount, values, (err) => {
@@ -299,8 +312,16 @@ async function createAccount(req, res, userData) {
           throw Error(
             `Error with database #create-account donwload user data: ${err}`
           );
-        res.clearCookie("confirmCode");
-        res.clearCookie("createAccountData");
+        res.clearCookie("confirmCode", {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+        });
+        res.clearCookie("createAccountData", {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+        });
         setLoggedCookies(result[0]["id"], res);
         resolve();
       });
@@ -382,7 +403,11 @@ function setLoggedCookies(id, res) {
 }
 // Logout
 app.post("/logout", function (req, res) {
-  res.clearCookie("logged", { maxAge: 0 });
+  res.clearCookie("logged", {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+  });
   res.sendStatus(200);
 });
 
@@ -397,7 +422,8 @@ app.get("/logged", async (req, res) => {
 
     // download user dates
     const userData = await new Promise((resolve) => {
-      const command = "SELECT id,nick,about,avatar,date FROM user where id =?";
+      const command =
+        "SELECT id,nick,about,avatar,date,baner,hashName FROM user where id =?";
       db.query(command, [id], (err, result) => {
         if (err) throw Error(`Error with database #logged-userData: ${err}`);
         resolve(result[0]);
@@ -466,34 +492,37 @@ app.post("/like", function (req, res) {
 });
 
 // Update profile info
-app.post("/update-profile", upload.single("myFile"), async (req, res) => {
-  const { nick, about, avatar, id } = JSON.parse(req.body["data"]);
-  let columns = "";
-  let imgSrc;
-  const value = [about, nick, id];
+const donwloadFileFN = upload.fields([
+  { name: "avatar", maxCount: 1, optionals: true },
+  { name: "baner", maxCount: 1, optionals: true },
+]);
+
+app.post("/update-profile", donwloadFileFN, async (req, res) => {
+  const { avatar, baner } = req.files;
+  const { nick, about, id, prevAvatar, prevBaner } = JSON.parse(
+    req.body["data"]
+  );
+
+  const value = [about, nick];
+  const newFile = [avatar, baner];
   try {
-    if (req.file) {
-      imgSrc = `/users-pictures/${req.file.filename}`;
-      columns = "avatar = ?,";
-      value.splice(1, 0, `/users-pictures/${req.file.filename}`);
-
-      if (avatar !== "/images/user.svg") {
-        fs.unlink(`../app/public/${avatar}`, (err) => {
-          if (err) throw err;
-        });
-      }
-    }
-
-    columns += "nick =?";
-    const updateAccount = `UPDATE user set about = ?, ${columns} where id = ?`;
-    db.query(updateAccount, value, (err) => {
+    [prevAvatar, prevBaner].forEach((e, index) => {
+      if (!newFile[index]) return value.push(e);
+      value.push(`/users-pictures/${newFile[index][0]["filename"]}`);
+      if (e === "/images/baner.png" || e === "/images/user.svg") return;
+      fs.unlink(`../app/public/${e}`, (err) => {
+        if (err) throw Error(err);
+      });
+    });
+console.log(newFile)
+    const updateAccount = `UPDATE user set about =?, nick =?, avatar =?, baner =? where id = ?`;
+    db.query(updateAccount, [...value, id], (err) => {
       if (err) throw Error(`Error with database #update-profile: ${err}`);
-      value.splice(0, 1);
-      const commandTwo = `UPDATE user_comments set ${columns} where ownerID = ?`;
-      db.query(commandTwo, value, (err) => {
+      const commandTwo = `UPDATE user_comments set nick=?,avatar =? where ownerID = ?`;
+      db.query(commandTwo, [nick, value.slice(2, 3), id], (err) => {
         if (err)
           throw Error(`Erorr with database #update-profile-commets: ${err}`);
-        res.json({ imgSrc: imgSrc }).status(200);
+        res.json({ avatar: value[2], baner: value[3] });
       });
     });
   } catch (err) {

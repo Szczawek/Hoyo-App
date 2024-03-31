@@ -2,7 +2,7 @@ import { useContext, useRef, useState } from "react";
 import Timer from "./Timer";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
-export default function ConfirmEmail() {
+export default function ConfirmEmail({ closeConfrimGate }) {
   const navigate = useNavigate();
   const { verifyLogged } = useContext(UserContext);
   const checkCodeBtn = useRef(null);
@@ -40,6 +40,7 @@ export default function ConfirmEmail() {
       if (!res.ok) return console.error(`Invalid code: ${res.status}`);
       const { nick } = await res.json();
       verifyLogged();
+      closeConfrimGate();
       navigate(`/${nick}`);
     } catch (err) {
       throw err;
@@ -62,6 +63,7 @@ export default function ConfirmEmail() {
                   id={`box-${index}`}
                   className="num_box"
                   maxLength={1}
+                  placeholder="num"
                   onChange={(e) => {
                     setCode((prev) => {
                       const copy = { ...prev };
@@ -85,7 +87,7 @@ export default function ConfirmEmail() {
         </div>
       </div>
       <Timer stopBtnFn={disabledBtn} />
-      <button ref={checkCodeBtn} className="confirm check_code">
+      <button ref={checkCodeBtn} className="confirm temporary">
         Check Code
       </button>
     </form>

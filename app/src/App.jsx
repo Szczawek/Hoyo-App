@@ -22,7 +22,7 @@ const std = {
   likes: [],
 };
 export default function App() {
-  // to change in the future 
+  // to change in the future
   const [confrimCodePath, setConfirmCodePath] = useState(true);
   const [userData, setUserData] = useState(std);
 
@@ -38,7 +38,6 @@ export default function App() {
       });
       if (!response.ok) return setUserData(std);
       const obj = await response.json();
-      console.log(obj)
       if (!obj["avatar"]) obj["avatar"] = "/images/user.svg";
       setUserData(obj);
     } catch (err) {
@@ -83,6 +82,10 @@ export default function App() {
       following: copy,
     }));
   }
+
+  function protectPath() {
+    setConfirmCodePath((prev) => !prev);
+  }
   return (
     <>
       <Suspense fallback={<div className="loading">Loading...</div>}>
@@ -102,9 +105,16 @@ export default function App() {
               <Route path="info" element={<Info />} />
               <Route path="empty-user/" element={<EmptyUser data={userData} />}>
                 <Route index element={<LoginAccount />} />
-                <Route path="create-account" element={<CreateAccount />} />
+                <Route
+                  path="create-account"
+                  element={<CreateAccount openConfrimGate={protectPath} />}
+                />
                 {confrimCodePath && (
-                  <Route path="confirm-email" element={<ConfirmEmail />} />
+                  <Route
+                    path="confirm-email"
+                    closeConfirmGate={protectPath}
+                    element={<ConfirmEmail />}
+                  />
                 )}
                 <Route path="*" element={<NotFoundAcc />} />
               </Route>

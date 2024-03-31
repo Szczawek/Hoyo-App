@@ -38,6 +38,7 @@ const Profile = memo(function Profile({ user }) {
       <div className="bg-img"></div>
       <header className="profile">
         <div className="baner">
+          <img src={user["baner"]} className="baner-img" alt="baner" />
           <div className="container">
             <div className="avatar big">
               <img src={user["avatar"]} alt="profile image" />
@@ -68,7 +69,7 @@ const Profile = memo(function Profile({ user }) {
                 tabIndex={0}
                 onClick={() => menuDoor()}
                 className="open_menu_btn">
-                <img src="/images/settings.svg" alt="" />
+                <img src="/images/settings.svg" alt="Open Settings" />
               </button>
             ) : (
               <Menu closeMenu={menuDoor} />
@@ -77,6 +78,7 @@ const Profile = memo(function Profile({ user }) {
         </div>
         <div className="account_description">
           <h2 className="nick">{user["nick"]}</h2>
+          <small>@{user["hashName"]}</small>
           <p className="about">{user["about"]}</p>
         </div>
         <Follow followers={user["followers"]} following={user["following"]} />

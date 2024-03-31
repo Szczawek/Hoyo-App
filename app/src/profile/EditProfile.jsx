@@ -4,41 +4,59 @@ import { useNavigate } from "react-router-dom";
 import updateProfileData from "./updateProfileData";
 export default function EditProfile() {
   const { userData, updateUserData } = useContext(UserContext);
-  const { nick, about, avatar, id } = userData;
+  const { nick, about, avatar, id, baner } = userData;
   const [data, setData] = useState({ nick, about, id });
   const [img, setImg] = useState(avatar);
-  const [file, setFile] = useState();
+  const [imgFile, setImgFile] = useState();
+  const [banerFile, setBanerFile] = useState();
+  const [backgroudImage, setBackgroundImage] = useState(baner);
   const navigate = useNavigate();
 
+  function newLocation(place) {
+    navigate(`${place}`);
+  }
+
   async function haddleSaveData(e) {
+    e.preventDefault();
     const comandRule =
-      data["nick"] === nick && data["about"] === about && img === avatar;
+      data["nick"] === nick &&
+      data["about"] === about &&
+      !imgFile &&
+      !banerFile;
     updateProfileData(
-      navigate,
+      newLocation,
       comandRule,
-      e,
-      img,
       data,
       avatar,
       updateUserData,
-      file
+      imgFile,
+      banerFile,
+      baner
     );
   }
   // UPDATE IMG
-  function handleUpdataImg(e) {
-    const fileImg = e.target.files[0];
-    if (!fileImg) return;
-    setFile(fileImg);
+  function handleUpdataImg(e, type) {
+    const file = e.target.files[0];
+    if (!file) return;
     const render = new FileReader();
-    render.readAsDataURL(fileImg);
+    render.readAsDataURL(file);
     render.onload = () => {
-      setImg(render.result);
+      switch (type) {
+        case "avatar":
+          setImgFile(file);
+          setImg(render.result);
+          break;
+        case "baner":
+          setBanerFile(file);
+          setBackgroundImage(render.result);
+          break;
+      }
     };
   }
 
   return (
     <div className="edit_window">
-      <form onSubmit={haddleSaveData}>
+      <form onSubmit={(e) => haddleSaveData(e)}>
         <header>
           <h3>Edit Profile</h3>
           <button className="cancel" type="button" onClick={() => navigate(-1)}>
@@ -50,24 +68,46 @@ export default function EditProfile() {
             </svg>
           </button>
         </header>
-        <label className="avatar" htmlFor="choose_img">
-          <img className="profile_img" src={img} alt="avatar" />
-          <img
-            className="add_icon"
-            src="/images/add_photo.svg"
-            alt="decoration"
-          />
-
-          <input
-            accept="image/.png, .jpg, .jpeg"
-            type="file"
-            onChange={handleUpdataImg}
-            id="choose_img"
-          />
-        </label>
-        <small className="complement">
-          Click on the image to select a new image
-        </small>
+        <div className="set_images">
+          <label className="baner" htmlFor="backgroundImage-file">
+            <img className="baner-img" src={backgroudImage} alt="baner" />
+            <input
+              onChange={(e) => handleUpdataImg(e, "baner")}
+              type="file"
+              id="backgroundImage-file"
+            />
+            <div className="add_image_box">
+              <div className="icon_box">
+                <img
+                  className="add_icon"
+                  src="/images/add_photo.svg"
+                  alt="decoration"
+                />
+              </div>
+            </div>
+            <label className="avatar profile" htmlFor="choose_img">
+              <img className="profile_img" src={img} alt="avatar" />
+              <div className="add_image_box">
+                <div className="icon_box">
+                  <img
+                    className="add_icon"
+                    src="/images/add_photo.svg"
+                    alt="decoration"
+                  />
+                </div>
+              </div>
+              <input
+                accept="image/.png, .jpg, .jpeg"
+                type="file"
+                onChange={(e) => handleUpdataImg(e, "avatar")}
+                id="choose_img"
+              />
+            </label>
+          </label>
+          <small className="complement">
+            Click on the image to select a new image
+          </small>
+        </div>
         <label
           className="tip"
           htmlFor="change_nick

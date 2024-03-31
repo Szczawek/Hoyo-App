@@ -16,16 +16,11 @@ Dodać polskie znaki do tworzenia konta w from CreateAccount
 
 # dodać wydajne doadawnie liczby podkomentarzy
 
-# add
-
-dodać potwierdzanie emaila
-
 # To fix
 
 w Like zmienić alert na p> z wiadomością, gdy nie usern nie jest zalogowany
 
 # idea
-
 dodać animacje wsuwania karty profile podczas wszchodzenie na profil innego użytkownika w searchBar
 
 # account
@@ -41,7 +36,3 @@ tablicy useEffect, by po upływnie czasu resetowało code
 zaszyfrować ją,
 naprawić wydajność
 dowiedzieć się czemu funcka sendCode wywołue się dwa razy
-
-# Error Creator 
-
-Dodać możliwość logowanie się, gdy chcesz dodać com, ale nie jesteś zalogowany.

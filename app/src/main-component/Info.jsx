@@ -2,30 +2,28 @@ import YouTube from "react-youtube";
 import Account from "../account/Account";
 import { useEffect } from "react";
 export default function Info() {
-  const opts = {
-    height: "390",
-    width: "640",
-    playerVars: {
-      autoplay: 1,
-    },
-  };
-  const tt = Number([1,2].join("")) * 1000
-  console.log(tt)
-
-  localStorage.setItem("ttd", new Date());
-  useEffect(() => {
-    fetch("https://localhost:443/code-timer", {
-      credentials: "include",
-    });
-  }, []);
-  function onPlayerReady(event) {
-    // access to player in all event handlers via event.target
-    event.target.pauseVideo();
+  async function tt() {
+    try {
+      const ss = [1, 12, 3];
+      for (const item of ss) {
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            console.log(1);
+            resolve();
+          }, 1500);
+        });
+      }
+      console.log(2);
+    } catch (err) {
+      throw err;
+    }
   }
+
   return (
     <div className="info">
       <h3>Info</h3>
       <p>12</p>
+      <button onClick={() => tt()}>X</button>
       {/* <YouTube id="6UlU_FsicK8" opts={opts} onReady={onPlayerReady} /> */}
     </div>
   );
