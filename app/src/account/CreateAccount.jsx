@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function CreateAccount({ openConfrimGate }) {
+export default function CreateAccount() {
   const [warning, setWarning] = useState(false);
   const [eyelock, setEyelock] = useState(true);
   const inputPassword = useRef(null);
@@ -30,8 +30,9 @@ export default function CreateAccount({ openConfrimGate }) {
         setWarning(true);
         return console.error(`${obj}: ${res.status}`);
       }
-      openConfrimGate();
-      navigate("/empty-user/confirm-email");
+      console.log(1)
+
+      navigate("/empty-user/confirm-email")
     } catch (err) {
       throw err;
     }
@@ -60,6 +61,9 @@ export default function CreateAccount({ openConfrimGate }) {
   }
   return (
     <form onSubmit={(e) => checkAccountAvailability(e)}>
+      <button type="button" onClick={() => [
+        navigate("/empty-user/confirm-email")
+      ]}>X</button>
       <header>
         <h2>Create Account</h2>
       </header>

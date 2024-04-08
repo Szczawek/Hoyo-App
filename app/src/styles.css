@@ -1021,15 +1021,35 @@ button.confirm:is(:hover, :focus) {
 }
 
 /* share in panel */
-.comment .copy-message {
+.comment .alert_message {
+position: fixed;
+top: 1rem;
+left: 50%;
+z-index: 999;
+border-radius: .2rem;
+overflow: hidden;
+padding: .4rem .8rem;
+background-color: var(--component-contrast-green);
+}
+.comment .alert_message span {
+  width: 100%;
   position: absolute;
-  bottom: 0.7rem;
-  border-radius: 0.2rem;
-  padding: 0.2rem 0.6rem;
-  background-color: var(--confirm);
-  left: 50%;
+  height: 4px;
+  bottom: 0px;
+  left: -100%;
+  border-radius: 0 0 .2rem.2rem;
+  background-color: red;
+animation: 3s bar;
 }
 
+@keyframes bar {
+  0%{
+  }
+  100%{
+    translate: 100% 0;
+  }
+  
+}
 /* like in panel */
 .comment .super {
   fill: #1e3050;
@@ -1118,6 +1138,32 @@ button.confirm:is(:hover, :focus) {
   scale: 1.2;
 }
 
+/* PLAYGROUND */
+.playground {
+  display: grid;
+  grid-template-columns: repeat(3, 4rem);
+  gap: 1rem;
+}
+.playground p {
+  text-align: center;
+  border-radius: .4rem;
+  cursor:grabbing;
+  transition: filter 300ms;
+}
+
+.playground .delta {
+  background-color: purple;;
+}
+.playground .circle {
+  background-color:pink;
+}
+.playground .square {
+  background-color:green;
+}
+.playground p:is(:hover,:focus-visible) {
+  filter: brightness(70%);
+}
+
 @media (max-width: 630px) {
   /* Navigation */
   .navigation_case {
@@ -1201,13 +1247,6 @@ button.confirm:is(:hover, :focus) {
   }
   .user .bg-img .avatar {
     max-width: 3.2rem;
-  }
-  /* comment SHare */
-  .comment .copy-message {
-    left: auto;
-    font-size: 0.8rem;
-    right: 0.5rem;
-    padding-inline: 0.2rem;
   }
 }
 

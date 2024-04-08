@@ -18,16 +18,13 @@ Dodać polskie znaki do tworzenia konta w from CreateAccount
 
 # To fix
 
+# 50% działa dodać ograniczenie spawmowanie w like
 w Like zmienić alert na p> z wiadomością, gdy nie usern nie jest zalogowany
+
 
 # idea
 dodać animacje wsuwania karty profile podczas wszchodzenie na profil innego użytkownika w searchBar
 
-# account
-
-dodać code z inp do sprawdzenie poprawności kodu,
-dodac setInerwal(() =>) ustawiony na 3min, zapisać jego do zmiennej i zmienną dodać do
-tablicy useEffect, by po upływnie czasu resetowało code
 
 # zaszyfrować code w ciasteczka
 
@@ -36,3 +33,6 @@ tablicy useEffect, by po upływnie czasu resetowało code
 zaszyfrować ją,
 naprawić wydajność
 dowiedzieć się czemu funcka sendCode wywołue się dwa razy
+
+
+# Zminić Post na różne odpowiadające jemy REST np DELETE,PUT,GET

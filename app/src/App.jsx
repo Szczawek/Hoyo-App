@@ -9,7 +9,6 @@ const User = lazy(() => import("./main-component/User"));
 const Replies = lazy(() => import("./main-component/Replies"));
 const Settings = lazy(() => import("./main-component/Settings"));
 const NotFound = lazy(() => import("./main-component/NotFound"));
-const Account = lazy(() => import("./account/Account"));
 const Empty = lazy(() => import("./main-component/Empty"));
 import LoginAccount from "./account/LoginAccount";
 import ConfirmEmail from "./account/ConfirmEmail";
@@ -22,14 +21,11 @@ const std = {
   likes: [],
 };
 export default function App() {
-  // to change in the future
-  const [confrimCodePath, setConfirmCodePath] = useState(true);
   const [userData, setUserData] = useState(std);
 
   useEffect(() => {
     verifyLogged();
   }, []);
-
   // Check if the user is logged in
   async function verifyLogged() {
     try {
@@ -83,9 +79,6 @@ export default function App() {
     }));
   }
 
-  function protectPath() {
-    setConfirmCodePath((prev) => !prev);
-  }
   return (
     <>
       <Suspense fallback={<div className="loading">Loading...</div>}>
@@ -103,19 +96,14 @@ export default function App() {
               <Route path="home" element={<Home session={userData["id"]} />} />
               <Route path="news" element={<News />} />
               <Route path="info" element={<Info />} />
-              <Route path="empty-user/" element={<EmptyUser data={userData} />}>
+              <Route
+                path="empty-user/*"
+                element={<EmptyUser data={userData} />}>
                 <Route index element={<LoginAccount />} />
-                <Route
-                  path="create-account"
-                  element={<CreateAccount openConfrimGate={protectPath} />}
-                />
-                {confrimCodePath && (
-                  <Route
-                    path="confirm-email"
-                    closeConfirmGate={protectPath}
-                    element={<ConfirmEmail />}
-                  />
-                )}
+                <Route path="create-account" element={<CreateAccount />} />
+
+                <Route path="confirm-email" element={<ConfirmEmail />} />
+
                 <Route path="*" element={<NotFoundAcc />} />
               </Route>
               <Route path="settings" element={<Settings />} />

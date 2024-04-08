@@ -4,10 +4,10 @@ export default function Share({ id }) {
   const [shareWin, setShareWin] = useState();
   return (
     <>
-      {shareWin ? (
-        <p className="copy-message">Copied link</p>
+      {shareWin? (
+        <p className="alert_message">Copied link <span className="bar"></span></p>
       ) : shareWin !== undefined ? (
-        <p className="copy-message">Error wtih link</p>
+        <p className="alert_message">Error wtih link <span className="bar"></span></p>
       ) : null}
       <div
         className="share"
@@ -23,7 +23,7 @@ export default function Share({ id }) {
           } finally {
             setTimeout(() => {
               setShareWin();
-            }, 1000);
+            }, 3000);
           }
         }}>
         <div className="svg-parent">

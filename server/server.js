@@ -9,26 +9,26 @@ import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import nodemailer from "nodemailer";
-
+import jwt from "jsonwebtoken";
+import imgur from "imgur";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.ethereal.email",
   port: 465,
   secure: true,
   auth: {
-    user: "earthwenus@gmail.com",
-    pass: `rwij fvhe npay fpit`,
+    user: process.env.GMAIL_LOGIN,
+    pass: process.env.GMAIL_PASSWORD,
   },
 });
 
 // Dodaj middleware do obsługi żądań HTTPS
 const options = {
-  key: fs.readFileSync("server.key"),
-  cert: fs.readFileSync("server.cert"),
+  key: process.env.KEY_KEY,
+  cert: process.env.CERT_KEY,
 };
 
 const PORT = 443;
-// const PORT = 80;
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -73,6 +73,21 @@ const upload = multer({
   },
 });
 
+// const client = new ImgurClient({
+//   clientId: "	fed77e32bf8fdcb",
+//   clientSecret: "41fd6a1fa4188c6857341a9c1d2f728d96b7e4dd",
+// });
+// app.post("/test",async (req,res) => {
+//  imgur.uploadFile("../app/public/images/baner.png").then(e => {
+
+//    console.log(e)
+//  })
+//  await client.upload({
+//     image: fs.createReadStream('../app/public/image/baner.png'),
+//     type: 'stream',
+//   })
+// res.sendStatus(200)
+// })
 // create comment
 app.post("/create-comment", (req, res) => {
   const { ownerID, nick, avatar, content, reply } = req.body;
@@ -187,7 +202,7 @@ app.get("/users:nick", function (req, res) {
 
 // Check if email is already in use
 app.post("/account-availability", async (req, res) => {
-  const { login, password, nick,name } = req.body;
+  const { login, password, nick, name } = req.body;
   const findUserCmd = "SELECT id from user where login = ? OR nick = ?";
   try {
     const user = await new Promise((resolve) => {
@@ -200,12 +215,16 @@ app.post("/account-availability", async (req, res) => {
 
     if (user)
       return res.status(400).json("Account with that email already exists!");
-    res.cookie("createAccountData", JSON.stringify({ login, password, nick,name }), {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      maxAge: 1000 * 60 * 60,
-    });
+    res.cookie(
+      "createAccountData",
+      JSON.stringify({ login, password, nick, name }),
+      {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 1000 * 60 * 60,
+      }
+    );
     sendConfrimCode(res, login);
     res.json("Account message");
   } catch (err) {
@@ -250,8 +269,7 @@ app.post("/refresh", (req, res) => {
   const { createAccountData } = req.cookies;
   if (!createAccountData) return res.sendStatus(400);
   const { login } = JSON.parse(createAccountData);
-  console.log(login);
-  // sendConfrimCode(res, login);
+  sendConfrimCode(res, login);
   res.sendStatus(200);
 });
 
@@ -297,7 +315,7 @@ async function createAccount(req, res, userData) {
       new Date(),
       "/images/user.svg",
       name,
-      "/images/baner.png"
+      "/images/baner.png",
     ];
     await new Promise((resolve) => {
       db.query(addAccount, values, (err) => {
@@ -394,9 +412,10 @@ function setLoggedCookies(id, res) {
     JSON.stringify(id),
     process.env.COOKIE_KEY
   ).toString();
-  res.cookie("logged", encryptID, {
+  const token = jwt.sign(encryptID, process.env.ACCOUNT_ACCESS_KEY);
+  res.cookie("logged", token, {
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 60 * 24,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
     sameSite: "none",
     secure: true,
   });
@@ -417,9 +436,10 @@ app.get("/logged", async (req, res) => {
     const { logged } = req.cookies;
     if (!logged) return res.sendStatus(400);
     // decrypt cookie
-    const bytes = CryptoJS.AES.decrypt(logged, process.env.COOKIE_KEY);
+    const firstBarrier = jwt.verify(logged, process.env.ACCOUNT_ACCESS_KEY);
+    console.log(firstBarrier);
+    const bytes = CryptoJS.AES.decrypt(firstBarrier, process.env.COOKIE_KEY);
     const id = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-
     // download user dates
     const userData = await new Promise((resolve) => {
       const command =
@@ -514,7 +534,7 @@ app.post("/update-profile", donwloadFileFN, async (req, res) => {
         if (err) throw Error(err);
       });
     });
-console.log(newFile)
+    console.log(avatar);
     const updateAccount = `UPDATE user set about =?, nick =?, avatar =?, baner =? where id = ?`;
     db.query(updateAccount, [...value, id], (err) => {
       if (err) throw Error(`Error with database #update-profile: ${err}`);

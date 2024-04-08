@@ -3,6 +3,7 @@ import { UserContext } from "../App";
 
 export default function Like(props) {
   const { comID, comLikes } = props;
+  const [likeAction, setLikeAction] = useState();
   const { userData, updateLikes } = useContext(UserContext);
   const { id, likes } = userData;
   const [liked, setLiked] = useState(likes.includes(comID));
@@ -30,13 +31,25 @@ export default function Like(props) {
       throw Error(`Error when awarding likes: ${err}`);
     }
   }
+
   return (
     <>
+      {likeAction && (
+        <p className="alert_message">
+          Login to your account! <span className="bar"></span>
+        </p>
+      )}
       <button
         title="like"
         className="super"
         onClick={() => {
-          if (!id) return alert("Login to your account to give a like");
+          if (!id) {
+            setLikeAction(true);
+            setTimeout(() => {
+              setLikeAction();
+            }, 3000);
+            return;
+          }
           like();
         }}>
         <div className="svg-parent">

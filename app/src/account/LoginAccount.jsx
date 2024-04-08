@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-export default function LoginAccount({ nextPage }) {
+export default function LoginAccount() {
   const [warningMessage, setWarningMessage] = useState(false);
   const [account, setAccount] = useState({ login: "", password: "" });
   const [eyelock, setEyelock] = useState(true);

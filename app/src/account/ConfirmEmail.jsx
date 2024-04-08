@@ -37,6 +37,7 @@ export default function ConfirmEmail({ closeConfrimGate }) {
         },
         body: JSON.stringify({ codeToCheck }),
       });
+      console.log(1)
       if (!res.ok) return console.error(`Invalid code: ${res.status}`);
       const { nick } = await res.json();
       verifyLogged();

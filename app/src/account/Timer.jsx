@@ -4,13 +4,14 @@ export default function Timer({ stopBtnFn }) {
   const [duration, setDuration] = useState(180000);
   const [minutes, setMinutes] = useState(3);
   const [seconds, setSeconds] = useState(0);
+  const [warning, setWarning] = useState(false);
   const [disabledBtn, setDisabledBtn] = useState(true);
   useEffect(() => {
     const interval = setInterval(startTimer, 1000);
     const timer = setTimeout(() => {
       clearInterval(interval);
       stopBtnFn();
-      setDisabledBtn(false);
+      if (!warning) setDisabledBtn(false);
     }, duration);
 
     return () => {
@@ -26,6 +27,7 @@ export default function Timer({ stopBtnFn }) {
       });
       if (!res.ok) {
         console.error(res.status);
+        setWarning(true);
         setDuration(0);
         setMinutes(0);
         setSeconds(0);
