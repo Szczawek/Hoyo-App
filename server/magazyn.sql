@@ -67,3 +67,35 @@ UPDATE TABLE user set "./images/baner.png" where id > 0
 SELECT * from user_comments
 
 UPDATE user_comments SET avatar = "/images/user.svg" where nick = "Deku";
+
+
+
+SHOW DATABASEs
+
+use test
+
+SHOW TABLESPACE
+
+use mySQL
+
+SHOW TABLESPACE
+
+SELECT * FROM `user`
+
+use magazine 
+
+show tables
+
+
+SHOW CREATE TABLE user_comments
+
+
+
+SELECT * FROM user_comments
+
+
+SHOW CREATE TABLE followers
+
+
+
+SELECT * FROM user

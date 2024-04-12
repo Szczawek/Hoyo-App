@@ -37,8 +37,6 @@ export default function SearchBar() {
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && e.target.checkValidity()) {
-            // defaultSettings();
-            // input.current.blur();
             navigate(`/${e.target.value}`);
           }
         }}

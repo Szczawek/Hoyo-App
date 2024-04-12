@@ -30,9 +30,9 @@ export default function CreateAccount() {
         setWarning(true);
         return console.error(`${obj}: ${res.status}`);
       }
-      console.log(1)
+      console.log(1);
 
-      navigate("/empty-user/confirm-email")
+      navigate("/empty-user/confirm-email");
     } catch (err) {
       throw err;
     }
@@ -61,9 +61,6 @@ export default function CreateAccount() {
   }
   return (
     <form onSubmit={(e) => checkAccountAvailability(e)}>
-      <button type="button" onClick={() => [
-        navigate("/empty-user/confirm-email")
-      ]}>X</button>
       <header>
         <h2>Create Account</h2>
       </header>

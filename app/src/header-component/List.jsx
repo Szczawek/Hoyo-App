@@ -36,10 +36,11 @@ export default function List({ value, fn }) {
   if (!list.length || value === "") return <p className="empty">Nothing</p>;
   return (
     <ul className="list">
-      {list.map((data, index) => {
+      {list.slice(0, 5).map((data, index) => {
         return (
           <li key={index}>
             <Link
+              className="users_list_link"
               ref={currentItem === index + 1 ? itemInList : null}
               onClick={() => fn()}
               onKeyDown={(e) => {
@@ -49,7 +50,13 @@ export default function List({ value, fn }) {
                 }
               }}
               to={`/${data["nick"]}`}>
-              {data["nick"]}
+              <div className="avatar">
+                <img src={data["avatar"]} alt="avatar" />
+              </div>
+              <div className="names">
+                <p className="name">{data["nick"]}</p>
+                <p className="hashName">@{data["hashName"]}</p>
+              </div>
             </Link>
           </li>
         );

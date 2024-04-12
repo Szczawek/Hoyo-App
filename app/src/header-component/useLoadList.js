@@ -16,7 +16,14 @@ export default function useLoadList(value) {
 
     loadUserList();
   }, []);
-  return obj.filter((e) =>
-    e["nick"].toLowerCase().startsWith(value.toLowerCase())
-  );
+
+  function filterUsers(e) {
+    const findNick = e["nick"].toLowerCase().includes(value.toLowerCase());
+    const findHashName = e["hashName"]
+      .toLowerCase()
+      .includes(value.toLowerCase());
+    if (findNick || findHashName) return true;
+    return false;
+  }
+  return obj.filter(filterUsers);
 }

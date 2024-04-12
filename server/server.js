@@ -10,7 +10,6 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
-import imgur from "imgur";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.ethereal.email",
@@ -73,21 +72,6 @@ const upload = multer({
   },
 });
 
-// const client = new ImgurClient({
-//   clientId: "	fed77e32bf8fdcb",
-//   clientSecret: "41fd6a1fa4188c6857341a9c1d2f728d96b7e4dd",
-// });
-// app.post("/test",async (req,res) => {
-//  imgur.uploadFile("../app/public/images/baner.png").then(e => {
-
-//    console.log(e)
-//  })
-//  await client.upload({
-//     image: fs.createReadStream('../app/public/image/baner.png'),
-//     type: 'stream',
-//   })
-// res.sendStatus(200)
-// })
 // create comment
 app.post("/create-comment", (req, res) => {
   const { ownerID, nick, avatar, content, reply } = req.body;
@@ -481,7 +465,7 @@ app.get("/logged", async (req, res) => {
 
 // Donwload ALL users
 app.get("/account-list", (req, res) => {
-  const command = "SELECT nick, avatar FROM `user`";
+  const command = "SELECT nick, avatar,hashName FROM `user`";
   db.query(command, function (err, users) {
     if (err) throw Error(`Error with database #users-list: ${err}`);
     res.json(users);
