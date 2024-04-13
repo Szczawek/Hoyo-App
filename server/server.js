@@ -74,17 +74,18 @@ const upload = multer({
 
 // create comment
 app.post("/create-comment", (req, res) => {
-  const { ownerID, nick, avatar, content, reply } = req.body;
+  const { ownerID, nick, avatar, content, reply, hashName } = req.body;
   const value = [
     ownerID,
     nick,
     avatar,
     content,
+    hashName,
     new Date(),
     reply ? reply : null,
   ];
   const command =
-    "INSERT INTO user_comments(`ownerID`, nick , avatar , content ,date ,reply) VALUES(?,?,?,?,?,?)";
+    "INSERT INTO user_comments(`ownerID`, nick , avatar , content,hashName ,date ,reply) VALUES(?,?,?,?,?,?,?)";
   db.query(command, value, (err) => {
     if (err) throw Error(`Error with database #create-comment: ${err}`);
     const lastComment = "SELECT * FROM user_comments ORDER BY id DESC LIMIT 1";
@@ -173,12 +174,11 @@ app.post("/remove-comment", (req, res) => {
 });
 
 // Load User Profile date
-app.get("/users:nick", function (req, res) {
-  const { nick } = req.params;
-
+app.get("/users:hashName", function (req, res) {
+  const { hashName } = req.params;
   const command =
-    "SELECT nick, about, avatar,baner,hashName, id,(SELECT COUNT(ID) FROM followers where personID = user.id) as followers,(SELECT COUNT(ID) from followers where ownerID = user.id) as following from user where nick = ?";
-  db.query(command, [nick], (err, result) => {
+    "SELECT nick, about, avatar,baner,hashName, id,(SELECT COUNT(ID) FROM followers where personID = user.id) as followers,(SELECT COUNT(ID) from followers where ownerID = user.id) as following from user where hashName = ?";
+  db.query(command, [hashName], (err, result) => {
     if (err) throw Error(`Error with database #users userData: ${err}`);
     res.json(result);
   });
@@ -209,13 +209,12 @@ app.post("/account-availability", async (req, res) => {
         maxAge: 1000 * 60 * 60,
       }
     );
-    sendConfrimCode(res, login);
+    await sendConfrimCode(res, login);
     res.json("Account message");
   } catch (err) {
     throw err;
   }
 });
-
 async function sendConfrimCode(res, login) {
   try {
     const arrayWithCode = [];
@@ -223,9 +222,11 @@ async function sendConfrimCode(res, login) {
       arrayWithCode.push(Math.round(Math.random() * 9));
     }
     const code = arrayWithCode.join("");
-    res.cookie(
+    const encryptCode = await encryption(code, 5);
+    console.log({ Code: code });
+    await res.cookie(
       "confirmCode",
-      JSON.stringify({ code: Number(code), timer: new Date() }),
+      JSON.stringify({ code: encryptCode, timer: new Date() }),
       {
         httpOnly: true,
         sameSite: "none",
@@ -277,9 +278,10 @@ app.post("/confirm-code", async (req, res) => {
   const { createAccountData, confirmCode } = req.cookies;
   const createAccountDataObj = JSON.parse(createAccountData);
   const { code } = JSON.parse(confirmCode);
-  if (codeToCheck === code) {
+  const decodeCode = await bcrypt.compare(String(codeToCheck), code);
+  if (decodeCode) {
     await createAccount(req, res, createAccountDataObj);
-    return res.json({ nick: createAccountDataObj["nick"] });
+    return res.json({ nick: createAccountDataObj["hashName"] });
   }
   res.status(400).json(":/");
 });
@@ -290,7 +292,7 @@ async function createAccount(req, res, userData) {
   const addAccount =
     "INSERT INTO user(login,nick,password,about,date,avatar,hashName,baner) values(?,?,?,?,?,?,?,?)";
   try {
-    const newPassword = await encryption(password);
+    const newPassword = await encryption(password, 10);
     const values = [
       login,
       nick,
@@ -334,21 +336,21 @@ async function createAccount(req, res, userData) {
 }
 
 // password encryption
-async function encryption(e) {
-  return await bcrypt.hash(e, 10);
+async function encryption(e, salt) {
+  return await bcrypt.hash(e, salt);
 }
 
-// remove account
-app.post("/remove", function (req, res) {
+// Delete Profile
+app.delete("/delete-account", function (req, res) {
   const command = "DELETE from user where id =?";
   const commandComments = "DELETE from user_comments where ownerID =?";
   const commandLikes = "DELETE from likes where userID = ?";
   const removeFollowers = "DELETE from followers where ownerID =?";
-  const bytes = CryptoJS.AES.decrypt(
-    req.cookies["logged"],
-    process.env.COOKIE_KEY
-  );
+  const { logged } = req.cookies;
+  const firstBarrier = jwt.verify(logged, process.env.ACCOUNT_ACCESS_KEY);
+  const bytes = CryptoJS.AES.decrypt(firstBarrier, process.env.COOKIE_KEY);
   const id = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
   res.clearCookie("logged", { httpOnly: true });
   db.query(command, [id], function (err) {
     if (err) throw Error(`Error with database #remove: ${err}`);
@@ -421,7 +423,6 @@ app.get("/logged", async (req, res) => {
     if (!logged) return res.sendStatus(400);
     // decrypt cookie
     const firstBarrier = jwt.verify(logged, process.env.ACCOUNT_ACCESS_KEY);
-    console.log(firstBarrier);
     const bytes = CryptoJS.AES.decrypt(firstBarrier, process.env.COOKIE_KEY);
     const id = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
     // download user dates
@@ -501,7 +502,8 @@ const donwloadFileFN = upload.fields([
   { name: "baner", maxCount: 1, optionals: true },
 ]);
 
-app.post("/update-profile", donwloadFileFN, async (req, res) => {
+// Edit Profile Data(nick,baner,avatar,about)
+app.put("/update-profile", donwloadFileFN, async (req, res) => {
   const { avatar, baner } = req.files;
   const { nick, about, id, prevAvatar, prevBaner } = JSON.parse(
     req.body["data"]
@@ -518,7 +520,6 @@ app.post("/update-profile", donwloadFileFN, async (req, res) => {
         if (err) throw Error(err);
       });
     });
-    console.log(avatar);
     const updateAccount = `UPDATE user set about =?, nick =?, avatar =?, baner =? where id = ?`;
     db.query(updateAccount, [...value, id], (err) => {
       if (err) throw Error(`Error with database #update-profile: ${err}`);
@@ -534,7 +535,7 @@ app.post("/update-profile", donwloadFileFN, async (req, res) => {
   }
 });
 
-// folowers
+// add/remove follow
 app.post("/follow", (req, res) => {
   function deleteFollow(e) {
     const command = "DELETE FROM followers where id =?";

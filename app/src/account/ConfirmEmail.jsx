@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Timer from "./Timer";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../App";
@@ -6,6 +6,8 @@ export default function ConfirmEmail({ closeConfrimGate }) {
   const navigate = useNavigate();
   const { verifyLogged } = useContext(UserContext);
   const checkCodeBtn = useRef(null);
+  const [positionFocusedElement, setPositionFocusedElement] = useState(0);
+  const focusedElement = useRef(null);
   const [code, setCode] = useState({
     0: "",
     1: "",
@@ -37,7 +39,6 @@ export default function ConfirmEmail({ closeConfrimGate }) {
         },
         body: JSON.stringify({ codeToCheck }),
       });
-      console.log(1)
       if (!res.ok) return console.error(`Invalid code: ${res.status}`);
       const { nick } = await res.json();
       verifyLogged();
@@ -47,6 +48,26 @@ export default function ConfirmEmail({ closeConfrimGate }) {
       throw err;
     }
   }
+  useEffect(() => {
+    focusedElement.current.focus();
+
+    function putFocusOnItem(e) {
+      switch (e.key) {
+        case "ArrowDown":
+          if (positionFocusedElement != 0)
+            setPositionFocusedElement((prev) => prev - 1);
+          break;
+        case "ArrowUp":
+        case "Tab":
+          if (positionFocusedElement != 5)
+            setPositionFocusedElement((prev) => prev + 1);
+      }
+    }
+
+    document.addEventListener("keydown", putFocusOnItem);
+    return () => document.removeEventListener("keydown", putFocusOnItem);
+  }, [positionFocusedElement]);
+
   return (
     <form className="container confirm_email" onSubmit={(e) => confrimCode(e)}>
       <header>
@@ -59,13 +80,17 @@ export default function ConfirmEmail({ closeConfrimGate }) {
             return (
               <label key={index} htmlFor={`box-${index}`}>
                 <input
+                  ref={positionFocusedElement === index ? focusedElement : null}
                   required
-                  value={code[`${index}`]}
+                  onClick={() => setPositionFocusedElement(index)}
+                  value={code[index]}
                   id={`box-${index}`}
                   className="num_box"
                   maxLength={1}
                   placeholder="num"
                   onChange={(e) => {
+                    if (positionFocusedElement != 5 && e.target.value !== "")
+                      setPositionFocusedElement((prev) => prev + 1);
                     setCode((prev) => {
                       const copy = { ...prev };
                       copy[index] = e.target.value;

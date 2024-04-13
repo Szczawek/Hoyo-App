@@ -99,3 +99,22 @@ SHOW CREATE TABLE followers
 
 
 SELECT * FROM user
+
+
+SELECT * FROM user_comments
+
+
+    SELECT * FROM `user` RIGHT JOIN user_comments ON user.id = user_comments.ownerID 
+
+
+    UPDATE user_comments SET hashName = {
+        SELECT `hashName` FROM user where user.id = user_comments.ownerID
+    }
+
+
+    UPDATE user_comments
+SET hashName = (
+    SELECT user.hashName
+    FROM `user`
+    WHERE user.id = user_comments.ownerID
+);

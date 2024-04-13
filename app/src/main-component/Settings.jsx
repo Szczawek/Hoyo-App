@@ -8,8 +8,8 @@ export default function Settings() {
   // Delete account
   async function deleteAccount() {
     try {
-      const res = await fetch("https://localhost:443/remove", {
-        method: "POST",
+      const res = await fetch("https://localhost:443/delete-account", {
+        method: "DELETE",
         credentials: "include",
       });
       if (!res.ok) return console.log(res.status);

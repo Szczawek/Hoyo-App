@@ -11,7 +11,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
   const [loginWindow, setLoginWindow] = useState(false);
   const [expandMenu, setExpandMenu] = useState(false);
   const validation = useRef(null);
-  const { id, nick, avatar } = useContext(UserContext)["userData"];
+  const { id, nick, avatar,hashName } = useContext(UserContext)["userData"];
   const navigate = useNavigate();
   function setWindow() {
     setExpandMenu((prev) => !prev);
@@ -30,6 +30,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
       nick,
       content: value,
       reply,
+      hashName
     };
     try {
       const res = await fetch("https://localhost:443/create-comment", {

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import updateProfileData from "./updateProfileData";
 export default function EditProfile() {
   const { userData, updateUserData } = useContext(UserContext);
-  const { nick, about, avatar, id, baner } = userData;
+  const { nick, about, avatar, id, baner, hashName } = userData;
   const [data, setData] = useState({ nick, about, id });
   const [img, setImg] = useState(avatar);
   const [imgFile, setImgFile] = useState();
@@ -31,7 +31,8 @@ export default function EditProfile() {
       updateUserData,
       imgFile,
       banerFile,
-      baner
+      baner,
+      hashName
     );
   }
   // UPDATE IMG
@@ -118,7 +119,6 @@ export default function EditProfile() {
             value={data["nick"]}
             maxLength={35}
             minLength={2}
-            pattern="\w*"
             title="Nickname must not contain special characters. Minimum length 2 characters"
             onChange={(e) =>
               setData((prev) => ({ ...prev, nick: e.target.value }))

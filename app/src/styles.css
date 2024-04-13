@@ -302,12 +302,60 @@ body {
 /* Confirm Email */
 .confirm_email {
   display: grid;
+  position: relative;
   padding: 2rem;
   max-width: 600px;
   border: 1.5px solid var(--dark-contrast);
   border-radius: 0.2rem;
   row-gap: 2rem;
 }
+
+.confirm_email::after,
+.confirm_email::before {
+  content: "";
+  border: 2px solid rgba(129, 10, 109, 0.671);
+  position: absolute;
+  height: 0.5rem;
+  border-radius: 0.2rem;
+  width: 50%;
+  background-color: rgb(197, 81, 100);
+}
+.confirm_email::before {
+  right: 0;
+  top: -0.1rem;
+  animation: rotatingStickLeft 8s infinite ease-out;
+}
+.confirm_email::after {
+  bottom: -0.1rem;
+  animation: rotatingStickRight 3s infinite ease-out;
+}
+
+@keyframes rotatingStickLeft {
+  0% {
+    background-color: var(--component-contrast-green);
+  }
+  50% {
+    translate: -100% 0;
+    background-color: rgb(173, 13, 173);
+  }
+  100% {
+    background-color: rgb(206, 65, 65);
+  }
+}
+@keyframes rotatingStickRight {
+  0% {
+    background-color: var(--component-contrast-green);
+  }
+
+  50% {
+    translate: 100% 0;
+    background-color: rgb(173, 13, 173);
+  }
+  100% {
+    background-color: rgb(206, 65, 65);
+  }
+}
+
 .confirm_email header {
   text-align: center;
 }
@@ -664,12 +712,13 @@ body {
 }
 
 .edit_window .avatar::before {
-  width: 110%;
+  width: 115%;
   z-index: -1;
+  content: "";
   background-color: var(--very-dark-def);
   position: absolute;
   top: -0.8rem;
-  left: -5%;
+  left: -7.5%;
   border-radius: 50%;
   aspect-ratio: 1/1;
 }
@@ -696,12 +745,12 @@ body {
   border: 2px solid rgb(5, 64, 104);
   box-shadow: 0 0 2rem rgb(174, 0, 255);
   background-color: #15a0a567;
-  width: 4rem;
+  width: 3rem;
   display: grid;
   place-content: center;
   aspect-ratio: 1/1;
   transition: filter, scale, rotate, 350ms ease-out;
-  animation: puls_box 3s infinite ease-in-out;
+  animation: puls_box 3s 1s infinite ease-in-out;
 }
 
 @keyframes puls_box {
@@ -949,6 +998,7 @@ button.confirm:is(:hover, :focus) {
 /* COMMENTS */
 .shelf {
   display: grid;
+  padding-block: 2rem;
   grid-template-columns: 100%;
   row-gap: 1.5rem;
 }
@@ -1002,6 +1052,12 @@ button.confirm:is(:hover, :focus) {
 }
 .comment .nick:hover {
   color: var(--contrast);
+}
+
+.comment .hashName {
+  font-size: .7rem;
+  opacity: .7;
+  font-weight: 500;
 }
 .comment .container {
   display: grid;

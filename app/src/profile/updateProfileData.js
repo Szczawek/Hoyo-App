@@ -7,9 +7,9 @@ export default async function updateProfileData(
   updateUserData,
   imgFile,
   banerFile,
-  baner
+  baner,
+  hashName
 ) {
-
   try {
     if (noChanges) return newLocation(-1);
     const form = new FormData();
@@ -20,7 +20,6 @@ export default async function updateProfileData(
     if (imgFile || banerFile) {
       for (const item of file) {
         if (!item["file"]) continue;
-        console.log(item);
         await new Promise((resolve) => {
           resizer.imageFileResizer(
             item["file"],
@@ -45,14 +44,14 @@ export default async function updateProfileData(
       JSON.stringify({ ...updatedData, prevAvatar: avatar, prevBaner: baner })
     );
     const response = await fetch("https://localhost:443/update-profile", {
-      method: "POST",
+      method: "PUT",
       body: form,
     });
     if (!response.ok) return console.log(response.status);
     const obj = await response.json();
     const copy = { ...updatedData, ...obj };
     updateUserData(copy);
-    newLocation(`/${copy["nick"]}`);
+    newLocation(`/${hashName}`);
   } catch (err) {
     console.error(err);
   }

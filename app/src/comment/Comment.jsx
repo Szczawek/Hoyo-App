@@ -22,13 +22,14 @@ export default function Comment({ data }) {
       }}>
       <header className="showcase">
         <div className="container" onClick={(e) => e.stopPropagation()}>
-          <Link to={`/${data["nick"]}`}>
+          <Link to={`/${data["hashName"]}`}>
             <div className="info">
               <div className="avatar">
                 <img loading="lazy" src={data["avatar"]} alt="avatar" />
               </div>
               <div>
                 <h3 className="nick">{data["nick"]}</h3>
+                <h2 className="hashName">@{data["hashName"]}</h2>
                 <p className="date">
                   {data["date"] ? data["date"].split("T")[0] : null}
                 </p>
