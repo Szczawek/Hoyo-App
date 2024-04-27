@@ -10,8 +10,8 @@ export default defineConfig({
   },
   server: {
     https: {
-      key: 'key.key',
-      cert: 'cert.cert'
+      key:process.env.KEY_KEY,
+      cert:process.env.CERT_KEY
     }
   },
 });

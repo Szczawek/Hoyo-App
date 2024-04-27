@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { CommentFn } from "./Shelf";
 import { useNavigate } from "react-router-dom";
-export default function DeleteComment({ id, closeMenu, place }) {
-  const deleteComment = useContext(CommentFn);
+export default function DeleteComment({ id, closeMenu}) {
+  const { deleteComment, repliesFN } = useContext(CommentFn);
   const navigate = useNavigate();
   async function sendDeleteReq() {
     const options = {
@@ -22,6 +22,7 @@ export default function DeleteComment({ id, closeMenu, place }) {
       if (!deleteComment) return navigate(-1);
 
       deleteComment(id);
+      repliesFN("Delete")
     } catch (err) {
       throw Error(`There was an error while deleting a comment: ${err}`);
     }

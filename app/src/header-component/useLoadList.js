@@ -5,7 +5,7 @@ export default function useLoadList(value) {
   useEffect(() => {
     async function loadUserList() {
       try {
-        const res = await fetch("https://localhost:443/account-list");
+        const res = await fetch(`https://localhost:443/account-list`);
         if (!res.ok) return console.error(res.status);
         const obj = await res.json();
         setObj(obj);
@@ -25,5 +25,6 @@ export default function useLoadList(value) {
     if (findNick || findHashName) return true;
     return false;
   }
-  return obj.filter(filterUsers);
+  
+  return obj.filter(filterUsers).slice(0,5);
 }

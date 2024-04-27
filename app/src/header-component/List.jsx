@@ -7,7 +7,7 @@ export default function List({ value, fn }) {
   const list = useLoadList(value);
   const itemInList = useRef(null);
   const [currentItem, setCurrentItem] = useState(0);
-
+// console.log(list.length)w
   useEffect(() => {
     function focusItem(e) {
       if (value === "") return;
@@ -36,7 +36,7 @@ export default function List({ value, fn }) {
   if (!list.length || value === "") return <p className="empty">Nothing</p>;
   return (
     <ul className="list">
-      {list.slice(0, 5).map((data, index) => {
+      {list.map((data, index) => {
         return (
           <li key={index}>
             <Link
@@ -46,10 +46,10 @@ export default function List({ value, fn }) {
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   fn();
-                  navigate(`/${data["nick"]}`);
+                  navigate(`/${data["hashName"]}`);
                 }
               }}
-              to={`/${data["nick"]}`}>
+              to={`/${data["hashName"]}`}>
               <div className="avatar">
                 <img src={data["avatar"]} alt="avatar" />
               </div>

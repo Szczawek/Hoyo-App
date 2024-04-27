@@ -4,14 +4,14 @@ import { Link, useNavigate } from "react-router-dom";
 import Account from "../account/Account";
 import Window from "./Window";
 
-const Creator = memo(function Creator({ addComment, reply }) {
+const Creator = memo(function Creator({ addComment, reply, repliesFN }) {
   const [warning, setWarning] = useState(false);
   const [value, setValue] = useState("");
   const [validArea, setValidArea] = useState(false);
   const [loginWindow, setLoginWindow] = useState(false);
   const [expandMenu, setExpandMenu] = useState(false);
   const validation = useRef(null);
-  const { id, nick, avatar,hashName } = useContext(UserContext)["userData"];
+  const { id, nick, avatar, hashName } = useContext(UserContext)["userData"];
   const navigate = useNavigate();
   function setWindow() {
     setExpandMenu((prev) => !prev);
@@ -30,7 +30,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
       nick,
       content: value,
       reply,
-      hashName
+      hashName,
     };
     try {
       const res = await fetch("https://localhost:443/create-comment", {
@@ -43,6 +43,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
       if (!res.ok) return setWarning(true);
       const comment = await res.json();
       addComment(comment);
+      if (typeof repliesFN === "function") repliesFN("Add");
       setValue("");
     } catch (err) {
       throw Error(`Error wtih #CREATOR ${err}`);
@@ -53,7 +54,7 @@ const Creator = memo(function Creator({ addComment, reply }) {
     <div className="creator">
       <header className="intro">
         <div className="link">
-          <Link to={id ? `/${nick}` : "/empty-user"}>
+          <Link to={id ? `/${hashName}` : "/empty-user"}>
             <div className="avatar">
               <img src={avatar} alt="avatar" />
             </div>

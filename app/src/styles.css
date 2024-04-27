@@ -858,6 +858,7 @@ body {
 
 .avatar {
   display: grid;
+  align-items: center;
   border-radius: 50%;
   outline: 2px solid transparent;
   transition: filter 300ms;
@@ -1045,7 +1046,7 @@ button.confirm:is(:hover, :focus) {
   justify-content: space-between;
 }
 .comment .avatar {
-  max-width: 2.8rem;
+  max-width: 3rem;
 }
 .comment .nick {
   transition: color 300ms;
@@ -1129,7 +1130,8 @@ button.confirm:is(:hover, :focus) {
   fill: var(--contrast);
 }
 .comment .super .svg-parent svg {
-  width: 1.3rem;
+  width: 1.6rem;
+  padding: .1rem;
 }
 
 .comment .svg-parent {

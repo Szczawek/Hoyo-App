@@ -16,7 +16,7 @@ export default function Shelf(props) {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const loadingElemet = useRef(null);
-  const { creator, reply, type, id } = props;
+  const { creator, reply, type, id, repliesFN } = props;
 
   const addComment = useCallback((comment) => {
     setComments((prev) => [comment, ...prev]);
@@ -67,11 +67,17 @@ export default function Shelf(props) {
   if (warning) return <p className="dynamic-title">Error with comments</p>;
   return (
     <div className="shelf">
-      {creator && <Creator addComment={addComment} reply={reply} />}
-      <CommentFn.Provider value={deleteComment}>
+      {creator && (
+        <Creator addComment={addComment} reply={reply} repliesFN={repliesFN} />
+      )}
+      <CommentFn.Provider value={{ deleteComment, repliesFN }}>
         <Rendering loading={loading} comments={comments} />
       </CommentFn.Provider>
-      {loading && <p className="dynamic-title" ref={loadingElemet}>Loading...</p>}
+      {loading && (
+        <p className="dynamic-title" ref={loadingElemet}>
+          Loading...
+        </p>
+      )}
     </div>
   );
 }

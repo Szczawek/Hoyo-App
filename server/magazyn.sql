@@ -118,3 +118,6 @@ SET hashName = (
     FROM `user`
     WHERE user.id = user_comments.ownerID
 );
+
+
+SELECT nick, avatar,hashName FROM `user` LIMIT 5

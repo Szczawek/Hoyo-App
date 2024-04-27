@@ -34,9 +34,11 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
+      "https://stack-998d6.web.app",
+      "https://stack-998d6.firebaseapp.com",
       "https://localhost:5173",
       "https://resplendent-sable-c3ed12.netlify.app",
-      "https://stack-998d6.web.app",
+    
     ],
     credentials: true,
   })
@@ -465,8 +467,9 @@ app.get("/logged", async (req, res) => {
 });
 
 // Donwload ALL users
+// In the feature there will be an error with "LIMIT 100" and I will forget about it :D
 app.get("/account-list", (req, res) => {
-  const command = "SELECT nick, avatar,hashName FROM `user`";
+  const command = "SELECT nick, avatar,hashName FROM `user` LIMIT 100";
   db.query(command, function (err, users) {
     if (err) throw Error(`Error with database #users-list: ${err}`);
     res.json(users);
