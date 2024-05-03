@@ -123,4 +123,12 @@ SET hashName = (
 SELECT nick, avatar,hashName FROM `user` LIMIT 5
 
 
+
+UPDATE user set baner = "/images/baner.png"
+
 SELECT * FROM user
+
+
+SELECT * FROM user_comments
+
+UPDATE user_comments set avatar = "/images/user.svg"
