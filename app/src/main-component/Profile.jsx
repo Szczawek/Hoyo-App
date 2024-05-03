@@ -33,6 +33,7 @@ const Profile = memo(function Profile({ user }) {
       btn.current.disabled = false;
     }, 1000);
   }
+
   return (
     <section className="user">
       <div className="bg-img"></div>

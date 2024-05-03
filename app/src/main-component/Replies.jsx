@@ -5,34 +5,30 @@ import useFetchComment from "../comment/useFetchComment";
 import { Navigate, useParams } from "react-router-dom";
 export default function Replies() {
   const url = useParams();
-  const master = useFetchComment(url["id"]);
-  const [count,setCount] = useState(0)
+  const [count, setCount] = useState(true);
+  const master = useFetchComment(url["id"], count);
   if (!master) return <Navigate to={"/news"} />;
-  
-  const num = useMemo(() => {
-    return master["replies"];
-  }, [master]);
-  
+
+  // To change
   function changeRepliesNO(type) {
-    switch (type) {
-      case "Add":
-        console.log("Add");
-        setCount(prev => prev + 1)
-        break;
-      case "Delete":
-        console.log("delete");
-        setCount(prev => prev -1)
-        break;
-    }
+    setCount((prev) => !prev);
+    // switch (type) {
+    //   case "Add":
+    //     console.log("Add");
+    //     setCount((prev) => prev + 1);
+    //     break;
+    //   case "Delete":
+    //     console.log("delete");
+    //     setCount((prev) => prev - 1);
+    //     break;
+    // }
   }
-  console.log(count,"check  ")
-  // console.log(num)
   return (
     <div className="replies">
       {Array.isArray(master) ? (
         <p className="dynamic-title">loading...</p>
       ) : (
-        <Comment key={master["date"]} replies={num} data={master} />
+        <Comment key={master["date"]} replies={count} data={master} />
       )}
       <Shelf
         creator={true}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function useFetchComment(id) {
+export default function useFetchComment(id, count) {
   const [comment, setComment] = useState([]);
   useEffect(() => {
     async function loadMaster() {
@@ -20,7 +20,7 @@ export default function useFetchComment(id) {
       }
     }
     loadMaster();
-  }, [id]);
+  }, [id, count]);
 
   return comment;
 }

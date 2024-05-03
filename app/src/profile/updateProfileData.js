@@ -43,11 +43,12 @@ export default async function updateProfileData(
       "data",
       JSON.stringify({ ...updatedData, prevAvatar: avatar, prevBaner: baner })
     );
-    const response = await fetch("https://localhost:443/update-profile", {
+    const response = await fetch("https://localhost:443/test", {
       method: "PUT",
       body: form,
     });
     if (!response.ok) return console.log(response.status);
+    console.log("ok");
     const obj = await response.json();
     const copy = { ...updatedData, ...obj };
     updateUserData(copy);

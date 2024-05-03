@@ -3,13 +3,22 @@ import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import "dotenv/config";
-import fs from "fs";
+import fs, { link } from "fs";
 import https from "https";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
+import { fireApp } from "./fireConfig.js";
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smtp.ethereal.email",
@@ -38,7 +47,6 @@ app.use(
       "https://stack-998d6.firebaseapp.com",
       "https://localhost:5173",
       "https://resplendent-sable-c3ed12.netlify.app",
-    
     ],
     credentials: true,
   })
@@ -68,7 +76,8 @@ const storage = multer.diskStorage({
 
 // picture size limit
 const upload = multer({
-  storage: storage,
+  // storage: storage,
+  storage: multer.memoryStorage(),
   limits: {
     fieldSize: 1024 * 1024 * 10,
   },
@@ -515,7 +524,7 @@ app.put("/update-profile", donwloadFileFN, async (req, res) => {
   const value = [about, nick];
   const newFile = [avatar, baner];
   try {
-    [prevAvatar, prevBaner].forEach((e, index) => {
+    [(prevAvatar, prevBaner)].forEach((e, index) => {
       if (!newFile[index]) return value.push(e);
       value.push(`/users-pictures/${newFile[index][0]["filename"]}`);
       if (e === "/images/baner.png" || e === "/images/user.svg") return;
@@ -538,6 +547,63 @@ app.put("/update-profile", donwloadFileFN, async (req, res) => {
   }
 });
 
+app.put("/test", donwloadFileFN, async (req, res) => {
+  try {
+    const { avatar, baner } = req.files;
+    const { nick, about, id, prevAvatar, prevBaner } = JSON.parse(
+      req.body["data"]
+    );
+
+    const value = [about, nick];
+    const newFile = [avatar, baner];
+    const prevImage = [prevAvatar, prevBaner];
+    delete req.files;
+    for (let i = 0; i < 2; i++) {
+      await manageFiles(prevImage[i], i);
+    }
+    async function manageFiles(e, index) {
+      try {
+        if (!newFile[index]) return value.push(e);
+        const metadata = {
+          contentType: newFile[index][0]["mimetype"],
+        };
+        const storage = getStorage(fireApp);
+        const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
+        const imgLocation = ref(storage, `users_pictures/${fileName}`);
+        const imgToBlob = new Blob([newFile[index][0]["buffer"]], metadata);
+        await uploadBytes(imgLocation, imgToBlob, metadata);
+        const linkToImg = await getDownloadURL(imgLocation);
+        value.push(linkToImg);
+        if (e === "/images/baner.png" || e === "/images/user.svg") return;
+        const imgToDelete = ref(storage, e);
+        const statusDeletingImg = await deleteObject(imgToDelete);
+        console.log(statusDeletingImg);
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    //   // value.push(`/users-pictures/${newFile[index][0]["filename"]}`);
+    //   // if (e === "/images/baner.png" || e === "/images/user.svg") return;
+    //   // fs.unlink(`../app/public/${e}`, (err) => {
+    //   //   if (err) throw Error(err);
+    //   // });
+    // });
+
+    const updateAccount = `UPDATE user set about =?, nick =?, avatar =?, baner =? where id = ?`;
+    db.query(updateAccount, [...value, id], (err) => {
+      if (err) throw Error(`Error with database #update-profile: ${err}`);
+      const commandTwo = `UPDATE user_comments set nick=?,avatar =? where ownerID = ?`;
+      db.query(commandTwo, [nick, value.slice(2, 3), id], (err) => {
+        if (err)
+          throw Error(`Erorr with database #update-profile-commets: ${err}`);
+        res.json({ avatar: value[2], baner: value[3] });
+      });
+    });
+  } catch (err) {
+    throw err;
+  }
+});
 // add/remove follow
 app.post("/follow", (req, res) => {
   function deleteFollow(e) {

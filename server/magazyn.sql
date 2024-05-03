@@ -121,3 +121,6 @@ SET hashName = (
 
 
 SELECT nick, avatar,hashName FROM `user` LIMIT 5
+
+
+SELECT * FROM user
