@@ -3,7 +3,7 @@ import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import "dotenv/config";
-import fs, { link } from "fs";
+import fs from "fs";
 import https from "https";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
@@ -18,6 +18,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
+import rateLimit from "express-rate-limit";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -36,6 +37,17 @@ const options = {
   cert: process.env.CERT_KEY,
 };
 
+// All expensive endpoint
+const pathToSkip = ["/create-comment","/confirm-code","/update-profile"];
+
+const limit = rateLimit({
+  windowMs: 1000 * 60 * 15,
+  max: 1,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  skip: (req) => !pathToSkip.includes(req.url),
+});
+
 const PORT = 443;
 const app = express();
 app.use(express.json());
@@ -51,6 +63,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(limit);
 
 const server = https.createServer(options, app);
 
@@ -514,40 +527,7 @@ const donwloadFileFN = upload.fields([
   { name: "baner", maxCount: 1, optionals: true },
 ]);
 
-// Edit Profile Data(nick,baner,avatar,about)
 app.put("/update-profile", donwloadFileFN, async (req, res) => {
-  const { avatar, baner } = req.files;
-  const { nick, about, id, prevAvatar, prevBaner } = JSON.parse(
-    req.body["data"]
-  );
-
-  const value = [about, nick];
-  const newFile = [avatar, baner];
-  try {
-    [(prevAvatar, prevBaner)].forEach((e, index) => {
-      if (!newFile[index]) return value.push(e);
-      value.push(`/users-pictures/${newFile[index][0]["filename"]}`);
-      if (e === "/images/baner.png" || e === "/images/user.svg") return;
-      fs.unlink(`../app/public/${e}`, (err) => {
-        if (err) throw Error(err);
-      });
-    });
-    const updateAccount = `UPDATE user set about =?, nick =?, avatar =?, baner =? where id = ?`;
-    db.query(updateAccount, [...value, id], (err) => {
-      if (err) throw Error(`Error with database #update-profile: ${err}`);
-      const commandTwo = `UPDATE user_comments set nick=?,avatar =? where ownerID = ?`;
-      db.query(commandTwo, [nick, value.slice(2, 3), id], (err) => {
-        if (err)
-          throw Error(`Erorr with database #update-profile-commets: ${err}`);
-        res.json({ avatar: value[2], baner: value[3] });
-      });
-    });
-  } catch (err) {
-    throw err;
-  }
-});
-
-app.put("/test", donwloadFileFN, async (req, res) => {
   try {
     const { avatar, baner } = req.files;
     const { nick, about, id, prevAvatar, prevBaner } = JSON.parse(

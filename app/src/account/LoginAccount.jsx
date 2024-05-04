@@ -24,7 +24,6 @@ export default function LoginAccount() {
           setWarningMessage(true);
           return;
         }
-        alert("You have logged into your account!");
         window.location.reload();
       })
       .catch((err) => {

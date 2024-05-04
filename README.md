@@ -15,11 +15,8 @@ W replies jest, hook count i diziała to na zasadzie, dodanie komentarze dodaje 
 # Likes/Comments number
 dodać do nich usuwanie poprzedniej animacji przy spamowaniu
 
+# zwiększyć jakość zdjęć z banerów w profile 
 
-# Optymalizacja 
-dodać do EditProfile funckję, która nie aktualizuje zdjęć kiedy nie są różne, ale nie robić tego w taki spobób jak poprzednio.
+# ograniczenie/zabezpieczenie API 
 
-
-# Tip 
-Zmienianie zdjęć w innym profilu niż nowy/ma zapisane zdjęcia w firebase, spowoduję błąd.
-Nie chce mi się przeżucać zdjęć na firebase. I will do it leater!
+Dodać do pathToSkip w server wszystkie endpointy , które stanowią obciążenie dla strony. Jak również koszty!
