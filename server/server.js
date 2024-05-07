@@ -96,7 +96,7 @@ const upload = multer({
   },
 });
 
-app.get("/", (req, res) => {
+app.get("/test", (req, res) => {
   res.send("Szczawik");
 });
 
