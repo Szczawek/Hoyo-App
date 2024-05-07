@@ -38,11 +38,11 @@ const options = {
 };
 
 // All expensive endpoint
-const pathToSkip = ["/create-comment","/confirm-code","/update-profile"];
+const pathToSkip = ["/create-comment", "/confirm-code", "/update-profile"];
 
 const limit = rateLimit({
   windowMs: 1000 * 60 * 15,
-  max: 1,
+  max: 10,
   standardHeaders: "draft-7",
   legacyHeaders: false,
   skip: (req) => !pathToSkip.includes(req.url),
@@ -94,6 +94,10 @@ const upload = multer({
   limits: {
     fieldSize: 1024 * 1024 * 10,
   },
+});
+
+app.get("/", (req, res) => {
+  res.send("Szczawik");
 });
 
 // create comment
