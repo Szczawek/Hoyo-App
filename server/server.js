@@ -3,7 +3,7 @@ import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import "dotenv/config";
-import fs from "fs";
+import helmet from "helmet";
 import https from "https";
 import CryptoJS from "crypto-js";
 import cookieParser from "cookie-parser";
@@ -64,9 +64,21 @@ app.use(
   })
 );
 app.use(limit);
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: [
+        "'self'",
+        "https://stack-998d6.firebaseapp.com",
+        "https://hoyo-app-a5efd4021045.herokuapp.com",
+        "stack-998d6.web.app",
+        "https://localhost:5173",
+      ],
+    },
+  })
+);
 
 const server = https.createServer(options, app);
-
 // connecting to a database
 const db = mysql.createConnection({
   host: "localhost",
