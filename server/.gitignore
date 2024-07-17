@@ -15,7 +15,7 @@ dist-ssr
 **/*.cert
 **/*.key
 *.pem
-
+.sql
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
