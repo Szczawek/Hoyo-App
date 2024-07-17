@@ -125,7 +125,7 @@ app.post("/create-comment", (req, res) => {
     reply ? reply : null,
   ];
   const command =
-    "INSERT INTO user_comments(`ownerID`, nick , avatar , content, hashName ,date ,reply) VALUES(?,?,?,?,?,?,?)";
+    "INSERT INTO user_comments(`ownerID`, nick , avatar , content,hashName ,date ,reply) VALUES(?,?,?,?,?,?,?)";
   db.query(command, value, (err) => {
     if (err) throw Error(`Error with database #create-comment: ${err}`);
     const lastComment = "SELECT * FROM user_comments ORDER BY id DESC LIMIT 1";
