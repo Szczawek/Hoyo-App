@@ -8,16 +8,16 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-public
-public*/
-.firebase
 dist
 dist-ssr
+/.sql
+*.sql
 *.local
 *.env
 **/*.cert
 **/*.key
 *.pem
+public
 
 # Editor directories and files
 .vscode/*
